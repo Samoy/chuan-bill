@@ -60,7 +60,7 @@ public class User implements Serializable {
      * 性别，0未知，1男，2女
      */
     @TableField("gender")
-    private Boolean gender;
+    private Byte gender;
 
     /**
      * 状态，0禁用，1启用
