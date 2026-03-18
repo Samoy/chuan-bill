@@ -17,7 +17,6 @@ public class SystemConstants {
      */
     public static final Integer CODE_EXPIRE_TIME = 5 * 60;
 
-
     /**
      * 用户正常状态
      */

@@ -1,9 +1,9 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import com.samoy.chuanbillserver.entity.Category;
-import com.samoy.chuanbillserver.dao.CategoryMapper;
-import com.samoy.chuanbillserver.service.ICategoryService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.dao.CategoryMapper;
+import com.samoy.chuanbillserver.entity.Category;
+import com.samoy.chuanbillserver.service.ICategoryService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,4 @@ import org.springframework.stereotype.Service;
  * @since 2026-03-14
  */
 @Service
-public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements ICategoryService {
-
-}
+public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements ICategoryService {}

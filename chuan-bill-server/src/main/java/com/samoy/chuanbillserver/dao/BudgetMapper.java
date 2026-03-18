@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.Budget;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface BudgetMapper extends BaseMapper<Budget> {
-
-}
+public interface BudgetMapper extends BaseMapper<Budget> {}

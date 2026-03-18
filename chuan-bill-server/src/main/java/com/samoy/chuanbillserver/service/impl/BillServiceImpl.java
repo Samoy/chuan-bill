@@ -1,9 +1,9 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import com.samoy.chuanbillserver.entity.Bill;
-import com.samoy.chuanbillserver.dao.BillMapper;
-import com.samoy.chuanbillserver.service.IBillService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.dao.BillMapper;
+import com.samoy.chuanbillserver.entity.Bill;
+import com.samoy.chuanbillserver.service.IBillService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,4 @@ import org.springframework.stereotype.Service;
  * @since 2026-03-14
  */
 @Service
-public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IBillService {
-
-}
+public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IBillService {}

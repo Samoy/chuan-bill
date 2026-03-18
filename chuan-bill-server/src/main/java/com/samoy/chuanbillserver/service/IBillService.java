@@ -1,7 +1,7 @@
 package com.samoy.chuanbillserver.service;
 
-import com.samoy.chuanbillserver.entity.Bill;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.samoy.chuanbillserver.entity.Bill;
 
 /**
  * <p>
@@ -11,6 +11,4 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface IBillService extends IService<Bill> {
-
-}
+public interface IBillService extends IService<Bill> {}

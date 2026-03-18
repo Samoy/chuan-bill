@@ -11,5 +11,4 @@ public class ChuanBillServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(ChuanBillServerApplication.class, args);
     }
-
 }

@@ -7,7 +7,7 @@ public enum ResultEnum {
     // 成功状态码
     SUCCESS(200, "操作成功"),
 
-    //客户端错误 4xx
+    // 客户端错误 4xx
     BAD_REQUEST(400, "请求参数错误"),
     UNAUTHORIZED(401, "请求未授权"),
     FORBIDDEN(403, "请求被拒绝"),
@@ -15,7 +15,6 @@ public enum ResultEnum {
     METHOD_NOT_ALLOWED(405, "请求方法不允许"),
     UNPROCESSABLE_ENTITY(422, "请求参数校验失败"),
     TOO_MANY_REQUESTS(429, "请求过于频繁"),
-
 
     // 服务器错误 5xx
     ERROR(500, "服务器内部错误"),
@@ -39,10 +38,7 @@ public enum ResultEnum {
     BILL_NOT_ALLOW_VIEW(2002, "无权查看此账单"),
     BILL_NOT_ALLOW_UPDATE(2003, "无权修改此账单"),
     BILL_NOT_ALLOW_DELETE(2004, "无权删除此账单"),
-
-
     ;
-
 
     private final Integer code;
     private final String message;

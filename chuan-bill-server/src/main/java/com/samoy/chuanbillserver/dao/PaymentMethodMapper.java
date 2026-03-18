@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.PaymentMethod;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface PaymentMethodMapper extends BaseMapper<PaymentMethod> {
-
-}
+public interface PaymentMethodMapper extends BaseMapper<PaymentMethod> {}

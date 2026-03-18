@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.Bill;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface BillMapper extends BaseMapper<Bill> {
-
-}
+public interface BillMapper extends BaseMapper<Bill> {}

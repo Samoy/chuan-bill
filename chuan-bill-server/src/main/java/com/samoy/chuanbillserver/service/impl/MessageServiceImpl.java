@@ -1,9 +1,9 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import com.samoy.chuanbillserver.entity.Message;
-import com.samoy.chuanbillserver.dao.MessageMapper;
-import com.samoy.chuanbillserver.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.dao.MessageMapper;
+import com.samoy.chuanbillserver.entity.Message;
+import com.samoy.chuanbillserver.service.IMessageService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,4 @@ import org.springframework.stereotype.Service;
  * @since 2026-03-14
  */
 @Service
-public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
-
-}
+public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {}

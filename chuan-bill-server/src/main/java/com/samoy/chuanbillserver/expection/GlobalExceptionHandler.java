@@ -46,5 +46,4 @@ public class GlobalExceptionHandler {
         log.info("系统异常: {}", e.getMessage(), e);
         return Result.error("系统异常，请稍后再试");
     }
-
 }

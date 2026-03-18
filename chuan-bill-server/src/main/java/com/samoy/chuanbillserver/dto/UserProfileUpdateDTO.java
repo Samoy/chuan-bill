@@ -8,12 +8,9 @@ import lombok.Data;
 public class UserProfileUpdateDTO {
     private String userId;
 
-
-    @Size(max = 50, message = "昵称长度不能超过50个字符")
-    private String nickname;
+    @Size(max = 50, message = "昵称长度不能超过50个字符") private String nickname;
 
     private String avatar;
 
-    @Pattern(regexp = "^[0-2]$", message = "性别必须是0、1或2")
-    private Byte gender;
+    @Pattern(regexp = "^[0-2]$", message = "性别必须是0、1或2") private Byte gender;
 }

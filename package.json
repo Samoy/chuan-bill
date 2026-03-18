@@ -1,0 +1,28 @@
+{
+  "name": "chuan-bill",
+  "version": "1.0.0",
+  "description": "小川记账",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky",
+    "start:frontend": "cd chuan-bill-app && npm run dev && cd ..",
+    "start:backend": "cd chuan-bill-server && ./mvnw spring-boot:run && cd ..",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "lint:frontend": "cd chuan-bill-app && npm run lint && cd ..",
+    "lint:backend": "cd chuan-bill-server && ./mvnw spotless:check && cd ..",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend:fix": "cd chuan-bill-app && npm run lint:fix && cd ..",
+    "lint:backend:fix": "cd chuan-bill-server && ./mvnw spotless:apply && cd ..",
+    "lint:fix": "npm run lint:frontend:fix && npm run lint:backend:fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0",
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7"
+  }
+}

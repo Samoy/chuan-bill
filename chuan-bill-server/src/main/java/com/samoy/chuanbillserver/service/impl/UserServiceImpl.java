@@ -6,23 +6,22 @@ import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.constant.SystemConstants;
+import com.samoy.chuanbillserver.dao.UserMapper;
 import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.entity.User;
-import com.samoy.chuanbillserver.dao.UserMapper;
 import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IUserService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;
 import com.samoy.chuanbillserver.vo.TokenVO;
 import com.samoy.chuanbillserver.vo.UserVO;
 import jakarta.annotation.Resource;
+import java.time.LocalDateTime;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -167,14 +166,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     private User getByPhone(String phone) {
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<User>();
-        queryWrapper.eq(User::getPhone, phone)
-                .eq(User::getStatus, SystemConstants.USER_STATUS_NORMAL);
+        queryWrapper.eq(User::getPhone, phone).eq(User::getStatus, SystemConstants.USER_STATUS_NORMAL);
         return this.getOne(queryWrapper);
     }
 
-
-    @NotNull
-    private TokenVO genTokenVO(User user) {
+    @NotNull private TokenVO genTokenVO(User user) {
         // 更新用户最后登录时间
         user.setLastLoginTime(LocalDateTime.now());
         updateById(user);

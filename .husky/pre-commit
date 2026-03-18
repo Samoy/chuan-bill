@@ -1,0 +1,10 @@
+# 前端代码检测
+cd chuan-bill-app
+npx lint-staged --allow-empty $1
+cd ..
+
+# 后端代码检测
+cd chuan-bill-server
+chmod +x ./mvnw
+./mvnw spotless:apply --quiet
+cd ..

@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.FamilyJoinApply;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface FamilyJoinApplyMapper extends BaseMapper<FamilyJoinApply> {
-
-}
+public interface FamilyJoinApplyMapper extends BaseMapper<FamilyJoinApply> {}

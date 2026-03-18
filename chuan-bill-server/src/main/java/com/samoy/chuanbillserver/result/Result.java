@@ -36,10 +36,7 @@ public class Result<T> {
     }
 
     public static <T> Result<T> error(Integer code, String message) {
-        return new Result<T>()
-                .setCode(code)
-                .setMessage(message)
-                .setTimestamp(System.currentTimeMillis());
+        return new Result<T>().setCode(code).setMessage(message).setTimestamp(System.currentTimeMillis());
     }
 
     public static <T> Result<T> error(ResultEnum resultEnum) {

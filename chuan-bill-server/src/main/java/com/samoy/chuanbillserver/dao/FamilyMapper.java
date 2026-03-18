@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.Family;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface FamilyMapper extends BaseMapper<Family> {
-
-}
+public interface FamilyMapper extends BaseMapper<Family> {}

@@ -1,9 +1,9 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import com.samoy.chuanbillserver.entity.FamilyJoinApply;
-import com.samoy.chuanbillserver.dao.FamilyJoinApplyMapper;
-import com.samoy.chuanbillserver.service.IFamilyJoinApplyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.dao.FamilyJoinApplyMapper;
+import com.samoy.chuanbillserver.entity.FamilyJoinApply;
+import com.samoy.chuanbillserver.service.IFamilyJoinApplyService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,5 @@ import org.springframework.stereotype.Service;
  * @since 2026-03-14
  */
 @Service
-public class FamilyJoinApplyServiceImpl extends ServiceImpl<FamilyJoinApplyMapper, FamilyJoinApply> implements IFamilyJoinApplyService {
-
-}
+public class FamilyJoinApplyServiceImpl extends ServiceImpl<FamilyJoinApplyMapper, FamilyJoinApply>
+        implements IFamilyJoinApplyService {}

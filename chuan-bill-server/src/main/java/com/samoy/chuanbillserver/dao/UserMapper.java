@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.User;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface UserMapper extends BaseMapper<User> {
-
-}
+public interface UserMapper extends BaseMapper<User> {}

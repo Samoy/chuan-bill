@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.Message;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface MessageMapper extends BaseMapper<Message> {
-
-}
+public interface MessageMapper extends BaseMapper<Message> {}

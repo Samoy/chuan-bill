@@ -11,6 +11,4 @@ import com.samoy.chuanbillserver.entity.Category;
  * @author Samoy
  * @since 2026-03-14
  */
-public interface CategoryMapper extends BaseMapper<Category> {
-
-}
+public interface CategoryMapper extends BaseMapper<Category> {}
