@@ -4,11 +4,11 @@ import cn.dev33.satoken.exception.NotLoginException;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**

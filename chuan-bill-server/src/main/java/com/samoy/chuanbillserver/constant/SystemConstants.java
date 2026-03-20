@@ -13,9 +13,9 @@ public class SystemConstants {
     public static final String CODE_CACHE_KEY_PREFIX = "sms:code:";
 
     /**
-     * 验证码缓存过期时间(秒)
+     * 验证码缓存过期时间(秒) --- 5分钟
      */
-    public static final Integer CODE_EXPIRE_TIME = 5 * 600;
+    public static final Integer CODE_EXPIRE_TIME = 5 * 60;
 
     /**
      * 用户正常状态

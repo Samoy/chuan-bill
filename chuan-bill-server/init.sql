@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `t_user`
     `phone`           VARCHAR(11)             NOT NULL COMMENT '手机号',
     `password`        VARCHAR(128)                     DEFAULT NULL COMMENT '密码',
     `nickname`        VARCHAR(64)             NOT NULL COMMENT '昵称',
-    `avatar`          VARCHAR(512)            NOT NULL COMMENT '头像',
+    `avatar`          VARCHAR(512)                     DEFAULT NULL COMMENT '头像',
     `gender`          TINYINT(1)                       DEFAULT 0 COMMENT '性别，0未知，1男，2女',
     `status`          TINYINT(1)                       DEFAULT 1 COMMENT '状态，0禁用，1启用',
     `last_login_time` DATETIME                         DEFAULT NULL COMMENT '最后登录时间',
