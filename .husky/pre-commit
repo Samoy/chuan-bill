@@ -5,6 +5,5 @@ cd ..
 
 # 后端代码检测
 cd chuan-bill-server
-chmod +x ./mvnw
 ./mvnw spotless:apply --quiet
 cd ..

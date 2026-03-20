@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "start:frontend": "cd chuan-bill-app && npm run dev && cd ..",
-    "start:backend": "cd chuan-bill-server && ./mvnw spring-boot:run && cd ..",
+    "start:backend": "cd chuan-bill-server && mvn spring-boot:run && cd ..",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "lint:frontend": "cd chuan-bill-app && npm run lint && cd ..",
     "lint:backend": "cd chuan-bill-server && ./mvnw spotless:check && cd ..",

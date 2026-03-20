@@ -15,7 +15,7 @@ public class SystemConstants {
     /**
      * 验证码缓存过期时间(秒)
      */
-    public static final Integer CODE_EXPIRE_TIME = 5 * 60;
+    public static final Integer CODE_EXPIRE_TIME = 5 * 600;
 
     /**
      * 用户正常状态
