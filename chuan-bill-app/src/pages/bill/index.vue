@@ -1,9 +1,9 @@
 <script setup lang="ts">
 definePage({
-  name: 'home',
+  name: 'bill',
   layout: 'tabbar',
   style: {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: '账单',
   },
 })
 </script>

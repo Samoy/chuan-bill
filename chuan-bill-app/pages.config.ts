@@ -30,7 +30,13 @@ export default defineUniPages({
     backgroundColor: '@tabBgColor',
     borderStyle: '@tabBorderStyle',
     list: [{
-      pagePath: 'pages/index/index',
+      pagePath: 'pages/bill/index',
+    }, {
+      pagePath: 'pages/family/index',
+    }, {
+      pagePath: 'pages/statistics/index',
+    }, {
+      pagePath: 'pages/mine/index',
     }],
   },
 })

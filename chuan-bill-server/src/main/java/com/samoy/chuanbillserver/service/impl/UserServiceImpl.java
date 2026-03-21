@@ -1,9 +1,9 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.PhoneUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public TokenVO loginByPassword(LoginByPasswordDTO loginDTO) {
-        if (StrUtil.isBlank(loginDTO.getPhone()) || StrUtil.isBlank(loginDTO.getPassword())) {
+        if (CharSequenceUtil.isBlank(loginDTO.getPhone()) || CharSequenceUtil.isBlank(loginDTO.getPassword())) {
             throw new BusinessException(ResultEnum.PHONE_OR_PASSWORD_MISSING);
         }
         // 查询用户
@@ -62,7 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public TokenVO loginByPhone(LoginByPhoneDTO loginDTO) {
-        if (StrUtil.isBlank(loginDTO.getPhone())) {
+        if (CharSequenceUtil.isBlank(loginDTO.getPhone())) {
             throw new BusinessException(ResultEnum.PHONE_MISSING);
         }
         // 验证验证码
@@ -84,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public boolean updatePassWordByOld(UpdatePasswordByOldDTO updateDTO) {
-        if (StrUtil.isBlank(updateDTO.getOldPassword()) || StrUtil.isBlank(updateDTO.getNewPassword())) {
+        if (CharSequenceUtil.isBlank(updateDTO.getOldPassword()) || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
             throw new BusinessException(ResultEnum.PASSWORD_MISSING);
         }
         User user = getById(updateDTO.getUserId());
@@ -105,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public boolean updatePassWordByCode(UpdatePasswordByCodeDTO updateDTO) {
-        if (StrUtil.isBlank(updateDTO.getPhone()) || StrUtil.isBlank(updateDTO.getNewPassword())) {
+        if (CharSequenceUtil.isBlank(updateDTO.getPhone()) || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
             throw new BusinessException(ResultEnum.PHONE_OR_PASSWORD_MISSING);
         }
 
@@ -130,10 +130,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
         }
         // 更新用户信息
-        if (!StrUtil.isBlank(user.getNickname())) {
+        if (!CharSequenceUtil.isBlank(user.getNickname())) {
             user.setNickname(updateDTO.getNickname());
         }
-        if (!StrUtil.isBlank(user.getAvatar())) {
+        if (!CharSequenceUtil.isBlank(user.getAvatar())) {
             user.setAvatar(updateDTO.getAvatar());
         }
         if (!ObjectUtil.isEmpty(user.getGender())) {
@@ -165,7 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     private User getByPhone(String phone) {
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<User>();
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getPhone, phone).eq(User::getStatus, SystemConstants.USER_STATUS_NORMAL);
         return this.getOne(queryWrapper);
     }

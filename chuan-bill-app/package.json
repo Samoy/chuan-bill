@@ -93,6 +93,7 @@
     "@dcloudio/uni-vue-devtools": "3.0.0-4020420240722002",
     "@dcloudio/vite-plugin-uni": "3.0.0-4080520251106001",
     "@iconify-json/carbon": "^1.1.37",
+    "@iconify-json/lucide": "^1.2.98",
     "@mini-types/alipay": "^3.0.14",
     "@types/node": "^20.16.2",
     "@uni-helper/eslint-config": "^0.5.0",

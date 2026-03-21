@@ -18,6 +18,7 @@ import com.samoy.chuanbillserver.service.ICategoryService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
 import com.samoy.chuanbillserver.vo.BillVO;
 import jakarta.annotation.Resource;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -93,7 +95,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
                 .map(Bill::getCategoryId)
                 .filter(Objects::nonNull)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Map<String, Category> categoryMap;
         if (!categoryIds.isEmpty()) {
@@ -109,7 +111,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
                 .map(Bill::getPaymentMethodId)
                 .filter(Objects::nonNull)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Map<String, PaymentMethod> paymentMethodMap;
         if (!paymentMethodIds.isEmpty()) {
