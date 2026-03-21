@@ -33,3 +33,4 @@ build/
 
 ### Security Files ###
 src/main/java/com/samoy/chuanbillserver/utils/MybatisCodeGeneration.java
+.env
