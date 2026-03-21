@@ -6,5 +6,17 @@ cd ..
 
 # 后端代码检测
 cd chuan-bill-server
-mvn spotless:apply --quiet
+if mvn spotless:check --quiet; then
+  echo "Spotless passed."
+else
+  echo "Spotless check failed, trying automatic fix..."
+  mvn spotless:apply --quiet
+  if mvn spotless:check --quiet; then
+    echo "Spotless automatic fix successful. Updating staging area and continuing commit..."
+    git add .
+  else
+    printf "\033[31m[Error]\033[0m Spotless check failed even after automatic fix. Please review the issues and fix them manually before committing.\n"
+    exit 1
+  fi
+fi
 cd ..
