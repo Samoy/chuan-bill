@@ -84,7 +84,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public boolean updatePassWordByOld(UpdatePasswordByOldDTO updateDTO) {
-        if (CharSequenceUtil.isBlank(updateDTO.getOldPassword()) || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
+        if (CharSequenceUtil.isBlank(updateDTO.getOldPassword())
+                || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
             throw new BusinessException(ResultEnum.PASSWORD_MISSING);
         }
         User user = getById(updateDTO.getUserId());
