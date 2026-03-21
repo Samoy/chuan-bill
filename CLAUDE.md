@@ -24,8 +24,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm alova-gen` -- Regenerate API definitions from OpenAPI spec
 
 ### Backend (chuan-bill-server/)
-- `./mvnw spring-boot:run` -- Run server
-- `./mvnw spotless:check` / `./mvnw spotless:apply` -- Code formatting
+- `mvn spring-boot:run` -- Run server
+- `mvn spotless:check` / `mvn spotless:apply` -- Code formatting
 
 ## Architecture
 

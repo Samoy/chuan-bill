@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 # 前端代码检测
 cd chuan-bill-app
 npx lint-staged --allow-empty $1
@@ -5,5 +6,5 @@ cd ..
 
 # 后端代码检测
 cd chuan-bill-server
-./mvnw spotless:apply --quiet
+mvn spotless:apply --quiet
 cd ..

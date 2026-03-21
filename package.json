@@ -9,10 +9,10 @@
     "start:backend": "cd chuan-bill-server && mvn spring-boot:run && cd ..",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "lint:frontend": "cd chuan-bill-app && npm run lint && cd ..",
-    "lint:backend": "cd chuan-bill-server && ./mvnw spotless:check && cd ..",
+    "lint:backend": "cd chuan-bill-server && mvn spotless:check && cd ..",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend:fix": "cd chuan-bill-app && npm run lint:fix && cd ..",
-    "lint:backend:fix": "cd chuan-bill-server && ./mvnw spotless:apply && cd ..",
+    "lint:backend:fix": "cd chuan-bill-server && mvn spotless:apply && cd ..",
     "lint:fix": "npm run lint:frontend:fix && npm run lint:backend:fix"
   },
   "keywords": [],
