@@ -6,10 +6,15 @@ onLaunch(() => {})
 .page-wraper {
   min-height: calc(100vh - var(--window-top));
   box-sizing: border-box;
-  background: #f9f9f9;
+  background: #faf8fc;
 }
 
 .wot-theme-dark.page-wraper {
   background: #222;
+}
+
+:root,
+page {
+  --wot-segmented-padding: 6px;
 }
 </style>

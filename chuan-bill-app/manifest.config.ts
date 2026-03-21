@@ -10,7 +10,7 @@
 import { defineManifestConfig } from '@uni-helper/vite-plugin-uni-manifest'
 
 export default defineManifestConfig({
-  'name': 'wot-starter',
+  'name': 'chuan-bill-app',
   'appid': '__UNI__1208592',
   'description': '',
   'versionName': '1.0.0',
