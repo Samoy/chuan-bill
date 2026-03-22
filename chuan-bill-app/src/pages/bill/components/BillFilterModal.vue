@@ -125,7 +125,7 @@ function handleClose() {
     v-model="showPopup"
     position="bottom"
     :close-on-click-modal="true"
-    custom-style="border-radius: 24px 24px 0 0; overflow: hidden;"
+    custom-class="!rounded-3xl !rounded-b-none"
     @close="handleClose"
   >
     <view class="filter-modal">
@@ -133,14 +133,17 @@ function handleClose() {
       <view class="drag-indicator" />
 
       <!-- 标题栏 -->
-      <view class="filter-header">
-        <view class="header-content">
-          <view class="i-lucide:sliders-horizontal header-icon" />
-          <text class="filter-title">
+      <view class="flex items-center justify-between px-5 py-4">
+        <view class="flex items-center gap-2.5">
+          <view class="i-lucide:sliders-horizontal text-primary text-lg" />
+          <text class="text-base text-[var(--wot-font-color)] font-semibold">
             筛选条件
           </text>
         </view>
-        <view class="i-lucide:x filter-close" @click="handleClose" />
+        <view
+          class="i-lucide:x rounded-lg bg-[var(--wot-background-2)] p-2 text-lg text-[var(--wot-font-color-secondary)] transition-transform active:scale-90"
+          @click="handleClose"
+        />
       </view>
 
       <!-- 筛选表单 -->
@@ -148,8 +151,8 @@ function handleClose() {
         <!-- 账单类型 - Pill式选择器 -->
         <view class="filter-card">
           <view class="card-header">
-            <view class="i-lucide:tag card-icon" />
-            <text class="card-label">
+            <view class="i-lucide:tag text-primary" />
+            <text class="text-sm text-[var(--wot-font-color)] font-semibold">
               账单类型
             </text>
           </view>
@@ -170,8 +173,8 @@ function handleClose() {
         <!-- 分类选择 -->
         <view class="filter-card">
           <view class="card-header">
-            <view class="i-lucide:folder-tree card-icon" />
-            <text class="card-label">
+            <view class="i-lucide:folder-tree text-primary" />
+            <text class="text-sm text-[var(--wot-font-color)] font-semibold">
               分类
             </text>
           </view>
@@ -179,15 +182,15 @@ function handleClose() {
             v-model="tempFilters.categoryId"
             placeholder="选择分类"
             :columns="filteredCategories.map(c => ({ value: c.id, label: c.name }))"
-            custom-style="background: var(--wot-background-2); border-radius: 12px;"
+            custom-class="!bg-[var(--wot-background-2)] !rounded-xl"
           />
         </view>
 
         <!-- 支付方式选择 -->
         <view class="filter-card">
           <view class="card-header">
-            <view class="i-lucide:credit-card card-icon" />
-            <text class="card-label">
+            <view class="i-lucide:credit-card text-primary" />
+            <text class="text-sm text-[var(--wot-font-color)] font-semibold">
               支付方式
             </text>
           </view>
@@ -195,21 +198,21 @@ function handleClose() {
             v-model="tempFilters.paymentMethodId"
             placeholder="选择支付方式"
             :columns="paymentMethods.map(p => ({ value: p.id, label: p.name }))"
-            custom-style="background: var(--wot-background-2); border-radius: 12px;"
+            custom-class="!bg-[var(--wot-background-2)] !rounded-xl"
           />
         </view>
 
         <!-- 日期范围 -->
         <view class="filter-card">
           <view class="card-header">
-            <view class="i-lucide:calendar card-icon" />
-            <text class="card-label">
+            <view class="i-lucide:calendar text-primary" />
+            <text class="text-sm text-[var(--wot-font-color)] font-semibold">
               日期范围
             </text>
           </view>
-          <view class="date-range-container">
-            <view class="date-input-wrapper">
-              <view class="i-lucide:calendar-range date-icon" />
+          <view class="flex items-center gap-2">
+            <view class="min-h-11 flex flex-1 items-center gap-2 rounded-xl bg-[var(--wot-background-2)] px-3">
+              <view class="i-lucide:calendar-range text-sm text-[var(--wot-font-color-placeholder)]" />
               <wd-datetime-picker
                 v-model="tempFilters.startDate"
                 title="开始日期"
@@ -217,20 +220,20 @@ function handleClose() {
                 mode="date"
               >
                 <template #default>
-                  <view class="date-trigger">
+                  <view class="flex-1 py-3 text-center text-sm text-[var(--wot-font-color)]">
                     {{ tempFilters.startDate ? formatDateToString(tempFilters.startDate) : '开始日期' }}
                   </view>
                 </template>
               </wd-datetime-picker>
             </view>
-            <view class="date-divider">
-              <view class="divider-line" />
-              <text class="divider-text">
+            <view class="flex flex-shrink-0 items-center gap-2">
+              <view class="h-px w-3 bg-[var(--wot-border-color)]" />
+              <text class="text-xs text-[var(--wot-font-color-placeholder)]">
                 至
               </text>
-              <view class="divider-line" />
+              <view class="h-px w-3 bg-[var(--wot-border-color)]" />
             </view>
-            <view class="date-input-wrapper">
+            <view class="min-h-11 flex flex-1 items-center rounded-xl bg-[var(--wot-background-2)] px-3">
               <wd-datetime-picker
                 v-model="tempFilters.endDate"
                 title="结束日期"
@@ -238,7 +241,7 @@ function handleClose() {
                 mode="date"
               >
                 <template #default>
-                  <view class="date-trigger">
+                  <view class="flex-1 py-3 text-center text-sm text-[var(--wot-font-color)]">
                     {{ tempFilters.endDate ? formatDateToString(tempFilters.endDate) : '结束日期' }}
                   </view>
                 </template>
@@ -250,53 +253,63 @@ function handleClose() {
         <!-- 金额范围 -->
         <view class="filter-card">
           <view class="card-header">
-            <view class="i-lucide:wallet card-icon" />
-            <text class="card-label">
+            <view class="i-lucide:wallet text-primary" />
+            <text class="text-sm text-[var(--wot-font-color)] font-semibold">
               金额范围
             </text>
           </view>
-          <view class="amount-range-container">
-            <view class="amount-input-group">
-              <text class="amount-prefix">
+          <view class="flex items-center gap-3">
+            <view class="min-h-11 flex flex-1 items-center gap-2 rounded-xl bg-[var(--wot-background-2)] px-3">
+              <text class="text-primary text-sm font-semibold">
                 ¥
               </text>
               <wd-input
                 v-model="tempFilters.minAmount"
                 placeholder="最低"
                 type="number"
-                custom-style="background: var(--wot-background-2); border-radius: 12px; --wd-input-padding: 12px;"
+                custom-class="!bg-transparent !p-0"
               />
             </view>
-            <view class="amount-separator">
-              <view class="separator-dot" />
+            <view class="flex-shrink-0">
+              <view class="h-1.5 w-1.5 rounded-full bg-[var(--wot-border-color)]" />
             </view>
-            <view class="amount-input-group">
-              <text class="amount-prefix">
+            <view class="min-h-11 flex flex-1 items-center gap-2 rounded-xl bg-[var(--wot-background-2)] px-3">
+              <text class="text-primary text-sm font-semibold">
                 ¥
               </text>
               <wd-input
                 v-model="tempFilters.maxAmount"
                 placeholder="最高"
                 type="number"
-                custom-style="background: var(--wot-background-2); border-radius: 12px; --wd-input-padding: 12px;"
+                custom-class="!bg-transparent !p-0"
               />
             </view>
           </view>
         </view>
 
         <!-- 底部占位 -->
-        <view class="bottom-spacer" />
+        <view class="h-5" />
       </scroll-view>
 
       <!-- 底部按钮 -->
-      <view class="filter-footer">
-        <view class="btn-reset" @click="handleReset">
-          <view class="i-lucide:rotate-ccw btn-icon" />
-          <text>重置</text>
+      <view class="flex gap-3 border-t border-[var(--wot-border-color)] bg-white px-4 py-4">
+        <view
+          class="flex flex-1 items-center justify-center gap-2 border border-[var(--wot-border-color)] rounded-xl bg-[var(--wot-background-2)] px-5 py-3.5"
+          @click="handleReset"
+        >
+          <view class="i-lucide:rotate-ccw text-[var(--wot-font-color-secondary)]" />
+          <text class="text-sm text-[var(--wot-font-color-secondary)] font-semibold">
+            重置
+          </text>
         </view>
-        <view class="btn-confirm" @click="handleConfirm">
-          <view class="i-lucide:check btn-icon" />
-          <text>确定筛选</text>
+        <view
+          class="shadow-primary/30 flex flex-1 items-center justify-center gap-2 rounded-xl from-[var(--wot-color-primary)] to-[#667eea] bg-gradient-to-r px-5 py-3.5 text-white shadow-lg"
+          @click="handleConfirm"
+        >
+          <view class="i-lucide:check text-white" />
+          <text class="text-sm font-semibold">
+            确定筛选
+          </text>
         </view>
       </view>
     </view>
@@ -304,14 +317,9 @@ function handleClose() {
 </template>
 
 <style lang="scss" scoped>
-.filter-modal {
-  background: linear-gradient(180deg, var(--wot-background) 0%, var(--wot-background-2) 100%);
-  border-radius: 24px 24px 0 0;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-}
+// UnoCSS 无法实现的样式才写在这里
 
+// 拖动指示条
 .drag-indicator {
   width: 36px;
   height: 4px;
@@ -320,51 +328,14 @@ function handleClose() {
   margin: 12px auto 0;
 }
 
-.filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 20px 16px;
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .header-icon {
-    font-size: 20px;
-    color: var(--wot-color-primary);
-  }
-
-  .filter-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--wot-font-color);
-    letter-spacing: 0.5px;
-  }
-
-  .filter-close {
-    font-size: 20px;
-    color: var(--wot-font-color-secondary);
-    padding: 8px;
-    border-radius: 8px;
-    background: var(--wot-background-2);
-    transition: all 0.2s;
-
-    &:active {
-      transform: scale(0.9);
-      opacity: 0.7;
-    }
-  }
-}
-
+// 筛选内容区
 .filter-content {
   flex: 1;
   overflow-y: auto;
   padding: 0 16px;
 }
 
+// 筛选卡片
 .filter-card {
   background: #fff;
   border-radius: 16px;
@@ -379,19 +350,9 @@ function handleClose() {
     gap: 8px;
     margin-bottom: 14px;
   }
-
-  .card-icon {
-    font-size: 16px;
-    color: var(--wot-color-primary);
-  }
-
-  .card-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--wot-font-color);
-  }
 }
 
+// 类型选择Pill
 .type-pills {
   display: flex;
   gap: 10px;
@@ -438,158 +399,11 @@ function handleClose() {
   }
 }
 
-.date-range-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .date-input-wrapper {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--wot-background-2);
-    border-radius: 12px;
-    padding: 0 12px;
-    min-height: 44px;
-  }
-
-  .date-icon {
-    font-size: 16px;
-    color: var(--wot-font-color-placeholder);
-    flex-shrink: 0;
-  }
-
-  .date-trigger {
-    flex: 1;
-    font-size: 14px;
-    color: var(--wot-font-color);
-    padding: 12px 0;
-    text-align: center;
-  }
-
-  .date-divider {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-
-    .divider-line {
-      width: 12px;
-      height: 1px;
-      background: var(--wot-border-color);
-    }
-
-    .divider-text {
-      font-size: 12px;
-      color: var(--wot-font-color-placeholder);
-    }
-  }
-}
-
-.amount-range-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  .amount-input-group {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--wot-background-2);
-    border-radius: 12px;
-    padding: 0 12px;
-    min-height: 44px;
-  }
-
-  .amount-prefix {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--wot-color-primary);
-  }
-
-  .amount-separator {
-    flex-shrink: 0;
-
-    .separator-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--wot-border-color);
-    }
-  }
-}
-
-.bottom-spacer {
-  height: 20px;
-}
-
-.filter-footer {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: #fff;
-  border-top: 1px solid var(--wot-border-color);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-
-  .btn-reset,
-  .btn-confirm {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 20px;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 600;
-    transition: all 0.25s ease;
-
-    .btn-icon {
-      font-size: 16px;
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
-  }
-
-  .btn-reset {
-    background: var(--wot-background-2);
-    color: var(--wot-font-color-secondary);
-    border: 1px solid var(--wot-border-color);
-
-    .btn-icon {
-      color: var(--wot-font-color-secondary);
-    }
-  }
-
-  .btn-confirm {
-    background: linear-gradient(135deg, var(--wot-color-primary) 0%, #667eea 100%);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
-
-    .btn-icon {
-      color: #fff;
-    }
-  }
-}
-
-/* 深色模式适配 */
+// 深色模式适配
 :root.dark {
   .filter-card,
   .filter-footer {
     background: var(--wot-dark-background2);
-    border-color: var(--wot-dark-border-color);
-  }
-
-  .filter-content {
-    background: transparent;
-  }
-
-  .btn-reset {
-    background: var(--wot-dark-background);
     border-color: var(--wot-dark-border-color);
   }
 }

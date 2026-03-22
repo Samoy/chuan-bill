@@ -1,7 +1,12 @@
 ---
 description: 核心技术栈、架构和代码规范
-globs: src/store/**/*, src/api/**/*, src/router/**/*, src/pages/**/*, pages.config.ts, alova.config.ts
-alwaysApply: false
+paths:
+  - src/store/**/*
+  - src/api/**/*
+  - src/router/**/*
+  - src/pages/**/*
+  - pages.config.ts
+  - alova.config.ts
 ---
 
 # 技术栈与架构

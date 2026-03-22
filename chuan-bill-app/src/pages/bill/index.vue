@@ -132,11 +132,6 @@ function formatAmount(amount: number, type: string) {
   return type === 'income' ? `+${formatted}` : `-${formatted}`
 }
 
-// 获取金额颜色类
-function getAmountColorClass(type?: string) {
-  return type === 'income' ? 'text-green-600' : 'text-red-600'
-}
-
 // 页面生命周期
 onPullDownRefresh(() => {
   refresh()
@@ -150,16 +145,16 @@ onLoad(() => {
 <template>
   <view class="bill-page">
     <!-- 搜索区域 -->
-    <view class="search-bar px-3 py-3">
+    <view class="border-b border-[var(--wot-border-color)] px-3 py-3">
       <view class="flex items-center gap-2">
         <wd-search
           v-model="searchValue"
           placeholder="账单名称或备注"
           hide-cancel
-          custom-class="flex-1 rounded-xl border border-border dark:border-gray-600"
+          custom-class="flex-1 rounded-xl border border-[var(--wot-border-color)] dark:border-gray-600"
         />
         <view
-          class="filter-btn flex items-center justify-center border border-[var(--wot-border-color)] rounded-xl bg-white p-3 text-gray-600 transition-all active:scale-95 dark:bg-[var(--wot-dark-background2)]"
+          class="relative flex items-center justify-center border border-[var(--wot-border-color)] rounded-xl bg-white p-3 text-gray-600 transition-all active:scale-95 dark:bg-[var(--wot-dark-background2)]"
           @click="showFilterModal = true"
         >
           <view class="i-lucide:filter" />
@@ -169,7 +164,7 @@ onLoad(() => {
       </view>
 
       <!-- 筛选条件标签 -->
-      <view v-if="Object.keys(filterParams).length > 0" class="filter-tags mt-2 flex flex-wrap gap-2">
+      <view v-if="Object.keys(filterParams).length > 0" class="mt-2 flex flex-wrap gap-2">
         <wd-tag v-if="filterParams.type" type="primary" size="small" plain>
           {{ filterParams.type === 'income' ? '收入' : '支出' }}
         </wd-tag>
@@ -183,11 +178,11 @@ onLoad(() => {
     </view>
 
     <!-- 账单列表 -->
-    <scroll-view scroll-y class="bill-list" @scrolltolower="onReachBottom">
+    <scroll-view scroll-y class="flex-1" @scrolltolower="onReachBottom">
       <!-- 空状态 -->
-      <view v-if="!loading && billList.length === 0" class="empty-state">
-        <view class="i-lucide:receipt-empty-state-icon" />
-        <text class="empty-text">
+      <view v-if="!loading && billList.length === 0" class="flex flex-col items-center justify-center px-5 py-20 text-center">
+        <view class="i-lucide:receipt mb-4 text-8xl text-[var(--wot-font-color-placeholder)]" />
+        <text class="mb-5 text-base text-[var(--wot-font-color-secondary)]">
           暂无账单记录
         </text>
         <wd-button type="primary" size="small" @click="showQuickBillModal = true">
@@ -196,63 +191,68 @@ onLoad(() => {
       </view>
 
       <!-- 账单项 -->
-      <view v-else class="bill-list-content">
+      <view v-else class="p-3">
         <view
           v-for="bill in billList"
           :key="bill.id"
-          class="bill-item"
+          class="bill-card mb-3"
         >
-          <view class="bill-card">
+          <view class="flex gap-3 rounded-xl bg-white p-4 shadow-sm transition-all active:scale-98 dark:bg-[var(--wot-dark-background2)]">
             <!-- 左侧图标 -->
             <view class="bill-icon-wrapper">
-              <view class="bill-icon i-lucide:circle-dollar-sign" />
+              <view class="i-lucide:circle-dollar-sign text-xl text-white" />
             </view>
 
             <!-- 中间信息 -->
-            <view class="bill-info">
-              <view class="bill-header">
-                <text class="bill-name">
+            <view class="min-w-0 flex-1">
+              <view class="mb-2 flex items-center justify-between">
+                <text class="bill-name mr-2 flex-1 truncate text-base text-[var(--wot-font-color)] font-medium">
                   {{ bill.name }}
                 </text>
-                <text class="bill-amount" :class="getAmountColorClass(bill.type)">
+                <text
+                  class="flex-shrink-0 text-lg font-semibold"
+                  :class="bill.type === 'income' ? 'text-green-500' : 'text-red-500'"
+                >
                   {{ formatAmount(bill.amount, bill.type) }}
                 </text>
               </view>
 
-              <view class="bill-details">
+              <view class="mb-1.5 flex flex-wrap gap-3">
                 <text v-if="bill.categoryName" class="bill-detail-item">
-                  <view class="i-lucide:tag" />
+                  <view class="i-lucide:tag text-xs" />
                   {{ bill.categoryName }}
                 </text>
                 <text v-if="bill.paymentMethodName" class="bill-detail-item">
-                  <view class="i-lucide:credit-card" />
+                  <view class="i-lucide:credit-card text-xs" />
                   {{ bill.paymentMethodName }}
                 </text>
                 <text v-if="bill.time" class="bill-detail-item">
-                  <view class="i-lucide:calendar" />
+                  <view class="i-lucide:calendar text-xs" />
                   {{ bill.time }}
                 </text>
               </view>
 
               <view v-if="bill.remark" class="bill-remark">
-                <view class="i-lucide:message-square" />
-                <text>{{ bill.remark }}</text>
+                <view class="i-lucide:message-square text-xs" />
+                <text class="text-xs">
+                  {{ bill.remark }}
+                </text>
               </view>
             </view>
           </view>
         </view>
 
         <!-- 加载更多提示 -->
-        <view v-if="loading && billList.length > 0" class="loading-more">
+        <view v-if="loading && billList.length > 0" class="flex items-center justify-center gap-2 py-4">
           <wd-loading size="small" />
-          <text class="loading-text">
+          <text class="text-xs text-[var(--wot-font-color-placeholder)]">
             加载中...
           </text>
         </view>
 
         <!-- 没有更多数据 -->
-        <view v-if="!loading && !pagination.hasMore && billList.length > 0" class="no-more">
-          <text class="no-more-text">
+        <view v-if="!loading && !pagination.hasMore && billList.length > 0" class="flex items-center justify-center py-4">
+          <text class="text-xs text-[var(--wot-font-color-placeholder)]">
             - 已经到底了 -
           </text>
         </view>
@@ -284,6 +284,8 @@ onLoad(() => {
 </template>
 
 <style lang="scss" scoped>
+// UnoCSS 无法实现的样式才写在这里
+
 .bill-page {
   display: flex;
   flex-direction: column;
@@ -291,75 +293,19 @@ onLoad(() => {
   background: var(--wot-background);
 }
 
-.search-bar {
-  background: var(--wot-background);
-  border-bottom: 1px solid var(--wot-border-color);
+// 筛选红点
+.filter-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #ff4d4f;
+  border-radius: 50%;
+  border: 1px solid #fff;
 }
 
-.filter-btn {
-  position: relative;
-
-  .filter-dot {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
-    background: #ff4d4f;
-    border-radius: 50%;
-    border: 1px solid #fff;
-  }
-}
-
-.bill-list {
-  flex: 1;
-  overflow-y: hidden;
-}
-
-.bill-list-content {
-  padding: 12px;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
-
-  .empty-state-icon {
-    font-size: 80px;
-    color: var(--wot-font-color-placeholder);
-    margin-bottom: 16px;
-  }
-
-  .empty-text {
-    font-size: 16px;
-    color: var(--wot-font-color-secondary);
-    margin-bottom: 20px;
-  }
-}
-
-.bill-item {
-  margin-bottom: 12px;
-}
-
-.bill-card {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s;
-
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  }
-}
-
+// 账单图标
 .bill-icon-wrapper {
   flex-shrink: 0;
   width: 44px;
@@ -369,61 +315,25 @@ onLoad(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  .bill-icon {
-    font-size: 24px;
-    color: #fff;
-  }
 }
 
-.bill-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.bill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
+// 账单名称
 .bill-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--wot-font-color);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
 }
 
-.bill-amount {
-  font-size: 18px;
-  font-weight: 600;
-  flex-shrink: 0;
-  margin-left: 8px;
-}
-
-.bill-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
+// 账单详情项
 .bill-detail-item {
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
   color: var(--wot-font-color-secondary);
-
-  view {
-    font-size: 12px;
-  }
 }
 
+// 账单备注
 .bill-remark {
   display: flex;
   align-items: center;
@@ -432,31 +342,5 @@ onLoad(() => {
   color: var(--wot-font-color-placeholder);
   padding-top: 6px;
   border-top: 1px dashed var(--wot-border-color);
-
-  view {
-    font-size: 12px;
-  }
-}
-
-.loading-more,
-.no-more {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  gap: 8px;
-
-  .loading-text,
-  .no-more-text {
-    font-size: 12px;
-    color: var(--wot-font-color-placeholder);
-  }
-}
-
-/* 深色模式适配 */
-:root.dark {
-  .bill-card {
-    background: var(--wot-dark-background2);
-  }
 }
 </style>

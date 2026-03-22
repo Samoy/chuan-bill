@@ -1,7 +1,8 @@
 ---
 description: 项目基本信息、工作流和常用命令
-globs: package.json, src/**/*
-alwaysApply: true
+paths:
+  - package.json
+  - src/**/*
 ---
 
 # 项目信息与工作流

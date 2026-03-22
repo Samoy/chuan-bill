@@ -176,7 +176,7 @@ watch(
     v-model="showPopup"
     position="bottom"
     :close-on-click-modal="true"
-    custom-style="border-radius: 24px 24px 0 0; overflow: hidden;"
+    custom-class="!rounded-3xl !rounded-b-none"
     :z-index="100"
   >
     <view class="quick-bill-modal">
@@ -184,27 +184,38 @@ watch(
       <view class="drag-indicator" />
 
       <!-- 标题栏 -->
-      <view class="modal-header">
-        <view class="header-content">
-          <view class="i-lucide:pen-line header-icon" />
-          <text class="modal-title">
+      <view class="flex items-center justify-between px-5 py-4">
+        <view class="flex items-center gap-2.5">
+          <view class="i-lucide:pen-line text-primary text-lg" />
+          <text class="text-base text-[var(--wot-font-color)] font-semibold">
             记一笔
           </text>
         </view>
-        <view class="i-lucide:x modal-close" @click="showPopup = false" />
+        <view
+          class="i-lucide:x rounded-lg bg-[var(--wot-background-2)] p-2 text-lg text-[var(--wot-font-color-secondary)] transition-transform active:scale-90"
+          @click="showPopup = false"
+        />
       </view>
 
       <!-- 记账方式切换 -->
-      <view class="source-selector">
+      <view class="flex gap-2 px-5 pb-4">
         <view
           v-for="option in sourceOptions"
           :key="option.value"
-          class="source-btn"
-          :class="{ active: source === option.value }"
+          class="flex flex-1 items-center justify-center gap-1.5 border-2 border-transparent rounded-xl bg-[var(--wot-background-2)] px-3 py-2.5 transition-all"
+          :class="{ '!bg-[var(--wot-color-primary)] border-[var(--wot-color-primary)]': source === option.value }"
           @click="source = option.value"
         >
-          <view :class="option.payload.icon" class="source-icon" />
-          <text>{{ option.payload.text }}</text>
+          <view
+            class="text-sm"
+            :class="[option.payload.icon, source === option.value ? 'text-white' : 'text-[var(--wot-font-color-secondary)]']"
+          />
+          <text
+            class="text-xs font-medium"
+            :class="source === option.value ? 'text-white' : 'text-[var(--wot-font-color-secondary)]'"
+          >
+            {{ option.payload.text }}
+          </text>
         </view>
       </view>
 
@@ -212,8 +223,11 @@ watch(
       <scroll-view scroll-y class="form-content">
         <!-- 金额输入 - 视觉焦点 -->
         <view class="amount-hero" :class="formData.type">
-          <view class="amount-display">
-            <text class="currency">
+          <view class="mb-5 flex items-center justify-center gap-2">
+            <text
+              class="text-3xl font-bold transition-colors duration-300"
+              :class="formData.type === 'expense' ? 'text-[#ff6b6b]' : 'text-[#51cf66]'"
+            >
               ¥
             </text>
             <wd-input-number
@@ -225,40 +239,60 @@ watch(
               custom-class="amount-input"
             />
           </view>
-          <view class="type-toggle">
+          <view class="flex justify-center gap-3">
             <view
-              class="type-btn"
-              :class="{ active: formData.type === 'expense', expense: formData.type === 'expense' }"
+              class="flex flex-1 items-center justify-center gap-2 border-2 rounded-xl px-5 py-3.5 transition-all duration-300"
+              :class="formData.type === 'expense'
+                ? 'bg-[#ff6b6b] border-transparent shadow-lg shadow-[#ff6b6b]/30'
+                : 'bg-[var(--wot-background-2)] border-transparent'"
               @click="formData.type = 'expense'"
             >
-              <view class="i-lucide:trending-down" />
-              <text>支出</text>
+              <view
+                class="text-lg"
+                :class="formData.type === 'expense' ? 'i-lucide:trending-down text-white' : 'i-lucide:trending-down text-[var(--wot-font-color-secondary)]'"
+              />
+              <text
+                class="text-sm font-semibold"
+                :class="formData.type === 'expense' ? 'text-white' : 'text-[var(--wot-font-color-secondary)]'"
+              >
+                支出
+              </text>
             </view>
             <view
-              class="type-btn"
-              :class="{ active: formData.type === 'income', income: formData.type === 'income' }"
+              class="flex flex-1 items-center justify-center gap-2 border-2 rounded-xl px-5 py-3.5 transition-all duration-300"
+              :class="formData.type === 'income'
+                ? 'bg-[#51cf66] border-transparent shadow-lg shadow-[#51cf66]/30'
+                : 'bg-[var(--wot-background-2)] border-transparent'"
               @click="formData.type = 'income'"
             >
-              <view class="i-lucide:trending-up" />
-              <text>收入</text>
+              <view
+                class="text-lg"
+                :class="formData.type === 'income' ? 'i-lucide:trending-up text-white' : 'i-lucide:trending-up text-[var(--wot-font-color-secondary)]'"
+              />
+              <text
+                class="text-sm font-semibold"
+                :class="formData.type === 'income' ? 'text-white' : 'text-[var(--wot-font-color-secondary)]'"
+              >
+                收入
+              </text>
             </view>
           </view>
         </view>
 
         <!-- 账单名称 -->
         <view class="form-card">
-          <view class="card-row">
+          <view class="flex items-start gap-3.5">
             <view class="row-icon">
               <view class="i-lucide:file-text" />
             </view>
-            <view class="row-content">
-              <text class="row-label">
+            <view class="min-w-0 flex-1">
+              <text class="mb-2 block text-xs text-[var(--wot-font-color-secondary)] font-medium">
                 账单名称
               </text>
               <wd-input
                 v-model="formData.name"
                 placeholder="简单描述这笔账"
-                custom-style="--wd-input-font-size: 15px; --wd-input-padding: 0;"
+                custom-class="!bg-transparent !p-0 text-sm"
               />
             </view>
           </view>
@@ -266,19 +300,19 @@ watch(
 
         <!-- 分类选择 -->
         <view class="form-card">
-          <view class="card-row">
+          <view class="flex items-start gap-3.5">
             <view class="row-icon category">
               <view class="i-lucide:tag" />
             </view>
-            <view class="row-content">
-              <text class="row-label">
+            <view class="min-w-0 flex-1">
+              <text class="mb-2 block text-xs text-[var(--wot-font-color-secondary)] font-medium">
                 分类
               </text>
               <wd-select-picker
                 v-model="formData.categoryId"
                 placeholder="选择分类"
                 :columns="filteredCategories.map(c => ({ value: c.id, label: c.name }))"
-                custom-style="background: transparent; --wd-select-picker-padding: 0;"
+                custom-class="!bg-transparent"
               />
             </view>
           </view>
@@ -286,12 +320,12 @@ watch(
 
         <!-- 支付方式 -->
         <view class="form-card">
-          <view class="card-row">
+          <view class="flex items-start gap-3.5">
             <view class="row-icon payment">
               <view class="i-lucide:credit-card" />
             </view>
-            <view class="row-content">
-              <text class="row-label">
+            <view class="min-w-0 flex-1">
+              <text class="mb-2 block text-xs text-[var(--wot-font-color-secondary)] font-medium">
                 支付方式
               </text>
               <wd-select-picker
@@ -299,7 +333,7 @@ watch(
                 placeholder="选择支付方式（可选）"
                 :columns="paymentMethods.map(p => ({ value: p.id, label: p.name }))"
                 clearable
-                custom-style="background: transparent; --wd-select-picker-padding: 0;"
+                custom-class="!bg-transparent"
               />
             </view>
           </view>
@@ -307,12 +341,12 @@ watch(
 
         <!-- 日期选择 -->
         <view class="form-card">
-          <view class="card-row">
+          <view class="flex items-start gap-3.5">
             <view class="row-icon date">
               <view class="i-lucide:calendar" />
             </view>
-            <view class="row-content">
-              <text class="row-label">
+            <view class="min-w-0 flex-1">
+              <text class="mb-2 block text-xs text-[var(--wot-font-color-secondary)] font-medium">
                 日期
               </text>
               <wd-datetime-picker
@@ -322,9 +356,11 @@ watch(
                 mode="datetime"
               >
                 <template #default>
-                  <view class="date-trigger">
-                    {{ formData.time ? formatDateTime(new Date(formData.time)) : '选择日期时间' }}
-                    <view class="i-lucide:chevron-right trigger-arrow" />
+                  <view class="flex items-center justify-between py-2">
+                    <text class="text-sm text-[var(--wot-font-color)]">
+                      {{ formData.time ? formatDateTime(new Date(formData.time)) : '选择日期时间' }}
+                    </text>
+                    <view class="i-lucide:chevron-right text-[var(--wot-font-color-placeholder)]" />
                   </view>
                 </template>
               </wd-datetime-picker>
@@ -333,13 +369,13 @@ watch(
         </view>
 
         <!-- 备注 -->
-        <view class="form-card remark-card">
-          <view class="card-row remark-row">
+        <view class="form-card">
+          <view class="flex items-start gap-3.5">
             <view class="row-icon remark">
               <view class="i-lucide:message-square" />
             </view>
-            <view class="row-content">
-              <text class="row-label">
+            <view class="min-w-0 flex-1">
+              <text class="mb-2 block text-xs text-[var(--wot-font-color-secondary)] font-medium">
                 备注
               </text>
               <wd-textarea
@@ -347,40 +383,35 @@ watch(
                 placeholder="选填：补充说明..."
                 :maxlength="200"
                 :rows="2"
-                custom-style="background: transparent; --wd-textarea-padding: 0; font-size: 15px;"
+                custom-class="!bg-transparent !p-0 text-sm"
               />
             </view>
           </view>
         </view>
 
         <!-- 底部占位 -->
-        <view class="bottom-spacer" />
+        <view class="h-5" />
       </scroll-view>
 
       <!-- 提交按钮 -->
-      <view class="form-footer">
-        <view
-          class="submit-btn"
-          :class="formData.type"
-          @click="handleSubmit"
-        >
-          <view class="i-lucide:check-circle submit-icon" />
-          <text>确认记账</text>
-        </view>
+      <view
+        class="mx-4 mb-3 flex items-center justify-center gap-2.5 rounded-2xl py-4 text-base text-white font-bold transition-all active:scale-98"
+        :class="formData.type === 'expense'
+          ? 'bg-gradient-to-r from-[#ff6b6b] to-[#ee5a5a] shadow-xl shadow-[#ff6b6b]/40'
+          : 'bg-gradient-to-r from-[#51cf66] to-[#3cc955] shadow-xl shadow-[#51cf66]/40'"
+        @click="handleSubmit"
+      >
+        <view class="i-lucide:check-circle" />
+        <text>确认记账</text>
       </view>
     </view>
   </wd-popup>
 </template>
 
 <style lang="scss" scoped>
-.quick-bill-modal {
-  background: linear-gradient(180deg, var(--wot-background) 0%, var(--wot-background-2) 100%);
-  border-radius: 24px 24px 0 0;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
+// UnoCSS 无法实现的样式才写在这里
 
+// 拖动指示条
 .drag-indicator {
   width: 36px;
   height: 4px;
@@ -389,99 +420,14 @@ watch(
   margin: 12px auto 0;
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .header-icon {
-    font-size: 20px;
-    color: var(--wot-color-primary);
-  }
-
-  .modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--wot-font-color);
-    letter-spacing: 0.5px;
-  }
-
-  .modal-close {
-    font-size: 20px;
-    color: var(--wot-font-color-secondary);
-    padding: 8px;
-    border-radius: 8px;
-    background: var(--wot-background-2);
-    transition: all 0.2s;
-
-    &:active {
-      transform: scale(0.9);
-      opacity: 0.7;
-    }
-  }
-}
-
-.source-selector {
-  display: flex;
-  gap: 8px;
-  padding: 0 20px 16px;
-
-  .source-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: var(--wot-background-2);
-    border: 2px solid transparent;
-    transition: all 0.25s ease;
-    cursor: pointer;
-
-    .source-icon {
-      font-size: 16px;
-      color: var(--wot-font-color-secondary);
-      transition: color 0.25s;
-    }
-
-    text {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--wot-font-color-secondary);
-      transition: color 0.25s;
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
-
-    &.active {
-      background: var(--wot-color-primary);
-      border-color: var(--wot-color-primary);
-
-      .source-icon,
-      text {
-        color: #fff;
-      }
-    }
-  }
-}
-
+// 表单内容区
 .form-content {
   flex: 1;
   overflow-y: auto;
   padding: 0 16px;
 }
 
-/* 金额英雄区 */
+// 金额英雄区
 .amount-hero {
   background: #fff;
   border-radius: 20px;
@@ -490,28 +436,7 @@ watch(
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--wot-border-color);
 
-  &.expense .amount-display {
-      .currency { color: #ff6b6b; }
-    }
-
-  &.income .amount-display {
-      .currency { color: #51cf66; }
-    }
-
-  .amount-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .currency {
-    font-size: 32px;
-    font-weight: 700;
-    transition: color 0.3s;
-  }
-
+  // 金额输入样式（deep selector）
   :deep(.amount-input) {
     .wd-input-number__input {
       font-size: 40px !important;
@@ -520,62 +445,44 @@ watch(
       color: var(--wot-font-color);
     }
   }
+}
 
-  .type-toggle {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
+// 行图标
+.row-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--wot-color-primary) 0%, #667eea 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
-    .type-btn {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px 20px;
-      border-radius: 14px;
-      background: var(--wot-background-2);
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
-      cursor: pointer;
+  view {
+    font-size: 18px;
+    color: #fff;
+  }
 
-      view {
-        font-size: 18px;
-        color: var(--wot-font-color-secondary);
-        transition: color 0.3s;
-      }
+  &.category {
+    background: linear-gradient(135deg, #f06595 0%, #cc6699 100%);
+  }
 
-      text {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--wot-font-color-secondary);
-        transition: color 0.3s;
-      }
+  &.payment {
+    background: linear-gradient(135deg, #f093fb 0%, #c471ed 100%);
+  }
 
-      &:active {
-        transform: scale(0.97);
-      }
+  &.date {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
 
-      &.expense.active {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-        border-color: transparent;
-        box-shadow: 0 4px 16px rgba(255, 107, 107, 0.35);
+  &.remark {
+    background: linear-gradient(135deg, #96fbc4 0%, #a8edea 100%);
 
-        view, text { color: #fff; }
-      }
-
-      &.income.active {
-        background: linear-gradient(135deg, #51cf66 0%, #3cc955 100%);
-        border-color: transparent;
-        box-shadow: 0 4px 16px rgba(81, 207, 102, 0.35);
-
-        view, text { color: #fff; }
-      }
-    }
+    view { color: #2d8a6e; }
   }
 }
 
-/* 表单卡片 */
+// 表单卡片
 .form-card {
   background: #fff;
   border-radius: 16px;
@@ -583,142 +490,18 @@ watch(
   margin-bottom: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--wot-border-color);
-
-  .card-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .row-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--wot-color-primary) 0%, #667eea 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    view {
-      font-size: 18px;
-      color: #fff;
-    }
-
-    &.category {
-      background: linear-gradient(135deg, #f06595 0%, #cc6699 100%);
-    }
-
-    &.payment {
-      background: linear-gradient(135deg, #f093fb 0%, #c471ed 100%);
-    }
-
-    &.date {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
-    &.remark {
-      background: linear-gradient(135deg, #96fbc4 0%, #a8edea 100%);
-
-      view { color: #2d8a6e; }
-    }
-  }
-
-  .row-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .row-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--wot-font-color-secondary);
-    margin-bottom: 8px;
-  }
-
-  .date-trigger {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    font-size: 15px;
-    color: var(--wot-font-color);
-
-    .trigger-arrow {
-      font-size: 16px;
-      color: var(--wot-font-color-placeholder);
-    }
-  }
 }
 
-.remark-card {
-  .remark-row {
-    align-items: flex-start;
-  }
-}
-
-.bottom-spacer {
-  height: 20px;
-}
-
-/* 提交按钮 */
-.form-footer {
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
-  background: #fff;
-  border-top: 1px solid var(--wot-border-color);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-
-  .submit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 16px 24px;
-    border-radius: 16px;
-    font-size: 17px;
-    font-weight: 700;
-    transition: all 0.3s ease;
-    cursor: pointer;
-
-    .submit-icon {
-      font-size: 20px;
-    }
-
-    &:active {
-      transform: scale(0.98);
-    }
-
-    &.expense {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-      color: #fff;
-      box-shadow: 0 6px 24px rgba(255, 107, 107, 0.4);
-    }
-
-    &.income {
-      background: linear-gradient(135deg, #51cf66 0%, #3cc955 100%);
-      color: #fff;
-      box-shadow: 0 6px 24px rgba(81, 207, 102, 0.4);
-    }
-  }
-}
-
-/* 深色模式适配 */
+// 深色模式适配
 :root.dark {
   .amount-hero,
-  .form-card,
-  .form-footer {
+  .form-card {
     background: var(--wot-dark-background2);
     border-color: var(--wot-dark-border-color);
   }
 
   .form-content {
     background: transparent;
-  }
-
-  .date-trigger {
-    color: var(--wot-dark-font-color);
   }
 }
 </style>
