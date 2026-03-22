@@ -37,7 +37,7 @@ export interface SystemThemeState {
  * 预定义的主题色选项
  */
 export const themeColorOptions: ThemeColorOption[] = [
-  { name: '默认蓝', value: 'blue', primary: '#4D7FFF' },
+  { name: '默认蓝', value: 'blue', primary: '#2563EB' },
   { name: '活力橙', value: 'orange', primary: '#FF7D00' },
   { name: '薄荷绿', value: 'green', primary: '#07C160' },
   { name: '樱花粉', value: 'pink', primary: '#FF69B4' },

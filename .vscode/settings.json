@@ -14,5 +14,8 @@
   "explorer.fileNesting.patterns": {
     "vite.config.*": "pages.config.*, manifest.config.*, uno.config.*, volar.config.*, *.env, .env.*, alova.config.*"
   },
+  "java.configuration.runtimes": [
+    { "name":"JavaSE-21", "path": "D:\\JDK", "default": true }
+  ],
   "java.compile.nullAnalysis.mode": "automatic"
 }

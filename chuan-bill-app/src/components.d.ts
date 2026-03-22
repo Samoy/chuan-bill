@@ -17,6 +17,7 @@ declare module 'vue' {
     WdConfigProvider: typeof import('wot-design-uni/components/wd-config-provider/wd-config-provider.vue')['default']
     WdDatetimePicker: typeof import('wot-design-uni/components/wd-datetime-picker/wd-datetime-picker.vue')['default']
     WdFab: typeof import('wot-design-uni/components/wd-fab/wd-fab.vue')['default']
+    WdForm: typeof import('wot-design-uni/components/wd-form/wd-form.vue')['default']
     WdIcon: typeof import('wot-design-uni/components/wd-icon/wd-icon.vue')['default']
     WdInput: typeof import('wot-design-uni/components/wd-input/wd-input.vue')['default']
     WdInputNumber: typeof import('wot-design-uni/components/wd-input-number/wd-input-number.vue')['default']

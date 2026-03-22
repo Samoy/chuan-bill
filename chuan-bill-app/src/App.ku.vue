@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { themeVars, theme } = useManualTheme()
+console.log('当前主题变量：', themeVars.value)
 </script>
 
 <template>

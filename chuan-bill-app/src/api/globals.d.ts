@@ -227,7 +227,7 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: string;
+  type: 'income' | 'expense';
   /**
    * 账单金额
    */
@@ -247,7 +247,7 @@ export interface AddBillDTO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: string;
+  source?: 'manual' | 'ocr' | 'voice';
 }
 export interface SendCodeDTO {
   /**

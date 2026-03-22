@@ -9,7 +9,7 @@
     "node": ">=20.19.0 || >=22.12.0 || >=24.0.0"
   },
   "scripts": {
-    "dev": "uni",
+    "dev": "uni --host",
     "dev:app": "uni -p app",
     "dev:app-android": "uni -p app-android",
     "dev:app-ios": "uni -p app-ios",
