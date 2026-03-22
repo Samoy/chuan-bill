@@ -222,7 +222,7 @@ VALUES ('cat_exp_001', '餐饮', 'icon-food', 'expense', 1, 1),
        ('cat_exp_004', '娱乐', 'icon-fun', 'expense', 4, 1),
        ('cat_exp_005', '医疗', 'icon-hospital', 'expense', 5, 1),
        ('cat_exp_006', '教育', 'icon-education', 'expense', 6, 1),
-       ('cat_exp_007', '其他', 'icon-other-expense', 'expense', 7, 1);
+       ('cat_exp_007', '其他支出', 'icon-other-expense', 'expense', 7, 1);
 -- 收入类目
 INSERT INTO `t_category` (`id`, `name`, `icon`, `type`, `sort_order`, `is_default`)
 VALUES ('cat_inc_001', '工资', 'icon-salary', 'income', 1, 1),
@@ -231,7 +231,7 @@ VALUES ('cat_inc_001', '工资', 'icon-salary', 'income', 1, 1),
        ('cat_inc_004', '兼职', 'icon-part-time', 'income', 4, 1),
        ('cat_inc_005', '礼金', 'icon-gift', 'income', 5, 1),
        ('cat_inc_006', '退款', 'icon-refund', 'income', 6, 1),
-       ('cat_inc_007', '其他', 'icon-other-income', 'income', 7, 1);
+       ('cat_inc_007', '其他收入', 'icon-other-income', 'income', 7, 1);
 
 -- ===============================
 -- 初始化系统预设支付方式

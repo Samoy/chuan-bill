@@ -20,7 +20,9 @@
       "name": "bill",
       "layout": "tabbar",
       "style": {
-        "navigationBarTitleText": "账单"
+        "navigationBarTitleText": "账单",
+        "enablePullDownRefresh": true,
+        "onReachBottomDistance": 50
       }
     },
     {
