@@ -23,8 +23,8 @@ public class UserVO {
     @Schema(description = "性别：0-未知，1-男，2-女", example = "1")
     private Byte gender;
 
-    @Schema(description = "状态：0-禁用，1-正常", example = "1")
-    private Byte status;
+    @Schema(description = "状态：false-禁用，true-正常", example = "true")
+    private Boolean status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "最后登录时间", example = "2024-01-01 12:00:00")
