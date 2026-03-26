@@ -17,19 +17,19 @@
  * **Do not edit the file manually.**
  */
 export default {
-  'general.updateProfile': ['POST', '/user/updateProfile'],
-  'general.updatePasswordByOld': ['POST', '/user/updatePasswordByOld'],
-  'general.updatePasswordByCode': ['POST', '/user/updatePasswordByCode'],
-  'general.updateBill': ['POST', '/bill/update'],
-  'general.deleteBill': ['POST', '/bill/delete'],
-  'general.addBill': ['POST', '/bill/add'],
-  'general.sendCode': ['POST', '/auth/sendCode'],
-  'general.loginByPhone': ['POST', '/auth/loginByPhone'],
-  'general.loginByPassword': ['POST', '/auth/loginByPassword'],
-  'general.getProfile': ['GET', '/user/profile'],
-  'general.hasPassword': ['GET', '/user/hasPassword'],
-  'general.getPaymentMethods': ['GET', '/bill/payment-methods'],
-  'general.getBillList': ['GET', '/bill/list'],
-  'general.getBillDetail': ['GET', '/bill/detail'],
-  'general.getCategories': ['GET', '/bill/categories']
+  'user.updateProfile': ['POST', '/user/updateProfile'],
+  'user.updatePasswordByOld': ['POST', '/user/updatePasswordByOld'],
+  'user.updatePasswordByCode': ['POST', '/user/updatePasswordByCode'],
+  'bill.updateBill': ['POST', '/bill/update'],
+  'bill.deleteBill': ['POST', '/bill/delete'],
+  'bill.addBill': ['POST', '/bill/add'],
+  'auth.sendCode': ['POST', '/auth/sendCode'],
+  'auth.loginByPhone': ['POST', '/auth/loginByPhone'],
+  'auth.loginByPassword': ['POST', '/auth/loginByPassword'],
+  'user.getProfile': ['GET', '/user/profile'],
+  'user.hasPassword': ['GET', '/user/hasPassword'],
+  'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
+  'bill.getBillList': ['GET', '/bill/list'],
+  'bill.getBillDetail': ['GET', '/bill/detail'],
+  'bill.getCategories': ['GET', '/bill/categories']
 };

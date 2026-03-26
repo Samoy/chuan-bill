@@ -227,7 +227,7 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: 'income' | 'expense';
+  type: string;
   /**
    * 账单金额
    */
@@ -247,7 +247,7 @@ export interface AddBillDTO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: 'manual' | 'ocr' | 'voice';
+  source?: string;
 }
 export interface SendCodeDTO {
   /**
@@ -426,11 +426,11 @@ export interface BillVO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: string;
+  type?: string;
   /**
    * 账单金额
    */
-  amount: number;
+  amount?: number;
   /**
    * 账单时间
    */
@@ -450,13 +450,13 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
-  total?: number;
+  records?: BillVO[];
+  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  current?: number;
-  records?: BillVO[];
+  total?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -514,7 +514,7 @@ export interface ResultListCategoryVO {
 }
 declare global {
   interface Apis {
-    general: {
+    user: {
       /**
        * ---
        *
@@ -557,7 +557,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.updateProfile', Config>;
+      ): Alova2Method<ResultBoolean, 'user.updateProfile', Config>;
       /**
        * ---
        *
@@ -598,7 +598,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.updatePasswordByOld', Config>;
+      ): Alova2Method<ResultBoolean, 'user.updatePasswordByOld', Config>;
       /**
        * ---
        *
@@ -639,7 +639,75 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.updatePasswordByCode', Config>;
+      ): Alova2Method<ResultBoolean, 'user.updatePasswordByCode', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取用户资料
+       *
+       * **path:** /user/profile
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 用户信息
+       *   data?: {
+       *     // 用户 ID
+       *     id?: string
+       *     // 手机号
+       *     phone?: string
+       *     // 昵称
+       *     nickname?: string
+       *     // 头像 URL
+       *     avatar?: string
+       *     // 性别：0-未知，1-男，2-女
+       *     gender?: string
+       *     // 状态：0-禁用，1-正常
+       *     status?: string
+       *     // 最后登录时间
+       *     lastLoginTime?: string
+       *     // 创建时间
+       *     createTime?: string
+       *     // 更新时间
+       *     updateTime?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getProfile<Config extends Alova2MethodConfig<ResultUserVO>>(
+        config?: Config
+      ): Alova2Method<ResultUserVO, 'user.getProfile', Config>;
+      /**
+       * ---
+       *
+       * [GET] 检查是否设置了密码
+       *
+       * **path:** /user/hasPassword
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      hasPassword<Config extends Alova2MethodConfig<ResultBoolean>>(
+        config?: Config
+      ): Alova2Method<ResultBoolean, 'user.hasPassword', Config>;
+    };
+    bill: {
       /**
        * ---
        *
@@ -690,7 +758,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.updateBill', Config>;
+      ): Alova2Method<ResultBoolean, 'bill.updateBill', Config>;
       /**
        * ---
        *
@@ -732,7 +800,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.deleteBill', Config>;
+      ): Alova2Method<ResultBoolean, 'bill.deleteBill', Config>;
       /**
        * ---
        *
@@ -785,208 +853,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'general.addBill', Config>;
-      /**
-       * ---
-       *
-       * [POST] 发送验证码
-       *
-       * **path:** /auth/sendCode
-       *
-       * ---
-       *
-       * **RequestBody**
-       * ```ts
-       * type RequestBody = {
-       *   // 手机号
-       *   phone: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: null
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      sendCode<
-        Config extends Alova2MethodConfig<ResultVoid> & {
-          data: SendCodeDTO;
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultVoid, 'general.sendCode', Config>;
-      /**
-       * ---
-       *
-       * [POST] 手机号登录
-       *
-       * **path:** /auth/loginByPhone
-       *
-       * ---
-       *
-       * **RequestBody**
-       * ```ts
-       * type RequestBody = {
-       *   // 手机号
-       *   phone: string
-       *   // 验证码
-       *   code: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // 令牌响应
-       *   data?: {
-       *     // 访问令牌
-       *     token?: string
-       *     // 过期时间（毫秒）
-       *     expireTime?: number
-       *     // 用户 ID
-       *     userId?: string
-       *     // 用户昵称
-       *     nickname?: string
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      loginByPhone<
-        Config extends Alova2MethodConfig<ResultTokenVO> & {
-          data: LoginByPhoneDTO;
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultTokenVO, 'general.loginByPhone', Config>;
-      /**
-       * ---
-       *
-       * [POST] 密码登录
-       *
-       * **path:** /auth/loginByPassword
-       *
-       * ---
-       *
-       * **RequestBody**
-       * ```ts
-       * type RequestBody = {
-       *   // 手机号
-       *   phone: string
-       *   // 密码
-       *   password: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // 令牌响应
-       *   data?: {
-       *     // 访问令牌
-       *     token?: string
-       *     // 过期时间（毫秒）
-       *     expireTime?: number
-       *     // 用户 ID
-       *     userId?: string
-       *     // 用户昵称
-       *     nickname?: string
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      loginByPassword<
-        Config extends Alova2MethodConfig<ResultTokenVO> & {
-          data: LoginByPasswordDTO;
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultTokenVO, 'general.loginByPassword', Config>;
-      /**
-       * ---
-       *
-       * [GET] 获取用户资料
-       *
-       * **path:** /user/profile
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // 用户信息
-       *   data?: {
-       *     // 用户 ID
-       *     id?: string
-       *     // 手机号
-       *     phone?: string
-       *     // 昵称
-       *     nickname?: string
-       *     // 头像 URL
-       *     avatar?: string
-       *     // 性别：0-未知，1-男，2-女
-       *     gender?: string
-       *     // 状态：0-禁用，1-正常
-       *     status?: string
-       *     // 最后登录时间
-       *     lastLoginTime?: string
-       *     // 创建时间
-       *     createTime?: string
-       *     // 更新时间
-       *     updateTime?: string
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getProfile<Config extends Alova2MethodConfig<ResultUserVO>>(
-        config?: Config
-      ): Alova2Method<ResultUserVO, 'general.getProfile', Config>;
-      /**
-       * ---
-       *
-       * [GET] 检查是否设置了密码
-       *
-       * **path:** /user/hasPassword
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: boolean
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      hasPassword<Config extends Alova2MethodConfig<ResultBoolean>>(
-        config?: Config
-      ): Alova2Method<ResultBoolean, 'general.hasPassword', Config>;
+      ): Alova2Method<ResultBoolean, 'bill.addBill', Config>;
       /**
        * ---
        *
@@ -1025,7 +892,7 @@ declare global {
        */
       getPaymentMethods<Config extends Alova2MethodConfig<ResultListPaymentMethodVO>>(
         config?: Config
-      ): Alova2Method<ResultListPaymentMethodVO, 'general.getPaymentMethods', Config>;
+      ): Alova2Method<ResultListPaymentMethodVO, 'bill.getPaymentMethods', Config>;
       /**
        * ---
        *
@@ -1073,10 +940,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
-       *     // [deprecated]
-       *     pages?: number
-       *     current?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -1106,6 +969,10 @@ declare global {
        *       // 家庭 ID
        *       familyId?: string
        *     }>
+       *     current?: number
+       *     // [deprecated]
+       *     pages?: number
+       *     total?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1123,7 +990,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultIPageBillVO, 'general.getBillList', Config>;
+      ): Alova2Method<ResultIPageBillVO, 'bill.getBillList', Config>;
       /**
        * ---
        *
@@ -1191,7 +1058,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultBillVO, 'general.getBillDetail', Config>;
+      ): Alova2Method<ResultBillVO, 'bill.getBillDetail', Config>;
       /**
        * ---
        *
@@ -1251,7 +1118,144 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultListCategoryVO, 'general.getCategories', Config>;
+      ): Alova2Method<ResultListCategoryVO, 'bill.getCategories', Config>;
+    };
+    auth: {
+      /**
+       * ---
+       *
+       * [POST] 发送验证码
+       *
+       * **path:** /auth/sendCode
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机号
+       *   phone: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      sendCode<
+        Config extends Alova2MethodConfig<ResultVoid> & {
+          data: SendCodeDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultVoid, 'auth.sendCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 手机号登录
+       *
+       * **path:** /auth/loginByPhone
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机号
+       *   phone: string
+       *   // 验证码
+       *   code: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 令牌响应
+       *   data?: {
+       *     // 访问令牌
+       *     token?: string
+       *     // 过期时间（毫秒）
+       *     expireTime?: number
+       *     // 用户 ID
+       *     userId?: string
+       *     // 用户昵称
+       *     nickname?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      loginByPhone<
+        Config extends Alova2MethodConfig<ResultTokenVO> & {
+          data: LoginByPhoneDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultTokenVO, 'auth.loginByPhone', Config>;
+      /**
+       * ---
+       *
+       * [POST] 密码登录
+       *
+       * **path:** /auth/loginByPassword
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机号
+       *   phone: string
+       *   // 密码
+       *   password: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 令牌响应
+       *   data?: {
+       *     // 访问令牌
+       *     token?: string
+       *     // 过期时间（毫秒）
+       *     expireTime?: number
+       *     // 用户 ID
+       *     userId?: string
+       *     // 用户昵称
+       *     nickname?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      loginByPassword<
+        Config extends Alova2MethodConfig<ResultTokenVO> & {
+          data: LoginByPasswordDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultTokenVO, 'auth.loginByPassword', Config>;
     };
   }
 

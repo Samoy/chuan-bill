@@ -21,9 +21,9 @@ interface Props {
 
 // 记账方式选项
 const sourceOptions = [
-  { payload: { label: '手动输入', icon: 'i-lucide:square-pen' }, value: 'manual' },
-  { payload: { label: '票据识别', icon: 'i-lucide:camera' }, value: 'ocr' },
-  { payload: { label: '语音记账', icon: 'i-lucide:mic' }, value: 'voice' },
+  { payload: { label: '手动添加', icon: 'i-lucide:square-pen' }, value: 'manual' },
+  { payload: { label: '图片识别', icon: 'i-lucide:camera' }, value: 'ocr' },
+  { payload: { label: '语音识别', icon: 'i-lucide:mic' }, value: 'voice' },
 ]
 const source = ref('manual')
 

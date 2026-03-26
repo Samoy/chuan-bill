@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bill")
-@Tag(name = "账单管理", description = "账单的增删改查、分类、支付方式等相关接口")
+@Tag(name = "bill", description = "账单的增删改查、分类、支付方式等相关接口")
 public class BillController {
 
     @Resource

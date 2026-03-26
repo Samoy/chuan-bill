@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "认证管理", description = "用户登录、注册、验证码等相关接口")
+@Tag(name = "auth", description = "认证、验证码相关接口")
 public class AuthController {
     @Resource
     private IUserService userService;

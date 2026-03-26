@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/user")
 @RestController
-@Tag(name = "用户管理", description = "用户信息、密码修改等相关接口")
+@Tag(name = "user", description = "用户信息、密码修改等相关接口")
 public class UserController {
 
     @Resource
