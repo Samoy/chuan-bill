@@ -4,6 +4,7 @@ import QuickBillModal from './components/QuickBillModal.vue'
 definePage({
   name: 'bill',
   layout: 'tabbar',
+  type: 'home',
   style: {
     navigationBarTitleText: '账单',
     enablePullDownRefresh: true,
