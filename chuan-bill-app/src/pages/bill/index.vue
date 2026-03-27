@@ -13,6 +13,8 @@ definePage({
 const searchValue = ref('')
 const showFilterModal = ref(false)
 const showQuickBillModal = ref(false)
+
+const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
 </script>
 
 <template>
@@ -34,7 +36,7 @@ const showQuickBillModal = ref(false)
     </view>
 
     <!-- FAB 按钮 -->
-    <wd-fab draggable :expandable="false" :gap="{ bottom: 70, right: 20 }" @click="showQuickBillModal = true" />
+    <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="showQuickBillModal = true" />
     <QuickBillModal v-model:show="showQuickBillModal" />
   </view>
 </template>

@@ -27,7 +27,9 @@ export const alovaInstance = createAlova({
 
     // Log request in development
     if (import.meta.env.MODE === 'development') {
+      // #ifdef H5
       method.baseURL = `${method.baseURL}/api`
+      // #endif
       console.log(`[Alova Request] ${method.type} ${method.url}`, method.data || method.config.params)
       console.log(`[API Base URL] ${import.meta.env.VITE_API_BASE_URL}`)
       console.log(`[Environment] ${import.meta.env.VITE_ENV_NAME}`)
@@ -51,8 +53,8 @@ export const alovaInstance = createAlova({
   // We'll use the middleware in the hooks
   // middleware is not directly supported in createAlova options
 
-  // Default request timeout (10 seconds)
-  timeout: 60000,
+  // Default request timeout (30 seconds)
+  timeout: 6000 * 30,
   // 设置为null即可全局关闭全部请求缓存
   cacheFor: null,
 })

@@ -11,7 +11,7 @@ import { defineManifestConfig } from '@uni-helper/vite-plugin-uni-manifest'
 
 export default defineManifestConfig({
   'name': 'chuan-bill-app',
-  'appid': '__UNI__1208592',
+  'appid': '__UNI__1BBFCBB',
   'description': '',
   'versionName': '1.0.0',
   'versionCode': '100',
@@ -64,13 +64,14 @@ export default defineManifestConfig({
     optimization: {
       subPackages: true,
     },
-    appid: '',
+    appid: 'wx67e283815fae178d',
     setting: {
       urlCheck: false,
     },
     usingComponents: true,
     darkmode: true,
     themeLocation: 'theme.json',
+    mergeVirtualHostAttributes: true,
   },
   'app-harmony': {},
   'mp-harmony': {},
