@@ -36,20 +36,16 @@ const showPopup = computed({
 
 <template>
   <wd-action-sheet
-    v-model="showPopup"
-    position="bottom"
-    custom-class="!rounded-3xl !rounded-b-none"
-    title="记一笔"
-    :close-on-click-modal="false"
-    :z-index="100"
+    v-model="showPopup" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
+    :close-on-click-modal="false" :z-index="100"
   >
-    <view class="flex flex-col gap-3 px-3 pb-3">
+    <view class="pos-relative h-[560px] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
         v-model:value="source" :options="sourceOptions"
         custom-class="!rounded-xl dark:!bg-[var(--wot-dark-background3)]"
       >
         <template #label="{ option }">
-          <view class="flex items-center justify-center gap-1 py-1">
+          <view class="h-full flex items-center justify-center gap-1">
             <view class="text-xs" :class="[option.payload.icon]" />
             <view class="text-xs">
               {{ option.payload.label }}
@@ -65,7 +61,10 @@ const showPopup = computed({
 </template>
 
 <style lang="scss" scoped>
-:deep(.wd-segmented__item--active){
+:deep(.wd-segmented__item--active) {
   @apply rounded-lg;
+}
+:deep(.wd-segmented__item-label){
+  height: 100%;
 }
 </style>

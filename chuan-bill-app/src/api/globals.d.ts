@@ -231,7 +231,7 @@ export interface AddBillDTO {
   /**
    * 账单金额
    */
-  amount: number;
+  amount: string;
   /**
    * 账单时间
    */

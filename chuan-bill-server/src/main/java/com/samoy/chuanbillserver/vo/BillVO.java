@@ -31,6 +31,7 @@ public class BillVO {
     private String type;
 
     @Schema(description = "账单金额", example = "10.50")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
