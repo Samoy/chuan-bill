@@ -8,17 +8,6 @@ defineOptions({
   styleIsolation: 'shared',
 })
 
-const props = defineProps<Props>()
-
-const emit = defineEmits<{
-  'update:show': [value: boolean]
-  'success': []
-}>()
-
-interface Props {
-  show: boolean
-}
-
 // 记账方式选项
 const sourceOptions = [
   { payload: { label: '手动添加', icon: 'i-lucide:square-pen' }, value: 'manual' },
@@ -27,19 +16,15 @@ const sourceOptions = [
 ]
 const source = ref('manual')
 
-// 使用 computed 处理 v-model
-const showPopup = computed({
-  get: () => props.show,
-  set: val => emit('update:show', val),
-})
+const show = defineModel<boolean>('show', { default: false })
 </script>
 
 <template>
   <wd-action-sheet
-    v-model="showPopup" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
+    v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
     :close-on-click-modal="false" :z-index="100"
   >
-    <view class="pos-relative h-[560px] flex flex-col gap-3 px-4 pb-4">
+    <view class="pos-relative max-h-[78vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
         v-model:value="source" :options="sourceOptions"
         custom-class="!rounded-xl dark:!bg-[var(--wot-dark-background3)]"

@@ -25,11 +25,9 @@ export class ApiError extends Error {
 // Define a type for the expected API response structure
 interface ApiResponse {
   code: number
-  msg?: string
+  message?: string
   data?: any
-  success?: boolean
-  total?: number
-  more?: boolean
+  timestamp?: number
 }
 
 // Handle successful responses

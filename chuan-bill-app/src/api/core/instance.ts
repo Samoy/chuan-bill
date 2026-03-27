@@ -5,12 +5,16 @@ import mockAdapter from '../mock/mockAdapter'
 import { handleAlovaError, handleAlovaResponse } from './handlers'
 
 export const alovaInstance = createAlova({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  // #ifndef H5
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  // #endif
   ...AdapterUniapp({
     mockRequest: mockAdapter,
   }),
   statesHook: vueHook,
   beforeRequest: (method) => {
+    // FIXME: 临时使用
+    method.config.headers.token = 'VmkIL7QUN2B2LgLsbcqZdKdqrbnbDa4FQcch2E0qGt3Le6vihyd0sxzyRXDTS3ov'
     // Add content type for POST/PUT/PATCH requests
     if (['POST', 'PUT', 'PATCH'].includes(method.type)) {
       method.config.headers['Content-Type'] = 'application/json'
@@ -23,6 +27,7 @@ export const alovaInstance = createAlova({
 
     // Log request in development
     if (import.meta.env.MODE === 'development') {
+      method.baseURL = `${method.baseURL}/api`
       console.log(`[Alova Request] ${method.type} ${method.url}`, method.data || method.config.params)
       console.log(`[API Base URL] ${import.meta.env.VITE_API_BASE_URL}`)
       console.log(`[Environment] ${import.meta.env.VITE_ENV_NAME}`)

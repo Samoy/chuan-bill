@@ -219,7 +219,7 @@ export interface AddBillDTO {
   /**
    * 分类 ID
    */
-  categoryId: string;
+  categoryId?: string;
   /**
    * 支付方式 ID
    */
@@ -227,7 +227,7 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: string;
+  type: 'income'|'expense';
   /**
    * 账单金额
    */
@@ -491,7 +491,7 @@ export interface CategoryVO {
   /**
    * 分类类型：income-收入，expense-支出
    */
-  type?: string;
+  type?: 'income' | 'expense';
   /**
    * 排序
    */
