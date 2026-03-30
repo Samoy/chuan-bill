@@ -3,9 +3,10 @@ import ManualEdit from './ManualEdit.vue'
 
 defineOptions({
   name: 'QuickBillModal',
-  virtualHost: true,
-  addGlobalClass: true,
-  styleIsolation: 'shared',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
 })
 
 // 记账方式选项
@@ -17,15 +18,17 @@ const sourceOptions = [
 const source = ref('manual')
 
 const show = defineModel<boolean>('show', { default: false })
+const segmentedRef = ref()
 </script>
 
 <template>
   <wd-action-sheet
     v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
-    :close-on-click-modal="false" :z-index="100"
+    :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
-    <view class="pos-relative max-h-[78vh] flex flex-col gap-3 px-4 pb-4">
+    <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
+        ref="segmentedRef"
         v-model:value="source" :options="sourceOptions"
         custom-class="!rounded-xl dark:!bg-[var(--wot-dark-background3)]"
       >
@@ -49,7 +52,8 @@ const show = defineModel<boolean>('show', { default: false })
 :deep(.wd-segmented__item--active) {
   @apply rounded-lg;
 }
-:deep(.wd-segmented__item-label){
-  height: 100%;
+
+:deep(.wd-segmented__item-label) {
+  @apply h-full! flex! items-center! justify-center!;
 }
 </style>

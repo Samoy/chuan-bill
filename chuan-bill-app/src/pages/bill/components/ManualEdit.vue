@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import type { AddBillDTO } from '@/api/globals'
 
+defineOptions({
+  name: 'ManualEdit',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
+})
+
 interface PickerOption {
   label?: string
   value?: string | number
@@ -130,13 +138,13 @@ watch(() => formData.value.type, (newValue) => {
 :deep(.wd-radio.is-button .wd-radio__label) {
   max-width: none;
   width: 100%;
-  @apply h-8 items-center flex justify-center py-0;
+  @apply h-8 items-center flex justify-center py-0 dark:border-black/30!;
 }
 
 .expense-radio {
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply important-border-red-100 important-bg-red-100 important-text-red-600;
+      @apply border-red-100! bg-red-100! text-red-600!;
     }
   }
 }
@@ -146,15 +154,15 @@ watch(() => formData.value.type, (newValue) => {
 
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply important-border-green-100 important-bg-green-100 important-text-green-600;
+      @apply border-green-100! bg-green-100! text-green-600!;
     }
   }
 }
-:deep(.wd-cell.wd-picker__cell){
-  @apply bg-gray-50 bg-opacity-80 rounded-xl;
+:deep(.wd-cell.wd-picker__cell) {
+  @apply bg-gray-50/80 rounded-xl dark:bg-black/30;
 }
-:deep(.wd-cell.wd-datetime-picker__cell){
-    @apply bg-gray-50 bg-opacity-80 rounded-xl;
+:deep(.wd-cell.wd-datetime-picker__cell) {
+    @apply bg-gray-50/80 rounded-xl dark:bg-black/30;
 }
 :deep(.wd-textarea__inner){
   height: 70px;
