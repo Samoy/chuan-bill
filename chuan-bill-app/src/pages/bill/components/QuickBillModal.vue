@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ManualEdit from './ManualEdit.vue'
+import OcrEdit from './OcrEdit.vue'
 
 defineOptions({
   name: 'QuickBillModal',
@@ -43,6 +44,9 @@ const segmentedRef = ref()
       </wd-segmented>
       <template v-if="source === 'manual'">
         <ManualEdit />
+      </template>
+      <template v-else-if="source === 'ocr'">
+        <OcrEdit />
       </template>
     </view>
   </wd-action-sheet>

@@ -167,4 +167,7 @@ watch(() => formData.value.type, (newValue) => {
 :deep(.wd-textarea__inner){
   height: 70px;
 }
+:deep(.wd-icon-arrow-right) {
+  @apply dark:text-white/50!;
+}
 </style>

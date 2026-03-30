@@ -1,10 +1,12 @@
 <script setup lang="ts">
 const { themeVars, theme } = useManualTheme()
-console.log('当前主题变量：', themeVars.value)
+const colorPrimary = computed(() => {
+  return hexToRgbString(themeVars.value.colorTheme || themeColorOptions[0].primary)
+})
 </script>
 
 <template>
-  <wd-config-provider :theme-vars="themeVars" :theme="theme" :custom-class="`page-wraper ${theme}`">
+  <wd-config-provider :theme-vars="themeVars" :theme="theme" :custom-class="`page-wraper ${theme}`" :custom-style="`--color-primary:${colorPrimary};`">
     <ku-root-view />
     <wd-notify />
     <wd-message-box />

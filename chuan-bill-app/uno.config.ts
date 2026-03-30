@@ -29,4 +29,9 @@ export default defineConfig({
     transformerDirectives(),
     transformerVariantGroup(),
   ],
+  theme: {
+    colors: {
+      primary: 'rgb(var(--color-primary))',
+    },
+  },
 })

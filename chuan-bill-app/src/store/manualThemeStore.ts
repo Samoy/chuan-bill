@@ -53,7 +53,7 @@ export const useManualThemeStore = defineStore('manualTheme', {
         this.hasUserSet = true // 标记用户已手动设置
         this.followSystem = false // 不再跟随系统
       }
-      this.setNavigationBarColor()
+      this.setCustomColor()
     },
 
     /**
@@ -69,13 +69,16 @@ export const useManualThemeStore = defineStore('manualTheme', {
     },
 
     /**
-     * 设置导航栏颜色
+     * 设置自定义的颜色，主要是用来设置没有在暗黑模式下定义的颜色
      */
-    setNavigationBarColor() {
+    setCustomColor() {
+      // 设置导航栏颜色
       uni.setNavigationBarColor({
         frontColor: this.theme === 'light' ? '#000000' : '#ffffff',
         backgroundColor: this.theme === 'light' ? '#ffffff' : '#000000',
       })
+      // 设置 picker 栏标题颜色
+      this.themeVars.pickerToolbarTitleColor = this.theme === 'light' ? '#000000d9' : '#ffffff'
     },
 
     /**
@@ -122,7 +125,7 @@ export const useManualThemeStore = defineStore('manualTheme', {
       // 如果用户已手动设置且不跟随系统，保持当前主题
       if (this.hasUserSet && !this.followSystem) {
         console.log('使用用户设置的主题:', this.theme)
-        this.setNavigationBarColor()
+        this.setCustomColor()
         return
       }
 
@@ -141,7 +144,7 @@ export const useManualThemeStore = defineStore('manualTheme', {
         }
       }
 
-      this.setNavigationBarColor()
+      this.setCustomColor()
     },
   },
 })
