@@ -20,6 +20,7 @@ export default {
   'user.updateProfile': ['POST', '/user/updateProfile'],
   'user.updatePasswordByOld': ['POST', '/user/updatePasswordByOld'],
   'user.updatePasswordByCode': ['POST', '/user/updatePasswordByCode'],
+  'file.uploadTempFile': ['POST', '/file/uploadTempFile'],
   'bill.updateBill': ['POST', '/bill/update'],
   'bill.deleteBill': ['POST', '/bill/delete'],
   'bill.addBill': ['POST', '/bill/add'],
@@ -31,5 +32,6 @@ export default {
   'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
   'bill.getBillList': ['GET', '/bill/list'],
   'bill.getBillDetail': ['GET', '/bill/detail'],
-  'bill.getCategories': ['GET', '/bill/categories']
+  'bill.getCategories': ['GET', '/bill/categories'],
+  'ai.ocr': ['GET', '/ai/ocr']
 };

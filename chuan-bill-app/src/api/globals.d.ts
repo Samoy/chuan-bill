@@ -219,7 +219,7 @@ export interface AddBillDTO {
   /**
    * 分类 ID
    */
-  categoryId?: string;
+  categoryId: string;
   /**
    * 支付方式 ID
    */
@@ -227,11 +227,11 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: 'income'|'expense';
+  type: string;
   /**
    * 账单金额
    */
-  amount: string;
+  amount: number;
   /**
    * 账单时间
    */
@@ -297,9 +297,9 @@ export interface UserVO {
    */
   gender?: string;
   /**
-   * 状态：0-禁用，1-正常
+   * 状态：false-禁用，true-正常
    */
-  status?: string;
+  status?: boolean;
   /**
    * 最后登录时间
    */
@@ -360,6 +360,26 @@ export interface ResultListPaymentMethodVO {
   code?: number;
   message?: string;
   data?: PaymentMethodVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface TempFileVO {
+  /**
+   * 临时文件ID
+   */
+  fileId?: string;
+  /**
+   * 临时文件大小
+   */
+  fileSize?: number;
+}
+export interface ResultTempFileVO {
+  code?: number;
+  message?: string;
+  /**
+   * 临时文件信息
+   */
+  data?: TempFileVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -450,13 +470,13 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
-  records?: BillVO[];
   current?: number;
+  records?: BillVO[];
+  total?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  total?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -491,7 +511,7 @@ export interface CategoryVO {
   /**
    * 分类类型：income-收入，expense-支出
    */
-  type?: 'income' | 'expense';
+  type?: string;
   /**
    * 排序
    */
@@ -509,6 +529,16 @@ export interface ResultListCategoryVO {
   code?: number;
   message?: string;
   data?: CategoryVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultAddBillDTO {
+  code?: number;
+  message?: string;
+  /**
+   * 添加账单请求
+   */
+  data?: AddBillDTO;
   timestamp?: number;
   success?: boolean;
 }
@@ -666,8 +696,8 @@ declare global {
        *     avatar?: string
        *     // 性别：0-未知，1-男，2-女
        *     gender?: string
-       *     // 状态：0-禁用，1-正常
-       *     status?: string
+       *     // 状态：false-禁用，true-正常
+       *     status?: boolean
        *     // 最后登录时间
        *     lastLoginTime?: string
        *     // 创建时间
@@ -706,6 +736,52 @@ declare global {
       hasPassword<Config extends Alova2MethodConfig<ResultBoolean>>(
         config?: Config
       ): Alova2Method<ResultBoolean, 'user.hasPassword', Config>;
+    };
+    file: {
+      /**
+       * ---
+       *
+       * [POST] 上传临时文件
+       *
+       * **path:** /file/uploadTempFile
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   file: Blob
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 临时文件信息
+       *   data?: {
+       *     // 临时文件ID
+       *     fileId?: string
+       *     // 临时文件大小
+       *     fileSize?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      uploadTempFile<
+        Config extends Alova2MethodConfig<ResultTempFileVO> & {
+          params: {
+            file: Blob;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultTempFileVO, 'file.uploadTempFile', Config>;
     };
     bill: {
       /**
@@ -940,6 +1016,7 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
+       *     current?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -969,10 +1046,9 @@ declare global {
        *       // 家庭 ID
        *       familyId?: string
        *     }>
-       *     current?: number
+       *     total?: number
        *     // [deprecated]
        *     pages?: number
-       *     total?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1256,6 +1332,66 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTokenVO, 'auth.loginByPassword', Config>;
+    };
+    ai: {
+      /**
+       * ---
+       *
+       * [GET] ocr
+       *
+       * **path:** /ai/ocr
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   fileId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 添加账单请求
+       *   data?: {
+       *     // 账单名称
+       *     name: string
+       *     // 分类 ID
+       *     categoryId: string
+       *     // 支付方式 ID
+       *     paymentMethodId?: string
+       *     // 账单类型：income-收入，expense-支出
+       *     type: string
+       *     // 账单金额
+       *     amount: number
+       *     // 账单时间
+       *     time: string
+       *     // 账单备注
+       *     remark?: string
+       *     // 家庭 ID（可选）
+       *     familyId?: string
+       *     // 账单来源：manual-手动，ocr-图片识别，voice-语音
+       *     source?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      ocr<
+        Config extends Alova2MethodConfig<ResultAddBillDTO> & {
+          params: {
+            fileId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultAddBillDTO, 'ai.ocr', Config>;
     };
   }
 

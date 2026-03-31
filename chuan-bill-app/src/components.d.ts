@@ -33,5 +33,6 @@ declare module 'vue' {
     WdTabbarItem: typeof import('wot-design-uni/components/wd-tabbar-item/wd-tabbar-item.vue')['default']
     WdTextarea: typeof import('wot-design-uni/components/wd-textarea/wd-textarea.vue')['default']
     WdToast: typeof import('wot-design-uni/components/wd-toast/wd-toast.vue')['default']
+    WdUpload: typeof import('wot-design-uni/components/wd-upload/wd-upload.vue')['default']
   }
 }
