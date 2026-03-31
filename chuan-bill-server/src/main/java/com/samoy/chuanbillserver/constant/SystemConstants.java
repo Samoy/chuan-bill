@@ -26,4 +26,9 @@ public class SystemConstants {
      * 用户性别未知
      */
     public static final Byte USER_GENDER_UNKNOWN = 0;
+
+    /**
+     * 临时文件上传目录
+     */
+    public static final String TEMP_FILE_UPLOAD_DIR = "temp/upload/";
 }

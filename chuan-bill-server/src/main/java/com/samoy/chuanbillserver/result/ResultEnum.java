@@ -38,6 +38,11 @@ public enum ResultEnum {
     BILL_NOT_ALLOW_VIEW(2002, "无权查看此账单"),
     BILL_NOT_ALLOW_UPDATE(2003, "无权修改此账单"),
     BILL_NOT_ALLOW_DELETE(2004, "无权删除此账单"),
+    BILL_OCR_FAILED(2101, "账单OCR识别失败"),
+
+    // 文件错误码 3000+
+    FILE_NOT_FOUND(3001, "文件不存在"),
+    FILE_UPLOAD_FAILED(3002, "文件上传失败"),
     ;
 
     private final Integer code;

@@ -45,3 +45,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+dashscope:
+  apiKey: ${DASHSCOPE_API_KEY}
+  ocr:
+    appId: ${DASHSCOPE_OCR_APP_ID}
