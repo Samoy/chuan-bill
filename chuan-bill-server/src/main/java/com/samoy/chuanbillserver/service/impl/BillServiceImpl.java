@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +18,8 @@ import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
 import com.samoy.chuanbillserver.vo.BillVO;
+import com.samoy.chuanbillserver.vo.CategoryVO;
+import com.samoy.chuanbillserver.vo.PaymentMethodVO;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -82,11 +85,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         if (billListDTO.getRemark() != null) {
             wrapper.like(Bill::getRemark, billListDTO.getRemark().trim());
         }
-        IPage<Bill> billPage = this.page(new Page<>(), wrapper);
-
-        if (billPage.getRecords().isEmpty()) {
-            return new Page<>();
-        }
+        IPage<Bill> billPage = this.page(new Page<>(billListDTO.getPage(), billListDTO.getSize()), wrapper);
 
         // 批量查询分类信息
         List<String> categoryIds = billPage.getRecords().stream()
@@ -194,20 +193,17 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         billVO.setId(bill.getId());
         billVO.setFamilyId(bill.getFamilyId());
         billVO.setName(bill.getName());
-        billVO.setCategoryId(bill.getCategoryId());
 
-        // 单个查询：直接获取分类名称
+        // 单个查询：直接获取分类
         if (bill.getCategoryId() != null) {
             Category category = categoryService.getById(bill.getCategoryId());
-            billVO.setCategoryName(category != null ? category.getName() : null);
+            billVO.setCategory(BeanUtil.copyProperties(category, CategoryVO.class));
         }
 
-        billVO.setPaymentMethodId(bill.getPaymentMethodId());
-
-        // 单个查询：直接获取支付方式名称
+        // 单个查询：直接获取支付方式
         if (bill.getPaymentMethodId() != null) {
             PaymentMethod paymentMethod = paymentMethodService.getById(bill.getPaymentMethodId());
-            billVO.setPaymentMethodName(paymentMethod != null ? paymentMethod.getName() : null);
+            billVO.setPaymentMethod(BeanUtil.copyProperties(paymentMethod, PaymentMethodVO.class));
         }
 
         billVO.setType(bill.getType());
@@ -228,17 +224,14 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         billVO.setId(bill.getId());
         billVO.setFamilyId(bill.getFamilyId());
         billVO.setName(bill.getName());
-        billVO.setCategoryId(bill.getCategoryId());
 
         // 从缓存的 Map 中获取分类名称
         Category category = categoryMap.get(bill.getCategoryId());
-        billVO.setCategoryName(category != null ? category.getName() : null);
+        billVO.setCategory(BeanUtil.copyProperties(category, CategoryVO.class));
 
-        billVO.setPaymentMethodId(bill.getPaymentMethodId());
-
-        // 从缓存的 Map 中获取支付方式名称
+        // 从缓存的 Map 中获取支付方式
         PaymentMethod paymentMethod = paymentMethodMap.get(bill.getPaymentMethodId());
-        billVO.setPaymentMethodName(paymentMethod != null ? paymentMethod.getName() : null);
+        billVO.setPaymentMethod(BeanUtil.copyProperties(paymentMethod, PaymentMethodVO.class));
 
         billVO.setType(bill.getType());
         billVO.setAmount(bill.getAmount());

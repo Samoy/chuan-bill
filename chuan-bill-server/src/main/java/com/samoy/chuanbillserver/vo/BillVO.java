@@ -15,17 +15,11 @@ public class BillVO {
     @Schema(description = "账单名称", example = "早餐")
     private String name;
 
-    @Schema(description = "分类 ID", example = "123456")
-    private String categoryId;
+    @Schema(description = "分类信息")
+    private CategoryVO category;
 
-    @Schema(description = "分类名称", example = "餐饮")
-    private String categoryName;
-
-    @Schema(description = "支付方式 ID", example = "123456")
-    private String paymentMethodId;
-
-    @Schema(description = "支付方式名称", example = "微信支付")
-    private String paymentMethodName;
+    @Schema(description = "支付方式信息")
+    private PaymentMethodVO paymentMethod;
 
     @Schema(description = "账单类型：income-收入，expense-支出", example = "expense")
     private String type;
