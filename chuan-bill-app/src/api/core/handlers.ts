@@ -38,26 +38,36 @@ export async function handleAlovaResponse(
   // Extract status code and data from UniApp response
   const { statusCode, data } = response as UniNamespace.RequestSuccessCallbackResult
 
-  // 处理401/403错误（如果不是在handleAlovaResponse中处理的）
-  if ((statusCode === 401 || statusCode === 403)) {
+  function handleError(code: number) {
+    // 处理401/403错误（如果不是在handleAlovaResponse中处理的）
+    if ((code === 401 || code === 403)) {
     // 如果是未授权错误，清除用户信息并跳转到登录页
-    globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
-    const timer = setTimeout(() => {
-      clearTimeout(timer)
-      router.replaceAll({ name: 'login' })
-    }, 500)
+      globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
+      const timer = setTimeout(() => {
+        clearTimeout(timer)
+        router.replaceAll({ name: 'login' })
+      }, 500)
 
-    throw new ApiError('登录已过期，请重新登录！', statusCode, data)
-  }
+      throw new ApiError('登录已过期，请重新登录！', code, data)
+    }
 
-  // Handle HTTP error status codes
-  if (statusCode >= 400) {
-    globalToast.error(`Request failed with status: ${statusCode}`)
-    throw new ApiError(`Request failed with status: ${statusCode}`, statusCode, data)
+    // Handle HTTP error status codes
+    if (code >= 400) {
+      globalToast.error(`Request failed with status: ${code}`)
+      throw new ApiError(`Request failed with status: ${code}`, code, data)
+    }
   }
 
   // The data is already parsed by UniApp adapter
   const json = data as ApiResponse
+
+  if (statusCode >= 400) {
+    handleError(statusCode)
+  }
+  if (json.code >= 400) {
+    handleError(json.code)
+  }
+
   // Log response in development
   if (import.meta.env.MODE === 'development') {
     console.log('[Alova Response]', json)

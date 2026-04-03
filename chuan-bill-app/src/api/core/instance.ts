@@ -1,8 +1,72 @@
+import type { Method } from 'alova'
 import AdapterUniapp from '@alova/adapter-uniapp'
 import { createAlova } from 'alova'
 import vueHook from 'alova/vue'
 import mockAdapter from '../mock/mockAdapter'
 import { handleAlovaError, handleAlovaResponse } from './handlers'
+
+function createLoadingManager() {
+  let activeCount = 0
+  let isShowing = false
+  const loading = useGlobalLoading()
+  const pendingTimers = new Map<string, ReturnType<typeof setTimeout> | null>()
+
+  const generateId = (() => {
+    let counter = 0
+    return (method: Method) => `${method.type}-${method.url}-${Date.now()}-${++counter}`
+  })()
+
+  return {
+    start(method: Method) {
+      const shouldShow = !method.config.meta?.silent
+      const delay = method.config.meta?.loadingDelay ?? 300
+      const text = method.config.meta?.loadingText || '请稍候...'
+      if (!shouldShow) {
+        return null
+      }
+      activeCount++
+      const requestId = generateId(method)
+
+      // 如果已经在显示，不再需要再定时
+      if (isShowing) {
+        pendingTimers.set(requestId, null)
+      }
+      // 延迟显示
+      const timer = setTimeout(() => {
+        isShowing = true
+        loading.loading(text)
+        // 显示后清除timer引用
+        pendingTimers.set(requestId, null)
+      }, delay)
+      // 储存定时器
+      pendingTimers.set(requestId, timer)
+      return requestId
+    },
+
+    finish(requestId: string) {
+      if (!requestId || !pendingTimers.has(requestId)) {
+        return
+      }
+      const timer = pendingTimers.get(requestId)
+
+      // 清除定时器
+      if (timer) {
+        clearTimeout(timer)
+      }
+      pendingTimers.delete(requestId)
+      activeCount--
+
+      // 只有当所有请求都完成，且正在显示时，才关闭
+      if (activeCount <= 0 && isShowing) {
+        isShowing = false
+        loading.close()
+        activeCount = 0 // 防止负数
+      }
+    },
+  }
+}
+
+const loadingManager = createLoadingManager()
 
 export const alovaInstance = createAlova({
   // #ifndef H5
@@ -34,6 +98,15 @@ export const alovaInstance = createAlova({
       console.log(`[API Base URL] ${import.meta.env.VITE_API_BASE_URL}`)
       console.log(`[Environment] ${import.meta.env.VITE_ENV_NAME}`)
     }
+
+    // Start loading
+    const requestId = loadingManager.start(method)
+    if (requestId) {
+      method.config.meta = {
+        ...method.config.meta,
+        __requestId: requestId,
+      }
+    }
   },
 
   // Response handlers
@@ -45,8 +118,9 @@ export const alovaInstance = createAlova({
     onError: handleAlovaError,
 
     // Complete handler - runs after success or error
-    onComplete: async () => {
+    onComplete: async (method) => {
       // Any cleanup or logging can be done here
+      loadingManager.finish(method.config.meta?.__requestId)
     },
   },
 
@@ -54,7 +128,7 @@ export const alovaInstance = createAlova({
   // middleware is not directly supported in createAlova options
 
   // Default request timeout (30 seconds)
-  timeout: 6000 * 30,
+  timeout: 1000 * 30,
   // 设置为null即可全局关闭全部请求缓存
   cacheFor: null,
 })

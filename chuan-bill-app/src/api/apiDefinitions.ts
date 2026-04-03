@@ -30,6 +30,7 @@ export default {
   'user.getProfile': ['GET', '/user/profile'],
   'user.hasPassword': ['GET', '/user/hasPassword'],
   'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
+  'bill.getMonthlyStats': ['GET', '/bill/monthly-stats'],
   'bill.getBillList': ['GET', '/bill/list'],
   'bill.getBillDetail': ['GET', '/bill/detail'],
   'bill.getCategories': ['GET', '/bill/categories'],

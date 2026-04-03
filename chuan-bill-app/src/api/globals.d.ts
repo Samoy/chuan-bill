@@ -89,6 +89,16 @@ type Alova2Method<
       >
     : never;
 
+export interface BillMonthlyStatsDTO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month: string;
+  /**
+   * 家庭ID，用于查询家庭账单统计信息
+   */
+  familyId?: string;
+}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -103,7 +113,7 @@ export interface BillListDTO {
    */
   categoryId?: string;
   /**
-   * 账单类型：income-收入，expense-支出
+   * 账单类型：income-收入，expense-支出，空字符串：全部
    */
   type?: string;
   /**
@@ -115,13 +125,9 @@ export interface BillListDTO {
    */
   maxAmount?: number;
   /**
-   * 账单名称模糊搜索
+   * 关键字模糊搜索，支持名称和备注
    */
-  name?: string;
-  /**
-   * 账单备注模糊搜索
-   */
-  remark?: string;
+  keyword?: string;
   /**
    * 页码
    */
@@ -418,80 +424,31 @@ export interface ResultTokenVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface BillVO {
+export interface BillMonthlyStatsVO {
   /**
-   * 账单 ID
+   * 月份，格式为YYYY-MM
    */
-  id?: string;
+  month?: string;
   /**
-   * 账单名称
+   * 支出金额
    */
-  name?: string;
+  expense?: number;
   /**
-   * 分类 ID
+   * 收入金额
    */
-  categoryId?: string;
+  income?: number;
   /**
-   * 分类名称
+   * 结余金额
    */
-  categoryName?: string;
-  /**
-   * 支付方式 ID
-   */
-  paymentMethodId?: string;
-  /**
-   * 支付方式名称
-   */
-  paymentMethodName?: string;
-  /**
-   * 账单类型：income-收入，expense-支出
-   */
-  type?: string;
-  /**
-   * 账单金额
-   */
-  amount?: number;
-  /**
-   * 账单时间
-   */
-  time?: string;
-  /**
-   * 账单备注
-   */
-  remark?: string;
-  /**
-   * 账单来源：manual-手动，ocr-图片识别，voice-语音
-   */
-  source?: string;
-  /**
-   * 家庭 ID
-   */
-  familyId?: string;
+  balance?: number;
 }
-export interface IPageBillVO {
-  size?: number;
-  current?: number;
-  records?: BillVO[];
-  total?: number;
-  /**
-   * @deprecated
-   */
-  pages?: number;
-}
-export interface ResultIPageBillVO {
-  code?: number;
-  message?: string;
-  data?: IPageBillVO;
-  timestamp?: number;
-  success?: boolean;
-}
-export interface ResultBillVO {
+export interface ResultBillMonthlyStatsVO {
   code?: number;
   message?: string;
   /**
-   * 账单信息
+   * 账单月度统计信息
    */
-  data?: BillVO;
+  data?: BillMonthlyStatsVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -525,20 +482,79 @@ export interface CategoryVO {
    */
   userId?: string;
 }
+export interface BillVO {
+  /**
+   * 账单 ID
+   */
+  id?: string;
+  /**
+   * 账单名称
+   */
+  name?: string;
+  /**
+   * 分类信息
+   */
+  category?: CategoryVO;
+  /**
+   * 支付方式信息
+   */
+  paymentMethod?: PaymentMethodVO;
+  /**
+   * 账单类型：income-收入，expense-支出
+   */
+  type?: string;
+  /**
+   * 账单金额
+   */
+  amount?: number;
+  /**
+   * 账单时间
+   */
+  time?: string;
+  /**
+   * 账单备注
+   */
+  remark?: string;
+  /**
+   * 账单来源：manual-手动，ocr-图片识别，voice-语音
+   */
+  source?: string;
+  /**
+   * 家庭 ID
+   */
+  familyId?: string;
+}
+export interface IPageBillVO {
+  size?: number;
+  records?: BillVO[];
+  current?: number;
+  total?: number;
+  /**
+   * @deprecated
+   */
+  pages?: number;
+}
+export interface ResultIPageBillVO {
+  code?: number;
+  message?: string;
+  data?: IPageBillVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultBillVO {
+  code?: number;
+  message?: string;
+  /**
+   * 账单信息
+   */
+  data?: BillVO;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface ResultListCategoryVO {
   code?: number;
   message?: string;
   data?: CategoryVO[];
-  timestamp?: number;
-  success?: boolean;
-}
-export interface ResultAddBillDTO {
-  code?: number;
-  message?: string;
-  /**
-   * 添加账单请求
-   */
-  data?: AddBillDTO;
   timestamp?: number;
   success?: boolean;
 }
@@ -972,6 +988,63 @@ declare global {
       /**
        * ---
        *
+       * [GET] 获取月度统计
+       *
+       * **path:** /bill/monthly-stats
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 账单月度统计参数
+       *   billMonthlyStatsDTO: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 账单月度统计信息
+       *   data?: {
+       *     // 月份，格式为YYYY-MM
+       *     month?: string
+       *     // 支出金额
+       *     expense?: number
+       *     // 收入金额
+       *     income?: number
+       *     // 结余金额
+       *     balance?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMonthlyStats<
+        Config extends Alova2MethodConfig<ResultBillMonthlyStatsVO> & {
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            billMonthlyStatsDTO: BillMonthlyStatsDTO;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBillMonthlyStatsVO, 'bill.getMonthlyStats', Config>;
+      /**
+       * ---
+       *
        * [GET] 获取账单列表
        *
        * **path:** /bill/list
@@ -989,16 +1062,14 @@ declare global {
        *     endDate?: string
        *     // 分类 ID
        *     categoryId?: string
-       *     // 账单类型：income-收入，expense-支出
+       *     // 账单类型：income-收入，expense-支出，空字符串：全部
        *     type?: string
        *     // 最小金额
        *     minAmount?: number
        *     // 最大金额
        *     maxAmount?: number
-       *     // 账单名称模糊搜索
-       *     name?: string
-       *     // 账单备注模糊搜索
-       *     remark?: string
+       *     // 关键字模糊搜索，支持名称和备注
+       *     keyword?: string
        *     // 页码
        *     page: number
        *     // 每页数量
@@ -1016,7 +1087,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     current?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -1025,14 +1095,38 @@ declare global {
        *       id?: string
        *       // 账单名称
        *       name?: string
-       *       // 分类 ID
-       *       categoryId?: string
-       *       // 分类名称
-       *       categoryName?: string
-       *       // 支付方式 ID
-       *       paymentMethodId?: string
-       *       // 支付方式名称
-       *       paymentMethodName?: string
+       *       // 分类信息
+       *       category?: {
+       *         // 分类 ID
+       *         id?: string
+       *         // 分类名称
+       *         name?: string
+       *         // 图标 URL
+       *         icon?: string
+       *         // 分类类型：income-收入，expense-支出
+       *         type?: string
+       *         // 排序
+       *         sortOrder?: number
+       *         // 是否默认
+       *         isDefault?: boolean
+       *         // 用户 ID
+       *         userId?: string
+       *       }
+       *       // 支付方式信息
+       *       paymentMethod?: {
+       *         // 支付方式 ID
+       *         id?: string
+       *         // 支付方式名称
+       *         name?: string
+       *         // 图标 URL
+       *         icon?: string
+       *         // 排序
+       *         sortOrder?: number
+       *         // 是否默认
+       *         isDefault?: boolean
+       *         // 用户 ID
+       *         userId?: string
+       *       }
        *       // 账单类型：income-收入，expense-支出
        *       type?: string
        *       // 账单金额
@@ -1046,6 +1140,7 @@ declare global {
        *       // 家庭 ID
        *       familyId?: string
        *     }>
+       *     current?: number
        *     total?: number
        *     // [deprecated]
        *     pages?: number
@@ -1097,14 +1192,38 @@ declare global {
        *     id?: string
        *     // 账单名称
        *     name?: string
-       *     // 分类 ID
-       *     categoryId?: string
-       *     // 分类名称
-       *     categoryName?: string
-       *     // 支付方式 ID
-       *     paymentMethodId?: string
-       *     // 支付方式名称
-       *     paymentMethodName?: string
+       *     // 分类信息
+       *     category?: {
+       *       // 分类 ID
+       *       id?: string
+       *       // 分类名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 分类类型：income-收入，expense-支出
+       *       type?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
+       *     // 支付方式信息
+       *     paymentMethod?: {
+       *       // 支付方式 ID
+       *       id?: string
+       *       // 支付方式名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
@@ -1357,26 +1476,56 @@ declare global {
        * type Response = {
        *   code?: number
        *   message?: string
-       *   // 添加账单请求
+       *   // 账单信息
        *   data?: {
+       *     // 账单 ID
+       *     id?: string
        *     // 账单名称
-       *     name: string
-       *     // 分类 ID
-       *     categoryId: string
-       *     // 支付方式 ID
-       *     paymentMethodId?: string
+       *     name?: string
+       *     // 分类信息
+       *     category?: {
+       *       // 分类 ID
+       *       id?: string
+       *       // 分类名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 分类类型：income-收入，expense-支出
+       *       type?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
+       *     // 支付方式信息
+       *     paymentMethod?: {
+       *       // 支付方式 ID
+       *       id?: string
+       *       // 支付方式名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
        *     // 账单类型：income-收入，expense-支出
-       *     type: string
+       *     type?: string
        *     // 账单金额
-       *     amount: number
+       *     amount?: number
        *     // 账单时间
-       *     time: string
+       *     time?: string
        *     // 账单备注
        *     remark?: string
-       *     // 家庭 ID（可选）
-       *     familyId?: string
        *     // 账单来源：manual-手动，ocr-图片识别，voice-语音
        *     source?: string
+       *     // 家庭 ID
+       *     familyId?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1384,14 +1533,14 @@ declare global {
        * ```
        */
       ocr<
-        Config extends Alova2MethodConfig<ResultAddBillDTO> & {
+        Config extends Alova2MethodConfig<ResultBillVO> & {
           params: {
             fileId: string;
           };
         }
       >(
         config: Config
-      ): Alova2Method<ResultAddBillDTO, 'ai.ocr', Config>;
+      ): Alova2Method<ResultBillVO, 'ai.ocr', Config>;
     };
   }
 
