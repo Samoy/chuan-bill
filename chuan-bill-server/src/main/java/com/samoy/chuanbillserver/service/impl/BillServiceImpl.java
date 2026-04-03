@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.dao.BillMapper;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
+import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.entity.Category;
@@ -17,11 +19,15 @@ import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
+import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
 import com.samoy.chuanbillserver.vo.PaymentMethodVO;
 import jakarta.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,37 +59,34 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         wrapper.eq(Bill::getUserId, userId).orderByDesc(Bill::getTime, Bill::getCreateTime);
 
         // 日期范围查询
-        if (billListDTO.getStartDate() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getStartDate())) {
             wrapper.ge(Bill::getTime, LocalDateTime.parse(String.format("%sT00:00:00", billListDTO.getStartDate())));
         }
-        if (billListDTO.getEndDate() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getEndDate())) {
             wrapper.le(Bill::getTime, LocalDateTime.parse(String.format("%sT23:59:59", billListDTO.getEndDate())));
         }
 
         // 类型过滤
-        if (billListDTO.getType() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getType())) {
             wrapper.eq(Bill::getType, billListDTO.getType());
         }
 
         // 分类过滤
-        if (billListDTO.getCategoryId() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getCategoryId())) {
             wrapper.eq(Bill::getCategoryId, billListDTO.getCategoryId());
         }
 
         // 金额范围过滤
-        if (billListDTO.getMinAmount() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getMinAmount())) {
             wrapper.ge(Bill::getAmount, billListDTO.getMinAmount());
         }
-        if (billListDTO.getMaxAmount() != null) {
+        if (ObjectUtil.isNotEmpty(billListDTO.getMaxAmount())) {
             wrapper.le(Bill::getAmount, billListDTO.getMaxAmount());
         }
-        // 名称模糊查询
-        if (billListDTO.getName() != null) {
-            wrapper.like(Bill::getName, billListDTO.getName().trim());
-        }
-        // 备注模糊查询
-        if (billListDTO.getRemark() != null) {
-            wrapper.like(Bill::getRemark, billListDTO.getRemark().trim());
+        // 关键字模糊查询
+        if (ObjectUtil.isNotEmpty(billListDTO.getKeyword())) {
+            String keyword = billListDTO.getKeyword();
+            wrapper.like(Bill::getName, keyword).or().like(Bill::getRemark, keyword);
         }
         IPage<Bill> billPage = this.page(new Page<>(billListDTO.getPage(), billListDTO.getSize()), wrapper);
 
@@ -183,6 +186,34 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         }
         // 单个账单查询，直接使用简化版本
         return this.getBillVO(bill);
+    }
+
+    @Override
+    public BillMonthlyStatsVO getMonthlyStats(String userId, BillMonthlyStatsDTO dto) {
+        YearMonth yearMonth = YearMonth.parse(dto.getMonth(), DateTimeFormatter.ofPattern("yyyy-MM"));
+        LocalDateTime startTime = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        // 查询收入总额
+        BigDecimal income = this.baseMapper.selectMonthlyStats(userId, dto.getFamilyId(), "income", startTime, endTime);
+        // 查询支出总额
+        BigDecimal expense =
+                this.baseMapper.selectMonthlyStats(userId, dto.getFamilyId(), "expense", startTime, endTime);
+
+        // 处理null值
+        income = income == null ? BigDecimal.ZERO : income;
+        expense = expense == null ? BigDecimal.ZERO : expense;
+
+        // 计算结余
+        BigDecimal balance = income.subtract(expense);
+
+        // 返回数据
+        BillMonthlyStatsVO vo = new BillMonthlyStatsVO();
+        vo.setMonth(dto.getMonth());
+        vo.setIncome(income);
+        vo.setExpense(expense);
+        vo.setBalance(balance);
+        return vo;
     }
 
     /**

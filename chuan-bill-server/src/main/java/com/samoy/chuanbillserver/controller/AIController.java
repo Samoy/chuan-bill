@@ -1,8 +1,8 @@
 package com.samoy.chuanbillserver.controller;
 
-import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IAIService;
+import com.samoy.chuanbillserver.vo.BillVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -19,7 +19,7 @@ public class AIController {
 
     @GetMapping("/ocr")
     @Operation(summary = "ocr", description = "ocr识别图片中的账单信息")
-    public Result<AddBillDTO> ocr(String fileId) {
+    public Result<BillVO> ocr(String fileId) {
         return Result.success(aiService.ocr(fileId));
     }
 }

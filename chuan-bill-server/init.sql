@@ -214,11 +214,11 @@ INSERT INTO
     `is_default`
   )
 VALUES
-  ('cat_exp_001', '餐饮', 'icon-food', 'expense', 1, 1),
+  ('cat_exp_001', '餐饮', 'i-icon-park-outline:chopsticks-fork', 'expense', 1, 1),
   (
     'cat_exp_002',
     '购物',
-    'icon-shopping',
+    'i-mingcute:shopping-bag-1-line',
     'expense',
     2,
     1
@@ -226,34 +226,48 @@ VALUES
   (
     'cat_exp_003',
     '交通',
-    'icon-transportation',
+    'i-mingcute:car-3-line',
     'expense',
     3,
     1
   ),
-  ('cat_exp_004', '娱乐', 'icon-fun', 'expense', 4, 1),
+  ('cat_exp_004', '娱乐', 'i-mingcute:movie-line', 'expense', 4, 1),
   (
     'cat_exp_005',
-    '医疗',
-    'icon-hospital',
+    '居住',
+    'i-lucide:house-plug',
     'expense',
     5,
     1
   ),
   (
     'cat_exp_006',
-    '教育',
-    'icon-education',
+    '通讯',
+    'i-lucide:smartphone-charging',
     'expense',
     6,
     1
   ),
   (
     'cat_exp_007',
-    '其他支出',
-    'icon-other-expense',
+    '医疗',
+    'i-lucide:hospital',
     'expense',
     7,
+    1
+  ),(
+    'cat_exp_008',
+    '教育',
+    'i-lucide:book-open',
+    'expense',
+    8,
+    1
+  ),(
+    'cat_exp_009',
+    '其他支出',
+    'i-icon-park-outline:expenses',
+    'expense',
+    9,
     1
   );
 
@@ -271,16 +285,16 @@ VALUES
   (
     'cat_inc_001',
     '工资',
-    'icon-salary',
+    'i-mingcute:currency-dollar-line',
     'income',
     1,
     1
   ),
-  ('cat_inc_002', '奖金', 'icon-bonus', 'income', 2, 1),
+  ('cat_inc_002', '奖金', 'i-material-symbols:money-bag-outline-rounded', 'income', 2, 1),
   (
     'cat_inc_003',
     '投资',
-    'icon-investment',
+    'i-carbon:financial-assets',
     'income',
     3,
     1
@@ -288,16 +302,16 @@ VALUES
   (
     'cat_inc_004',
     '兼职',
-    'icon-part-time',
+    'i-material-symbols:deployed-code-account-outline-rounded',
     'income',
     4,
     1
   ),
-  ('cat_inc_005', '礼金', 'icon-gift', 'income', 5, 1),
+  ('cat_inc_005', '礼金', 'i-mingcute:gift-line', 'income', 5, 1),
   (
     'cat_inc_006',
     '退款',
-    'icon-refund',
+    'i-mingcute:card-refund-line',
     'income',
     6,
     1
@@ -305,7 +319,7 @@ VALUES
   (
     'cat_inc_007',
     '其他收入',
-    'icon-other-income',
+    'i-icon-park-outline:income',
     'income',
     7,
     1
@@ -317,10 +331,9 @@ VALUES
 INSERT INTO
   `t_payment_method` (`id`, `name`, `icon`, `sort_order`, `is_default`)
 VALUES
-  ('pay_001', '微信', 'icon-wechat', 1, 1),
-  ('pay_002', '支付宝', 'icon-alipay', 2, 1),
-  ('pay_003', '现金', 'icon-cash', 3, 1),
-  ('pay_004', '银行卡', 'icon-bank-card', 4, 1),
-  ('pay_005', '信用卡', 'icon-credit-card', 5, 1),
-  ('pay_006', '花呗', 'icon-huabei', 6, 1),
-  ('pay_007', '其他', 'icon-other-payment', 7, 1);
+  ('pay_001', '微信', 'i-mingcute:wechat-pay-line text-[#07c160]', 1, 1),
+  ('pay_002', '支付宝', 'i-mingcute:alipay-line text-[#1677ff]', 2, 1),
+  ('pay_003', '现金', 'i-mingcute:cash-line text-[#f1c305]', 3, 1),
+  ('pay_004', '银行卡', 'i-mingcute:bank-card-line text-[#50f4ff]', 4, 1),
+  ('pay_005', '信用卡', 'i-lucide:credit-card text-[#8ba6c5]', 5, 1),
+  ('pay_006', '其他', 'i-icon-park-outline:payment-method text-[#ff4d4f]', 6, 1);

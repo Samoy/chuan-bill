@@ -1,0 +1,33 @@
+export const safeIconList: string[] = [
+// 支付方式
+  'i-mingcute:wechat-pay-line',
+  'text-[#07c160]',
+  'i-mingcute:alipay-line',
+  'text-[#1677ff]',
+  'i-mingcute:cash-line',
+  'text-[#f1c305]',
+  'i-mingcute:bank-card-line',
+  'text-[#50f4ff]',
+  'i-lucide:credit-card',
+  'text-[#8ba6c5]',
+  'i-icon-park-outline:payment-method',
+  'text-[#ff4d4f]',
+  // 支出类目图标
+  'i-icon-park-outline:chopsticks-fork',
+  'i-mingcute:shopping-bag-1-line',
+  'i-mingcute:car-3-line',
+  'i-mingcute:movie-line',
+  'i-lucide:house-plug',
+  'i-lucide:smartphone-charging',
+  'i-lucide:hospital',
+  'i-lucide:book-open',
+  'i-icon-park-outline:expenses',
+  // 收入类目图标
+  'i-mingcute:currency-dollar-line',
+  'i-material-symbols:money-bag-outline-rounded',
+  'i-carbon:financial-assets',
+  'i-material-symbols:deployed-code-account-outline-rounded',
+  'i-mingcute:gift-line',
+  'i-mingcute:card-refund-line',
+  'i-icon-park-outline:income',
+]

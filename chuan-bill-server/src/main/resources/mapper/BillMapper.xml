@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.samoy.chuanbillserver.dao.BillMapper">
-
+    <select id="selectMonthlyStats" resultType="java.math.BigDecimal">
+        SELECT
+            SUM(amount) as total_amount
+        FROM bill
+        WHERE user_id = #{userId}
+            AND time &gt;= #{startTime}
+            AND time &lt;= #{endTime}
+            AND deleted = 0
+            AND type = #{type}
+        <if test="familyId != null">
+            AND family_id = #{familyId}
+        </if>
+    </select>
 </mapper>

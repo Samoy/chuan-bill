@@ -3,7 +3,11 @@ package com.samoy.chuanbillserver.expection;
 import cn.dev33.satoken.exception.NotLoginException;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.result.ResultEnum;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -33,6 +37,24 @@ public class GlobalExceptionHandler {
     public Result<Void> handleBusinessException(BusinessException e) {
         log.info("业务异常: {}", e.getMessage(), e);
         return Result.error(e.getCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<String> errorMessages = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .toList();
+        log.info("参数验证异常: {}", errorMessages);
+        return Result.error(ResultEnum.BAD_REQUEST.getCode(), errorMessages.get(0));
+    }
+
+    @ExceptionHandler(BindException.class)
+    public Result<Void> handleBindException(BindException e) {
+        List<String> errorMessages = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .toList();
+        log.info("参数绑定异常: {}", errorMessages);
+        return Result.error(ResultEnum.BAD_REQUEST.getCode(), errorMessages.get(0));
     }
 
     /**

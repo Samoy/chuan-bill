@@ -1,3 +1,5 @@
+import { e } from '@unocss/core'
+import dayjs from 'dayjs'
 /**
  * 获取当前页面路径
  * @returns 当前页面路径
@@ -75,4 +77,44 @@ export function hexToRgbString(hex: string): string {
   }
 
   return rgbPart
+}
+
+/**
+ * 转换 UnoCSS 语法的 CSS 类名
+ * @param cssName CSS 类名
+ * @returns 转换后的 CSS 类名
+ */
+export function transformUnoCSS(cssName: string) {
+  // #ifdef MP
+  const unsupportedChars = ['.', ':', '%', '!', '#', '(', ')', '[', '/', ']', ',', '$', '{', '}', '@', '+', '^', '&', '<', '>', '\'', '\\', '"', '?', '*']
+  const esacpedUnsupportedChars = unsupportedChars.map(char => e(char))
+  return cssName.replace(new RegExp(`[${esacpedUnsupportedChars.join('')}]`, 'g'), '_a_')
+  // #endif
+  return cssName
+}
+
+/**
+ * 友好化显示时间
+ * @param t 时间
+ * @returns 友好时间
+ */
+export function friendlyTime(t: string | number | Date): string {
+  const d = dayjs(t)
+  const n = dayjs()
+  const f = 'HH:mm'
+  const s = d.format('YYYY-MM-DD')
+  const w = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  if (!d.isValid()) {
+    return '未知时间'
+  }
+  if (s === n.format('YYYY-MM-DD')) {
+    return d.format(f)
+  }
+  if (s === n.subtract(1, 'd').format('YYYY-MM-DD')) {
+    return `昨天 ${d.format(f)}`
+  }
+  if (n.diff(d, 'd') < 7) {
+    return `${w[d.day()]}` + ` ${d.format(f)}`
+  }
+  return d.format(d.year() === n.year() ? `MM-DD ${f}` : `YYYY-MM-DD ${f}`)
 }

@@ -8,11 +8,11 @@ import com.alibaba.dashscope.app.ApplicationResult;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.samoy.chuanbillserver.constant.SystemConstants;
-import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IAIService;
 import com.samoy.chuanbillserver.utils.OCRUtil;
+import com.samoy.chuanbillserver.vo.BillVO;
 import jakarta.annotation.Resource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +25,7 @@ public class AIServiceImpl implements IAIService {
     private OCRUtil ocrUtil;
 
     @Override
-    public AddBillDTO ocr(String fileId) {
+    public BillVO ocr(String fileId) {
         // 1. 通过fileId获取临时文件
         Path tempFile = Paths.get(SystemConstants.TEMP_FILE_UPLOAD_DIR, fileId);
         if (!FileUtil.exists(tempFile, false)) {
@@ -39,11 +39,11 @@ public class AIServiceImpl implements IAIService {
             ApplicationResult result = ocrUtil.callAgent("帮我提取账单", imageBase64);
             String output = result.getOutput().getText();
             JSON json = JSONUtil.parse(output);
-            AddBillDTO addBillDTO = json.getByPath("result", AddBillDTO.class);
+            BillVO billVO = json.getByPath("result", BillVO.class);
             // 4. 识别成功删除临时文件
             FileUtil.del(tempFile);
             // 5. 返回识别结果
-            return addBillDTO;
+            return billVO;
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new BusinessException(ResultEnum.BILL_OCR_FAILED);
         }

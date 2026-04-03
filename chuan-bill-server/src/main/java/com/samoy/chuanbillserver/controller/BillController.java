@@ -4,11 +4,13 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
+import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
+import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
 import com.samoy.chuanbillserver.vo.PaymentMethodVO;
@@ -86,5 +88,13 @@ public class BillController {
         String userId = StpUtil.getLoginIdAsString();
         List<PaymentMethodVO> result = paymentMethodService.getPaymentMethods(userId);
         return Result.success(result);
+    }
+
+    @GetMapping("/monthly-stats")
+    @Operation(summary = "获取月度统计", description = "获取月度统计信息")
+    public Result<BillMonthlyStatsVO> getMonthlyStats(
+            @Validated @ModelAttribute BillMonthlyStatsDTO billMonthlyStatsDTO) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(billService.getMonthlyStats(userId, billMonthlyStatsDTO));
     }
 }

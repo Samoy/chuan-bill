@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
+import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
+import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 
 /**
@@ -62,4 +64,12 @@ public interface IBillService extends IService<Bill> {
      * @return 账单详情
      */
     BillVO getBillDetail(String userId, String billId);
+
+    /**
+     * 获取月账单统计
+     * @param userId 用户ID
+     * @param billMonthlyStatsDTO 月账单统计DTO
+     * @return 月账单统计信息
+     */
+    BillMonthlyStatsVO getMonthlyStats(String userId, BillMonthlyStatsDTO billMonthlyStatsDTO);
 }

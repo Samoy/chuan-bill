@@ -1,6 +1,6 @@
 package com.samoy.chuanbillserver.service;
 
-import com.samoy.chuanbillserver.dto.AddBillDTO;
+import com.samoy.chuanbillserver.vo.BillVO;
 
 public interface IAIService {
 
@@ -9,5 +9,5 @@ public interface IAIService {
      * @param fileId 文件id
      * @return 识别结果
      */
-    AddBillDTO ocr(String fileId);
+    BillVO ocr(String fileId);
 }
