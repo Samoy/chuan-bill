@@ -15,7 +15,6 @@ export default defineConfig({
     }),
     presetIcons({
       warn: true,
-      cdn: 'https://esm.sh',
       // HBuilderX 必须针对要使用的 Collections 做异步导入
       collections: {
         carbon: () => import('@iconify-json/carbon/icons.json').then(i => i.default),

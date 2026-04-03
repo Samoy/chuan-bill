@@ -1,0 +1,57 @@
+<script setup lang="ts">
+import type { BillVO } from '@/api/globals'
+
+defineOptions({
+  name: 'BillCard',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
+})
+
+const { bill, customClass, customStyle } = defineProps<BillCardProps>()
+
+interface BillCardProps {
+  bill: BillVO
+  customClass?: string
+  customStyle?: string
+}
+
+const isFriendlyTime = ref(true)
+</script>
+
+<template>
+  <view
+    class="box-border w-full flex items-start gap-4 rounded-xl bg-white p-4 shadow-sm"
+    :class="customClass"
+    :style="customStyle"
+  >
+    <view class="flex flex-1 gap-4">
+      <!-- 左侧：图标 -->
+      <view
+        class="h-5 w-5 flex items-center justify-center rounded-xl p-3"
+        :class="bill.type === 'expense' ? 'bg-red-100 text-red-400' : 'bg-green-100 text-green-500'"
+      >
+        <text class="h-4 w-4" :class="transformUnoCSS(bill.category?.icon || '')" />
+      </view>
+      <!-- 中间：名称、时间、支付方式 -->
+      <view class="flex flex-col gap-2">
+        <view class="font-500">
+          {{ bill.name }}
+        </view>
+        <view class="flex gap-2 text-xs text-gray-500">
+          <text v-if="bill.time" @click="isFriendlyTime = !isFriendlyTime">
+            {{ isFriendlyTime ? friendlyTime(bill.time) : bill.time }}
+          </text>
+          <text v-if="bill.paymentMethod">
+            {{ bill.paymentMethod.name }}
+          </text>
+        </view>
+      </view>
+    </view>
+    <!-- 右侧：金额 -->
+    <text class="text-lg" :class="bill.type === 'expense' ? 'text-red-400' : 'text-green-500'">
+      {{ bill.type === 'expense' ? '-' : '+' }} {{ bill.amount }}
+    </text>
+  </view>
+</template>

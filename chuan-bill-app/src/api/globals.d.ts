@@ -502,7 +502,7 @@ export interface BillVO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type?: string;
+  type?: 'income' | 'expense';
   /**
    * 账单金额
    */
