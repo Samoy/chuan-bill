@@ -33,6 +33,9 @@ export const useManualThemeStore = defineStore('manualTheme', {
       searchSidePadding: '10px',
       searchPadding: '4px 10px',
       radioButtonRadius: '12px',
+      popupCloseColor: '#000000a6',
+      popupCloseSize: '16px',
+      dividerColor: '#dddddd',
     },
   }),
 

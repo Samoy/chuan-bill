@@ -9,66 +9,50 @@ defineOptions({
   },
 })
 
+const emit = defineEmits<{
+  submit: [data: AddBillDTO]
+}>()
+
 interface PickerOption {
   label?: string
   value?: string | number
   disabled?: boolean
 }
 
-interface CategoryMap {
-  income: PickerOption[]
-  expense: PickerOption[]
-}
-
 const form = ref()
 const isShared = ref(false)
+const billStore = useBillStore()
 
-const formData = ref<AddBillDTO>({ name: '', type: 'expense', amount: '', time: '' })
-const categoryMap: CategoryMap = { income: [], expense: [] }
-const categoryOptions = ref<PickerOption[]>()
-const paymentMethodOptions = ref<PickerOption[]>()
+const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'manual', type: 'expense' } })
+const categoryOptions = computed<PickerOption[]>(() => billStore.getCategoryList(formData.value.type).map(category => ({ label: category.name, value: category.id })))
+const paymentMethodOptions = computed<PickerOption[]>(() => billStore.getPaymentMethodList().map(paymentMethod => ({ label: paymentMethod.name, value: paymentMethod.id })))
 
-function getCategoryList() {
-  Apis.bill.getCategories({ params: { } })
-    .then((res) => {
-      if (res.success) {
-        const list = res.data || []
-        for (const item of list) {
-          const option: PickerOption = { label: item.name, value: item.id }
-          if (item.type === 'income') {
-            categoryMap.income.push(option)
-          }
-          if (item.type === 'expense') {
-            categoryMap.expense.push(option)
-          }
-        }
-        categoryOptions.value = categoryMap[formData.value.type]
-      }
-    })
-}
+onLoad(async () => {
+  await billStore.initBillData()
+})
 
-function getPayMethodList() {
-  Apis.bill.getPaymentMethods().then((res) => {
-    if (res.success) {
-      paymentMethodOptions.value = res.data?.map(item => ({ label: item.name, value: item.id }))
+watch(() => formData.value.type, () => {
+  formData.value.categoryId = undefined
+  formData.value.paymentMethodId = undefined
+})
+
+function sumbit() {
+  form.value?.validate().then(({ valid }: { valid: boolean }) => {
+    if (valid) {
+      emit('submit', formData.value)
     }
+  }).catch((error: Error) => {
+    console.error(error)
   })
 }
-
-onLoad(() => {
-  getCategoryList()
-  getPayMethodList()
-})
-
-watch(() => formData.value.type, (newValue) => {
-  categoryOptions.value = categoryMap[newValue]
-  formData.value.categoryId = undefined
-})
 </script>
 
 <template>
-  <wd-form :ref="form" :model="formData" custom-class="flex-1 overflow-auto">
-    <wd-radio-group v-model="formData.type" shape="button" custom-class="flex">
+  <wd-form ref="form" :model="formData" custom-class="flex-1 overflow-auto" error-type="toast">
+    <wd-radio-group
+      v-model="formData.type" shape="button" custom-class="flex mt-1" prop="type"
+      :rules="[{ required: true, message: '请选择账单类型' }]"
+    >
       <wd-radio value="expense" custom-class="flex-1 expense-radio">
         支出
       </wd-radio>
@@ -80,7 +64,8 @@ watch(() => formData.value.type, (newValue) => {
       金额
     </view>
     <wd-input
-      v-model="formData.amount" no-border type="digit" placeholder="0.00" custom-class="mt-2"
+      v-model="formData.amount" :rules="[{ required: true, message: '请输入账单金额' }]" no-border type="digit" placeholder="0.00" custom-class="mt-2"
+      prop="amount"
       custom-input-class="!text-[32px] !font-bold"
     />
     <view class="mt-3 text-xs text-gray-500">
@@ -88,39 +73,55 @@ watch(() => formData.value.type, (newValue) => {
     </view>
     <wd-input
       v-model="formData.name" type="text" placeholder="账单名称" custom-class="mt-2" no-border
+      prop="name"
+      :rules="[{ required: true, message: '请输入账单名称' }]"
       custom-input-class="!text-4"
       :maxlength="100"
     />
-    <wd-divider color="#dddddd" custom-class="!mt-2 !px-0" />
+    <wd-divider custom-class="!mt-2 !px-0" />
     <view class="mt-3 text-xs text-gray-500">
       时间
     </view>
-    <wd-datetime-picker v-model="formData.time" :default-value="Date.now()" custom-class="mt-3" />
-    <wd-divider color="#dddddd" custom-class="!mt-2 !px-0" />
+    <wd-datetime-picker
+      v-model="formData.time" :default-value="Date.now()" custom-class="mt-3"
+      prop="time"
+      :rules="[{ required: true, message: '请选择账单时间' }]"
+    />
+    <wd-divider custom-class="!mt-2 !px-0" />
     <view class="mt-3 flex gap-3">
       <view class="flex-1">
         <view class="text-xs text-gray-500">
           <text class="i-lucide:tag mr-2" />类目
         </view>
-        <wd-picker v-model="formData.categoryId" :columns="categoryOptions" title="请选择账单类目" placeholder="请选择" custom-class="mt-2 " />
+        <wd-picker
+          v-model="formData.categoryId" :columns="categoryOptions" title="请选择账单类目" placeholder="请选择" custom-class="mt-2" prop="categoryId"
+          :rules="[{ required: true, message: '请选择账单类目' }]"
+        />
       </view>
       <view class="flex-1">
         <view class="text-xs text-gray-500">
           <text class="i-lucide:credit-card mr-2" />支付方式
         </view>
-        <wd-picker v-model="formData.paymentMethodId" :columns="paymentMethodOptions" title="请选择支付方式" placeholder="请选择" custom-class="mt-2" />
+        <wd-picker
+          v-model="formData.paymentMethodId" :columns="paymentMethodOptions" title="请选择支付方式" placeholder="请选择" custom-class="mt-2" prop="paymentMethodId"
+          :rules="[{ required: true, message: '请选择支付方式' }]"
+        />
       </view>
     </view>
-    <wd-divider color="#dddddd" custom-class="!mt-2 !px-0" />
+    <wd-divider custom-class="!mt-2 !px-0" />
     <view class="mt-3 flex items-center justify-between text-xs text-gray-500">
       <text>共享到家庭</text>
       <wd-switch v-model="isShared" size="18px" />
     </view>
     <template v-if="isShared">
-      <wd-picker v-model="formData.familyId" custom-class="mt-3" title="请选择所要共享的家庭" />
+      <wd-picker
+        v-model="formData.familyId" custom-class="mt-3" title="请选择所要共享的家庭"
+        prop="familyId"
+        :rules="[{ required: true, message: '请选择所要共享的家庭' }]"
+      />
     </template>
     <view class="mt-3 text-xs text-gray-500">
-      备注
+      备注(可选)
     </view>
     <wd-textarea
       v-model="formData.remark" placeholder="可输入关于该账单的更多信息" custom-class="mt-2 !p-0 mb-10" no-border
@@ -128,7 +129,7 @@ watch(() => formData.value.type, (newValue) => {
       :maxlength="500"
       show-word-limit
     />
-    <wd-button size="large" type="primary" block custom-class="!pos-absolute bottom-[10px] left-4 right-4 z-1">
+    <wd-button size="large" type="primary" block custom-class="!pos-absolute bottom-[10px] left-4 right-4 z-1" @click="sumbit">
       保存
     </wd-button>
   </wd-form>
@@ -136,7 +137,7 @@ watch(() => formData.value.type, (newValue) => {
 
 <style lang="scss" scoped>
 :deep(.wd-radio.is-button .wd-radio__label) {
-  max-width: none;
+  max-width: none !important;
   width: 100%;
   @apply h-8 items-center flex justify-center py-0 dark:border-black/30!;
 }
@@ -144,7 +145,7 @@ watch(() => formData.value.type, (newValue) => {
 .expense-radio {
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply border-red-100! bg-red-100! text-red-600!;
+      @apply border-red-100! bg-red-100! text-red-600! shadow-red-100/20 shadow-lg;
     }
   }
 }
@@ -154,7 +155,7 @@ watch(() => formData.value.type, (newValue) => {
 
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply border-green-100! bg-green-100! text-green-600!;
+      @apply border-green-100! bg-green-100! text-green-600! shadow-green-100/20 shadow-lg;
     }
   }
 }

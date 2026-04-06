@@ -18,7 +18,7 @@ public class FileController {
     @Resource
     private IFileService fileService;
 
-    @PostMapping("/uploadTempFile")
+    @PostMapping("/temp/upload")
     @Operation(summary = "上传临时文件", description = "上传临时文件，返回fileId供ocr使用")
     public Result<TempFileVO> uploadTempFile(MultipartFile file) {
         return Result.success(fileService.uploadTempFile(file));

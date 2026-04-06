@@ -21,6 +21,9 @@ public class BillListDTO {
     @Schema(description = "账单类型：income-收入，expense-支出，空字符串：全部", example = "expense")
     private String type;
 
+    @Schema(description = "支付方式 ID", example = "123456")
+    private String paymentMethodId;
+
     @DecimalMin(value = "0.00", message = "最小金额不能小于 0.00", inclusive = false) @Digits(integer = 10, fraction = 2, message = "最小金额格式错误，最多 10 位整数，2 位小数") @Schema(description = "最小金额", example = "10.00")
     private BigDecimal minAmount;
 

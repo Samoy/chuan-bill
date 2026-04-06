@@ -115,7 +115,13 @@ export interface BillListDTO {
   /**
    * 账单类型：income-收入，expense-支出，空字符串：全部
    */
-  type?: string;
+  type?: 'income' | 'expense' | '';
+
+  /**
+   * 支付方式 ID
+   */
+  paymentMethodId?: string;
+
   /**
    * 最小金额
    */
@@ -225,7 +231,7 @@ export interface AddBillDTO {
   /**
    * 分类 ID
    */
-  categoryId: string;
+  categoryId?: string;
   /**
    * 支付方式 ID
    */
@@ -233,11 +239,11 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: string;
+  type: 'income' | 'expense';
   /**
    * 账单金额
    */
-  amount: number;
+  amount: string;
   /**
    * 账单时间
    */
@@ -506,7 +512,7 @@ export interface BillVO {
   /**
    * 账单金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 账单时间
    */
@@ -1152,12 +1158,7 @@ declare global {
        */
       getBillList<
         Config extends Alova2MethodConfig<ResultIPageBillVO> & {
-          params: {
-            /**
-             * 账单列表查询参数
-             */
-            billListDTO: BillListDTO;
-          };
+          params: BillListDTO;
         }
       >(
         config: Config

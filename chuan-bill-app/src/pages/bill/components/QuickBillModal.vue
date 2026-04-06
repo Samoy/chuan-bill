@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AddBillDTO, BillVO } from '@/api/globals'
+import dayjs from 'dayjs'
 import ManualEdit from './ManualEdit.vue'
 import OcrEdit from './OcrEdit.vue'
 
@@ -10,6 +12,10 @@ defineOptions({
   },
 })
 
+const emit = defineEmits<{
+  success: [result: AddBillDTO]
+}>()
+
 // 记账方式选项
 const sourceOptions = [
   { payload: { label: '手动添加', icon: 'i-lucide:square-pen' }, value: 'manual' },
@@ -18,8 +24,60 @@ const sourceOptions = [
 ]
 const source = ref('manual')
 
-const show = defineModel<boolean>('show', { default: false })
+const show = defineModel<boolean>({ default: false })
 const segmentedRef = ref()
+const toast = useGlobalToast()
+const billForm = ref<AddBillDTO>({ name: '', type: 'expense', amount: '', time: '', source: 'manual' })
+
+function convertBillVOToAddBillDTO(billVO: BillVO) {
+  billForm.value.name = billVO.name!
+  billForm.value.amount = billVO.amount!
+  billForm.value.type = billVO.type!
+  billForm.value.time = billVO.time!
+  if (billVO.category?.id) {
+    billForm.value.categoryId = billVO.category!.id!
+  }
+  if (billVO.paymentMethod?.id) {
+    billForm.value.paymentMethodId = billVO.paymentMethod!.id!
+  }
+  if (billVO.remark) {
+    billForm.value.remark = billVO.remark!
+  }
+  billForm.value.source = billVO.source!
+}
+
+function ocrSubmit(result: BillVO) {
+  convertBillVOToAddBillDTO(result)
+  source.value = 'manual'
+}
+
+function resetBillForm() {
+  billForm.value = {
+    name: '',
+    type: 'expense',
+    amount: '',
+    time: '',
+    source: 'manual',
+    remark: '',
+    categoryId: '',
+    paymentMethodId: '',
+  }
+}
+
+async function manualSubmit(addBillDTO: AddBillDTO) {
+  const res = await Apis.bill.addBill({
+    data: {
+      ...addBillDTO,
+      time: dayjs(addBillDTO.time).format('YYYY-MM-DD HH:mm'),
+    },
+  })
+  if (res.success) {
+    toast.success('添加成功')
+    show.value = false
+    resetBillForm()
+    emit('success', addBillDTO)
+  }
+}
 </script>
 
 <template>
@@ -43,10 +101,10 @@ const segmentedRef = ref()
         </template>
       </wd-segmented>
       <template v-if="source === 'manual'">
-        <ManualEdit />
+        <ManualEdit v-model="billForm" @submit="manualSubmit" />
       </template>
       <template v-else-if="source === 'ocr'">
-        <OcrEdit />
+        <OcrEdit @submit="ocrSubmit" />
       </template>
     </view>
   </wd-action-sheet>

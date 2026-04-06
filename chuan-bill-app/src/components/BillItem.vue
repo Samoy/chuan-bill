@@ -22,7 +22,7 @@ const isFriendlyTime = ref(true)
 
 <template>
   <view
-    class="box-border w-full flex items-start gap-4 rounded-xl bg-white p-4 shadow-sm"
+    class="box-border w-full flex items-start gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-[--wot-dark-background2]"
     :class="customClass"
     :style="customStyle"
   >

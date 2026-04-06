@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { UploadFile, UploadSuccessEvent } from 'wot-design-uni/components/wd-upload/types'
-import type { AddBillDTO, ResultTempFileVO, TempFileVO } from '@/api/globals'
+import type { BillVO, ResultTempFileVO, TempFileVO } from '@/api/globals'
 
 defineOptions({
   name: 'OcrEdit',
@@ -10,17 +10,23 @@ defineOptions({
   },
 })
 
+const emit = defineEmits<{
+  submit: [result: BillVO]
+}>()
+
 enum TaskStatus {
   Init = 'init',
+  UploadFailed = 'uploadFailed',
   Pending = 'pending',
   Success = 'success',
   Failed = 'failed',
 }
 
-const actionUrl = import.meta.env.VITE_API_UPLOAD_TEMP_FILE_URL
+const actionUrl = ref('/file/temp/upload')
+
 const fileList = ref<UploadFile[]>([])
 const tempFileInfo = ref<TempFileVO>()
-const taskResult = ref<AddBillDTO>()
+const taskResult = ref<BillVO>()
 const taskStatus = ref(TaskStatus.Init)
 const toast = useGlobalToast()
 
@@ -31,6 +37,7 @@ async function startTask() {
     try {
       const res = await Apis.ai.ocr({ params: { fileId } })
       if (res.code === 200) {
+        toast.success('识别成功')
         taskResult.value = res.data
         taskStatus.value = TaskStatus.Success
       }
@@ -63,53 +70,70 @@ function uploadSuccess(e: UploadSuccessEvent) {
   if (tempFileInfo.value) {
     startTask()
   }
-  else {
-    toast.error('上传失败，请重试上传')
-  }
 }
+
+function reset() {
+  fileList.value = []
+  tempFileInfo.value = undefined
+  taskResult.value = undefined
+  taskStatus.value = TaskStatus.Init
+}
+
+if (process.env.NODE_ENV === 'development') {
+  actionUrl.value = '/api/file/temp/upload'
+}
+
+// #ifndef H5
+actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/temp/upload`
+// #endif
 </script>
 
 <template>
   <view class="flex flex-col items-center justify-center gap-3">
-    <wd-upload
-      v-model="fileList"
-      :action="actionUrl"
-      accept="image"
-      :limit="1"
-      reupload
-      :header="{
-        // FIXME：暂时使用固定token
-        token: 'VmkIL7QUN2B2LgLsbcqZdKdqrbnbDa4FQcch2E0qGt3Le6vihyd0sxzyRXDTS3ov',
-      }"
-      custom-class="w-full! h-50!"
-      :custom-preview-class="`${taskStatus !== TaskStatus.Pending ? 'border-2 border-dashed rounded-xl border-gray-200 dark:border-gray-600' : ''}`"
-      @success="uploadSuccess"
-    >
-      <view
-        class="h-50 w-full flex flex-col items-center justify-center gap-3 border-2 border-gray-300 rounded-xl border-dashed dark:border-gray-600"
+    <view v-if="taskStatus !== TaskStatus.Success" class="relative h-50 w-full">
+      <wd-upload
+        v-model:file-list="fileList"
+        :action="actionUrl"
+        accept="image"
+        :limit="1"
+        reupload
+        :header="{
+          // FIXME：暂时使用固定token
+          token: 'VmkIL7QUN2B2LgLsbcqZdKdqrbnbDa4FQcch2E0qGt3Le6vihyd0sxzyRXDTS3ov',
+        }"
+        :custom-class="`w-full! h-full! ${taskStatus !== TaskStatus.UploadFailed ? 'wd-upload-success' : ''}`"
+        :custom-preview-class="`${taskStatus !== TaskStatus.Pending ? 'border-2 border-dashed rounded-xl border-gray-200 dark:border-gray-600' : ''}`"
+        @success="uploadSuccess"
+        @fail="taskStatus = TaskStatus.UploadFailed"
       >
-        <view class="h-16 w-16 flex items-center justify-center rounded-full bg-primary/10">
-          <view class="i-lucide:camera text-3xl text-primary" />
+        <view
+          class="h-50 w-full flex flex-col items-center justify-center gap-3 border-2 border-gray-200 rounded-lg border-dashed dark:border-gray-600"
+        >
+          <view class="h-16 w-16 flex items-center justify-center rounded-full bg-primary/10">
+            <view class="i-lucide:camera text-3xl text-primary" />
+          </view>
+          <text class="text-xs text-gray-500">
+            点击此处上传图片，AI将自动识别账单
+          </text>
         </view>
-        <text class="text-xs text-gray-500">
-          点击此处上传图片，AI将自动识别账单
-        </text>
+      </wd-upload>
+      <view
+        v-if="taskStatus === TaskStatus.Pending"
+        class="absolute bottom-0 left-0 right-0 top-0 box-border h-full w-full flex flex-col items-center justify-center gap-3 rounded-xl bg-black/60"
+      >
+        <!-- 左上角 -->
+        <view class="absolute left-0 top-0 z-20 h-8 w-8 border-b-0 border-l-4 border-r-0 border-t-4 border-primary rounded-tl-xl border-solid" />
+        <!-- 右上角 -->
+        <view class="absolute right-0 top-0 z-20 h-8 w-8 border-b-0 border-l-0 border-r-4 border-t-4 border-primary rounded-tr-xl border-solid" />
+        <!-- 左下角 -->
+        <view class="absolute bottom-0 left-0 z-20 h-8 w-8 border-b-4 border-l-4 border-r-0 border-t-0 border-primary rounded-bl-xl border-solid" />
+        <!-- 右下角 -->
+        <view class="absolute bottom-0 right-0 z-20 h-8 w-8 border-b-4 border-l-0 border-r-4 border-t-0 border-primary rounded-br-xl border-solid" />
+        <!-- 扫描线 -->
+        <view class="scan-line absolute left-0 right-0 z-10 h-1 shadow-[0_0_40px_rgb(var(--color-primary)/0.8)]" />
       </view>
-      <template #preview-cover>
-        <view v-if="taskStatus === TaskStatus.Pending" class="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-xl bg-black/60">
-          <!-- 左上角 -->
-          <view class="absolute left-0 top-0 z-20 h-8 w-8 border-b-0 border-l-4 border-r-0 border-t-4 border-primary rounded-tl-xl border-solid" />
-          <!-- 右上角 -->
-          <view class="absolute right-0 top-0 z-20 h-8 w-8 border-b-0 border-l-0 border-r-4 border-t-4 border-primary rounded-tr-xl border-solid" />
-          <!-- 左下角 -->
-          <view class="absolute bottom-0 left-0 z-20 h-8 w-8 border-b-4 border-l-4 border-r-0 border-t-0 border-primary rounded-bl-xl border-solid" />
-          <!-- 右下角 -->
-          <view class="absolute bottom-0 right-0 z-20 h-8 w-8 border-b-4 border-l-0 border-r-4 border-t-0 border-primary rounded-br-xl border-solid" />
-          <!-- 扫描线 -->
-          <view class="scan-line absolute left-0 right-0 z-10 h-1 shadow-[0_0_40px_rgb(var(--color-primary)/0.8)]" />
-        </view>
-      </template>
-    </wd-upload>
+    </view>
+
     <text v-if="taskStatus === TaskStatus.Pending" class="text-center text-xs text-gray-400">
       AI识别中，请稍候...
     </text>
@@ -119,7 +143,7 @@ function uploadSuccess(e: UploadSuccessEvent) {
         <text class="i-carbon:close text-xs text-red-500" />
       </view>
       <text class="text-center text-xs text-gray-400">
-        AI识别失败，请重试或者手动输入
+        识别失败，请重试或者手动输入
       </text>
       <view class="w-full flex gap-3">
         <wd-button custom-class="flex-1" @click="startTask">
@@ -130,18 +154,36 @@ function uploadSuccess(e: UploadSuccessEvent) {
         </wd-button>
       </view>
     </template>
+    <template v-if="taskResult">
+      <view class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+        <!-- 成功图标 -->
+        <wd-icon name="check-circle" size="20px" color="green" />
+      </view>
+      <bill-card :bill="taskResult" custom-class="w-full flex" />
+      <view class="box-border w-full flex gap-3">
+        <wd-button plain custom-class="flex-1" @click="reset">
+          重新识别
+        </wd-button>
+        <wd-button custom-class="flex-1" @click="emit('submit', taskResult)">
+          确认入账
+        </wd-button>
+      </view>
+      <text class="text-center text-xs text-gray-300 dark:text-gray-600">
+        内容由AI生成，可能出现错误，请仔细辨别。
+      </text>
+    </template>
   </view>
 </template>
 
 <style scoped lang="scss">
 :deep(.wd-upload__evoke-slot){
-  @apply w-full h-50!
+  @apply w-full! h-full!
 }
 :deep(.wd-upload__preview){
-  @apply w-full h-full!
+  @apply w-full! h-full!
 }
-:deep(.wd-upload__close){
-  @apply hidden
+:deep(.wd-upload-success .wd-icon.wd-upload__close){
+  @apply hidden!
 }
 .scan-line {
   background: linear-gradient(90deg,

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { BillListDTO, BillVO } from '@/api/globals'
+import FilterModal from './components/FilterModal.vue'
 import QuickBillModal from './components/QuickBillModal.vue'
 
 definePage({
@@ -12,33 +14,106 @@ definePage({
   },
 })
 const searchValue = ref('')
+const filterParams = ref<Optional<BillListDTO>>()
+const isFiltered = ref()
 const showFilterModal = ref(false)
 const showQuickBillModal = ref(false)
 
 const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
+
+const billList = ref<BillVO[]>()
+const page = ref(1)
+const loadingMoreStatus = ref<'loading' | 'finished' | 'error'>()
+
+async function getBillList() {
+  const res = await Apis.bill.getBillList({
+    params: {
+      page: page.value,
+      size: 10,
+      keyword: searchValue.value,
+      ...filterParams.value,
+    },
+  })
+  if (res.success) {
+    billList.value = page.value === 1 ? res.data?.records : [...billList.value || [], ...res.data?.records || []]
+    if (page.value * 10 >= (res.data?.total || 0)) {
+      loadingMoreStatus.value = 'finished'
+    }
+    else {
+      loadingMoreStatus.value = 'loading'
+    }
+  }
+  else {
+    loadingMoreStatus.value = 'error'
+  }
+}
+
+function refresh() {
+  page.value = 1
+  return getBillList()
+}
+
+function loadMore() {
+  page.value++
+  getBillList()
+}
+
+function submitFilter(result: Optional<BillListDTO>, filtered?: boolean) {
+  filterParams.value = result
+  isFiltered.value = filtered
+  showFilterModal.value = false
+  refresh()
+}
+
+onLoad(() => {
+  refresh()
+})
+
+onPullDownRefresh(async () => {
+  await refresh()
+  uni.stopPullDownRefresh()
+})
+
+onReachBottom(() => {
+  loadMore()
+})
 </script>
 
 <template>
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 搜索区域 -->
-    <view class="border-b border-[var(--wot-border-color)] px-3">
-      <view class="flex items-center gap-2">
-        <wd-search
-          v-model="searchValue" placeholder="账单名称或备注" hide-cancel
-          custom-class="flex-1 rounded-xl border border-solid border-[var(--wot-color-border)] dark:border-gray-600"
-        />
-        <view
-          class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
-          @click="showFilterModal = true"
-        >
-          <view class="i-lucide:filter" />
+    <wd-sticky>
+      <view class="box-border w-100vw border-b border-[var(--wot-border-color)] px-3">
+        <view class="flex items-center gap-2">
+          <wd-search
+            v-model="searchValue" placeholder="账单名称或备注" hide-cancel
+            custom-class="flex-1 rounded-xl border border-solid border-[var(--wot-color-border)] dark:border-gray-600"
+            @search="refresh"
+            @clear="refresh"
+          />
+          <view
+            class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
+            :class="isFiltered && 'text-primary'"
+            @click="showFilterModal = true"
+          >
+            <view v-if="isFiltered" class="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
+            <view class="i-lucide:filter" />
+          </view>
         </view>
       </view>
-    </view>
+    </wd-sticky>
 
+    <!-- 分页列表区域 -->
+    <view class="mb-9 box-border flex flex-col gap-3 px-3 pb-3">
+      <bill-item v-for="bill in billList" :key="bill.id" :bill="bill" />
+      <wd-loadmore :state="loadingMoreStatus" finished-text="没有更多数据了" custom-class="h-8!" @reload="refresh" />
+    </view>
+    <!-- 筛选弹框 -->
+    <FilterModal v-model="showFilterModal" @submit="submitFilter" />
     <!-- FAB 按钮 -->
     <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="showQuickBillModal = true" />
-    <QuickBillModal v-model:show="showQuickBillModal" />
+    <!-- 快速记账模态框 -->
+    <QuickBillModal v-model="showQuickBillModal" @success="refresh" />
   </view>
 </template>
 
@@ -49,5 +124,8 @@ const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
 
 :deep(.wot-theme-dark .wd-search__block) {
   background-color: transparent;
+}
+:deep(.wd-loadmore .wd-divider){
+  @apply m-0!
 }
 </style>

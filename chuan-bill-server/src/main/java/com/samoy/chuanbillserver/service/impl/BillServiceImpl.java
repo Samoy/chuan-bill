@@ -76,6 +76,11 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             wrapper.eq(Bill::getCategoryId, billListDTO.getCategoryId());
         }
 
+        // 支付方式过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getPaymentMethodId())) {
+            wrapper.eq(Bill::getPaymentMethodId, billListDTO.getPaymentMethodId());
+        }
+
         // 金额范围过滤
         if (ObjectUtil.isNotEmpty(billListDTO.getMinAmount())) {
             wrapper.ge(Bill::getAmount, billListDTO.getMinAmount());
