@@ -6,6 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * <p>
+ * 拦截器配置类
+ * </p>
+ *
+ * @author samoy
+ * @since 2023/4/1
+ */
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer {
     @Override

@@ -46,6 +46,8 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 dashscope:
-  apiKey: ${DASHSCOPE_API_KEY}
-  ocr:
-    appId: ${DASHSCOPE_OCR_APP_ID}
+  api-key: ${DASHSCOPE_API_KEY}
+  bill-recognition:
+    app-id: ${DASHSCOPE_BILL_RECOGNITION_APP_ID}
+  bill-analysis:
+    app-id: ${DASHSCOPE_BILL_ANALYSIS_APP_ID}

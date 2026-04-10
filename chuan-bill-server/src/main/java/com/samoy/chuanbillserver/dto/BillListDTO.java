@@ -33,9 +33,9 @@ public class BillListDTO {
     @Size(max = 50, message = "关键字长度不能超过50个字符") @Schema(description = "关键字模糊搜索，支持名称和备注", example = "早餐")
     private String keyword;
 
-    @NotNull(message = "页码不能为空") @Min(value = 1, message = "页码不能小于 1") @Schema(description = "页码", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Min(value = 1, message = "页码不能小于 1") @Schema(description = "页码", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer page = 1;
 
-    @NotNull(message = "每页数量不能为空") @Min(value = 1, message = "每页数量不能小于 1") @Schema(description = "每页数量", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Min(value = 1, message = "每页数量不能小于 1") @Schema(description = "每页数量", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer size = 10;
 }

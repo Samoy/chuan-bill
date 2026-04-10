@@ -39,6 +39,8 @@ public enum ResultEnum {
     BILL_NOT_ALLOW_UPDATE(2003, "无权修改此账单"),
     BILL_NOT_ALLOW_DELETE(2004, "无权删除此账单"),
     BILL_OCR_FAILED(2101, "账单OCR识别失败"),
+    BILL_TEXT_FAILED(2102, "账单文本识别失败"),
+    BILL_ANALYSIS_FAILED(2103, "账单分析失败"),
 
     // 文件错误码 3000+
     FILE_NOT_FOUND(3001, "文件不存在"),

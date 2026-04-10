@@ -9,6 +9,7 @@ import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
+import java.util.List;
 
 /**
  * <p>
@@ -25,9 +26,18 @@ public interface IBillService extends IService<Bill> {
      *
      * @param userId      用户ID
      * @param billListDTO 账单列表DTO
+     * @return 账单列表
+     */
+    List<BillVO> getBillList(String userId, BillListDTO billListDTO);
+
+    /**
+     * 分页获取账单列表
+     *
+     * @param userId      用户ID
+     * @param billListDTO 账单列表DTO
      * @return 账单分页列表
      */
-    IPage<BillVO> getBillList(String userId, BillListDTO billListDTO);
+    IPage<BillVO> getBillListByPage(String userId, BillListDTO billListDTO);
 
     /**
      * 添加账单

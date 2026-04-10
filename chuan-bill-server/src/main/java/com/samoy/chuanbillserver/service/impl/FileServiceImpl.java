@@ -1,8 +1,8 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
@@ -21,16 +21,14 @@ public class FileServiceImpl implements IFileService {
     public TempFileVO uploadTempFile(MultipartFile file) {
         // 1.判断是否是图片格式
         String contentType = file.getContentType();
-        if (!StrUtil.startWith(contentType, "image")) {
+        if (!CharSequenceUtil.startWith(contentType, "image")) {
             throw new BusinessException(ResultEnum.FILE_UPLOAD_FAILED, "只能上传图片文件");
         }
         try {
             // 2. 储存临时文件
-            String objectId = IdUtil.objectId();
-            String fileExt = FileUtil.extName(file.getOriginalFilename());
-            String fileId = String.format("%s.%s", objectId, fileExt);
+            String fileId = IdUtil.objectId();
             Path tempPath = Paths.get(SystemConstants.TEMP_FILE_UPLOAD_DIR, fileId);
-            FileUtil.copyFile(file.getInputStream(), tempPath);
+            PathUtil.copyFile(file.getInputStream(), tempPath);
             TempFileVO tempFileVO = new TempFileVO();
             tempFileVO.setFileId(fileId);
             tempFileVO.setFileSize(file.getSize());

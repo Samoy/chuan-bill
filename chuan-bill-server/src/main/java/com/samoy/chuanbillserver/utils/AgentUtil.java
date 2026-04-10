@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.dashscope.app.Application;
 import com.alibaba.dashscope.app.ApplicationParam;
 import com.alibaba.dashscope.app.ApplicationResult;
@@ -12,24 +13,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class OCRUtil {
-    @Value("${dashscope.apiKey}")
+public class AgentUtil {
+    @Value("${dashscope.api-key}")
     private String dashscopeApiKey;
 
-    @Value("${dashscope.ocr.appId}")
-    private String ocrAppId;
+    public ApplicationResult callAgent(String appId, String query) throws NoApiKeyException, InputRequiredException {
+        return callAgent(appId, query, null);
+    }
 
-    public ApplicationResult callAgent(String query, String imageBase64)
+    public ApplicationResult callAgent(String appId, String query, String imageBase64)
             throws NoApiKeyException, InputRequiredException {
-        log.info("apiKey: {}", dashscopeApiKey);
-        log.info("appId: {}", ocrAppId);
         ApplicationParam param = ApplicationParam.builder()
                 .apiKey(dashscopeApiKey)
-                .appId(ocrAppId)
+                .appId(appId)
                 .prompt(query)
                 .hasThoughts(true)
-                .images(Collections.singletonList(imageBase64))
                 .build();
+        if (ObjectUtil.isNotEmpty(imageBase64)) {
+            param.setImages(Collections.singletonList(imageBase64));
+        }
         Application application = new Application();
         return application.call(param);
     }

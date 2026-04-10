@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -28,10 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -54,80 +52,18 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
     private IPaymentMethodService paymentMethodService;
 
     @Override
-    public IPage<BillVO> getBillList(String userId, BillListDTO billListDTO) {
-        LambdaQueryWrapper<Bill> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Bill::getUserId, userId).orderByDesc(Bill::getTime, Bill::getCreateTime);
+    public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
+        LambdaQueryWrapper<Bill> wrapper = buildQueryWrapper(userId, billListDTO);
+        List<Bill> billList = baseMapper.selectList(wrapper);
+        return convertToBillVOList(billList);
+    }
 
-        // 日期范围查询
-        if (ObjectUtil.isNotEmpty(billListDTO.getStartDate())) {
-            wrapper.ge(Bill::getTime, LocalDateTime.parse(String.format("%sT00:00:00", billListDTO.getStartDate())));
-        }
-        if (ObjectUtil.isNotEmpty(billListDTO.getEndDate())) {
-            wrapper.le(Bill::getTime, LocalDateTime.parse(String.format("%sT23:59:59", billListDTO.getEndDate())));
-        }
-
-        // 类型过滤
-        if (ObjectUtil.isNotEmpty(billListDTO.getType())) {
-            wrapper.eq(Bill::getType, billListDTO.getType());
-        }
-
-        // 分类过滤
-        if (ObjectUtil.isNotEmpty(billListDTO.getCategoryId())) {
-            wrapper.eq(Bill::getCategoryId, billListDTO.getCategoryId());
-        }
-
-        // 支付方式过滤
-        if (ObjectUtil.isNotEmpty(billListDTO.getPaymentMethodId())) {
-            wrapper.eq(Bill::getPaymentMethodId, billListDTO.getPaymentMethodId());
-        }
-
-        // 金额范围过滤
-        if (ObjectUtil.isNotEmpty(billListDTO.getMinAmount())) {
-            wrapper.ge(Bill::getAmount, billListDTO.getMinAmount());
-        }
-        if (ObjectUtil.isNotEmpty(billListDTO.getMaxAmount())) {
-            wrapper.le(Bill::getAmount, billListDTO.getMaxAmount());
-        }
-        // 关键字模糊查询
-        if (ObjectUtil.isNotEmpty(billListDTO.getKeyword())) {
-            String keyword = billListDTO.getKeyword();
-            wrapper.like(Bill::getName, keyword).or().like(Bill::getRemark, keyword);
-        }
+    @Override
+    public IPage<BillVO> getBillListByPage(String userId, BillListDTO billListDTO) {
+        LambdaQueryWrapper<Bill> wrapper = buildQueryWrapper(userId, billListDTO);
         IPage<Bill> billPage = this.page(new Page<>(billListDTO.getPage(), billListDTO.getSize()), wrapper);
 
-        // 批量查询分类信息
-        List<String> categoryIds = billPage.getRecords().stream()
-                .map(Bill::getCategoryId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-
-        Map<String, Category> categoryMap;
-        if (!categoryIds.isEmpty()) {
-            List<Category> categories = categoryService.listByIds(categoryIds);
-            categoryMap =
-                    categories.stream().collect(Collectors.toMap(Category::getId, Function.identity(), (v1, v2) -> v1));
-        } else {
-            categoryMap = new HashMap<>();
-        }
-
-        // 批量查询支付方式信息
-        List<String> paymentMethodIds = billPage.getRecords().stream()
-                .map(Bill::getPaymentMethodId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-
-        Map<String, PaymentMethod> paymentMethodMap;
-        if (!paymentMethodIds.isEmpty()) {
-            List<PaymentMethod> paymentMethods = paymentMethodService.listByIds(paymentMethodIds);
-            paymentMethodMap = paymentMethods.stream()
-                    .collect(Collectors.toMap(PaymentMethod::getId, Function.identity(), (v1, v2) -> v1));
-        } else {
-            paymentMethodMap = new HashMap<>();
-        }
-
-        return billPage.convert(bill -> this.getBillVO(bill, categoryMap, paymentMethodMap));
+        return convertToBillVOPage(billPage);
     }
 
     @Override
@@ -206,8 +142,8 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
                 this.baseMapper.selectMonthlyStats(userId, dto.getFamilyId(), "expense", startTime, endTime);
 
         // 处理null值
-        income = income == null ? BigDecimal.ZERO : income;
-        expense = expense == null ? BigDecimal.ZERO : expense;
+        income = income == null ? new BigDecimal("0.00") : income;
+        expense = expense == null ? new BigDecimal("0.00") : expense;
 
         // 计算结余
         BigDecimal balance = income.subtract(expense);
@@ -219,6 +155,48 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         vo.setExpense(expense);
         vo.setBalance(balance);
         return vo;
+    }
+
+    private LambdaQueryWrapper<Bill> buildQueryWrapper(String userId, BillListDTO billListDTO) {
+        LambdaQueryWrapper<Bill> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Bill::getUserId, userId).orderByDesc(Bill::getTime, Bill::getCreateTime);
+
+        // 日期范围查询
+        if (ObjectUtil.isNotEmpty(billListDTO.getStartDate())) {
+            wrapper.ge(Bill::getTime, LocalDateTime.parse(String.format("%sT00:00:00", billListDTO.getStartDate())));
+        }
+        if (ObjectUtil.isNotEmpty(billListDTO.getEndDate())) {
+            wrapper.le(Bill::getTime, LocalDateTime.parse(String.format("%sT23:59:59", billListDTO.getEndDate())));
+        }
+
+        // 类型过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getType())) {
+            wrapper.eq(Bill::getType, billListDTO.getType());
+        }
+
+        // 分类过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getCategoryId())) {
+            wrapper.eq(Bill::getCategoryId, billListDTO.getCategoryId());
+        }
+
+        // 支付方式过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getPaymentMethodId())) {
+            wrapper.eq(Bill::getPaymentMethodId, billListDTO.getPaymentMethodId());
+        }
+
+        // 金额范围过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getMinAmount())) {
+            wrapper.ge(Bill::getAmount, billListDTO.getMinAmount());
+        }
+        if (ObjectUtil.isNotEmpty(billListDTO.getMaxAmount())) {
+            wrapper.le(Bill::getAmount, billListDTO.getMaxAmount());
+        }
+        // 关键字模糊查询
+        if (ObjectUtil.isNotEmpty(billListDTO.getKeyword())) {
+            String keyword = billListDTO.getKeyword();
+            wrapper.like(Bill::getName, keyword).or().like(Bill::getRemark, keyword);
+        }
+        return wrapper;
     }
 
     /**
@@ -275,5 +253,49 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         billVO.setRemark(bill.getRemark());
         billVO.setSource(bill.getSource());
         return billVO;
+    }
+
+    private List<BillVO> convertToBillVOList(List<Bill> billList) {
+        Map<String, Category> categoryMap = batchQueryCategories(billList);
+        Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billList);
+        return billList.stream()
+                .map(bill -> getBillVO(bill, categoryMap, paymentMethodMap))
+                .toList();
+    }
+
+    private IPage<BillVO> convertToBillVOPage(IPage<Bill> billPage) {
+        Map<String, Category> categoryMap = batchQueryCategories(billPage.getRecords());
+        Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billPage.getRecords());
+        return billPage.convert(bill -> getBillVO(bill, categoryMap, paymentMethodMap));
+    }
+
+    private Map<String, Category> batchQueryCategories(List<Bill> billList) {
+        List<String> categoryIds = billList.stream()
+                .map(Bill::getCategoryId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (CollUtil.isNotEmpty(categoryIds)) {
+            List<Category> categories = categoryService.listByIds(categoryIds);
+            return categories.stream()
+                    .collect(Collectors.toMap(
+                            Category::getId, Function.identity(), (existing, replacement) -> existing));
+        }
+        return Collections.emptyMap();
+    }
+
+    private Map<String, PaymentMethod> batchQueryPaymentMethods(List<Bill> billList) {
+        List<String> paymentMethodIds = billList.stream()
+                .map(Bill::getPaymentMethodId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (CollUtil.isNotEmpty(paymentMethodIds)) {
+            List<PaymentMethod> paymentMethods = paymentMethodService.listByIds(paymentMethodIds);
+            return paymentMethods.stream()
+                    .collect(Collectors.toMap(
+                            PaymentMethod::getId, Function.identity(), (existing, replacement) -> existing));
+        }
+        return Collections.emptyMap();
     }
 }

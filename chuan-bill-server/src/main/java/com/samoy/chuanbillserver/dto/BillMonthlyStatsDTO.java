@@ -3,9 +3,13 @@ package com.samoy.chuanbillserver.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "账单月度统计参数")
 public class BillMonthlyStatsDTO {
 

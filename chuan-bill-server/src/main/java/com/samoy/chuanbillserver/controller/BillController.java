@@ -36,11 +36,11 @@ public class BillController {
     @Resource
     private IPaymentMethodService paymentMethodService;
 
-    @GetMapping("/list")
+    @GetMapping("/page-list")
     @Operation(summary = "获取账单列表", description = "分页获取账单列表，支持多种筛选条件")
-    public Result<IPage<BillVO>> getBillList(@Validated @ModelAttribute BillListDTO billListDTO) {
+    public Result<IPage<BillVO>> getPageBillList(@Validated @ModelAttribute BillListDTO billListDTO) {
         String userId = StpUtil.getLoginIdAsString();
-        return Result.success(billService.getBillList(userId, billListDTO));
+        return Result.success(billService.getBillListByPage(userId, billListDTO));
     }
 
     @GetMapping("/detail")
