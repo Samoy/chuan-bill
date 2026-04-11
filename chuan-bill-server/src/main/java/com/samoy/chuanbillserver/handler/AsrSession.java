@@ -2,7 +2,6 @@ package com.samoy.chuanbillserver.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,7 @@ public class AsrSession {
     @Setter
     private volatile boolean recognizing = false;
 
-    private final AtomicReference<AsrSender> asrSenderRef = new AtomicReference<>();
+    private volatile AsrSender sender;
 
     public AsrSession(WebSocketSession webSocketSession) {
         this.webSocketSession = webSocketSession;
@@ -41,7 +40,7 @@ public class AsrSession {
      * @param asrSender 语音识别发送器
      */
     public void setSender(AsrSender asrSender) {
-        asrSenderRef.set(asrSender);
+        this.sender = asrSender;
     }
 
     /**
@@ -50,7 +49,6 @@ public class AsrSession {
      * @param byteBuffer 音频数据
      */
     public void sendAudioData(ByteBuffer byteBuffer) {
-        AsrSender sender = asrSenderRef.get();
         if (ObjectUtil.isNotNull(sender)) {
             sender.send(byteBuffer);
         } else {
@@ -62,7 +60,6 @@ public class AsrSession {
      * 停止语音识别
      */
     public void stopRecognition() {
-        AsrSender sender = asrSenderRef.get();
         if (ObjectUtil.isNotNull(sender)) {
             sender.stop();
         }
@@ -74,7 +71,7 @@ public class AsrSession {
      */
     public void close() {
         stopRecognition();
-        asrSenderRef.set(null);
+        sender = null;
     }
 
     /**

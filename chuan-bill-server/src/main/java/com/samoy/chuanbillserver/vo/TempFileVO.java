@@ -11,4 +11,7 @@ public class TempFileVO {
 
     @Schema(description = "临时文件大小", example = "1024")
     private long fileSize;
+
+    @Schema(description = "临时文件扩展名", example = "png")
+    private String fileExt;
 }

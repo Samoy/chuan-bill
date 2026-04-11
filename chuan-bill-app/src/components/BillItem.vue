@@ -11,6 +11,10 @@ defineOptions({
 
 const { bill, customClass, customStyle } = defineProps<BillCardProps>()
 
+const emit = defineEmits<{
+  click: [item: BillVO]
+}>()
+
 interface BillCardProps {
   bill: BillVO
   customClass?: string
@@ -18,6 +22,16 @@ interface BillCardProps {
 }
 
 const isFriendlyTime = ref(true)
+
+function toggleFriendlyTime(e: UniHelper.TouchEvent, time?: string) {
+  const isSame = friendlyTime(time) === time
+  if (!isSame) {
+    isFriendlyTime.value = !isFriendlyTime.value
+  }
+  else {
+    emit('click', bill)
+  }
+}
 </script>
 
 <template>
@@ -25,6 +39,7 @@ const isFriendlyTime = ref(true)
     class="box-border w-full flex items-start gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-[--wot-dark-background2]"
     :class="customClass"
     :style="customStyle"
+    @click="emit('click', bill)"
   >
     <view class="flex flex-1 gap-4">
       <!-- 左侧：图标 -->
@@ -40,7 +55,7 @@ const isFriendlyTime = ref(true)
           {{ bill.name }}
         </view>
         <view class="flex gap-2 text-xs text-gray-500">
-          <text v-if="bill.time" @click="isFriendlyTime = !isFriendlyTime">
+          <text v-if="bill.time" @click.stop="toggleFriendlyTime($event, bill.time)">
             {{ isFriendlyTime ? friendlyTime(bill.time) : bill.time }}
           </text>
           <text v-if="bill.paymentMethod">

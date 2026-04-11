@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
@@ -32,6 +33,7 @@ public class FileServiceImpl implements IFileService {
             TempFileVO tempFileVO = new TempFileVO();
             tempFileVO.setFileId(fileId);
             tempFileVO.setFileSize(file.getSize());
+            tempFileVO.setFileExt(FileUtil.extName(file.getOriginalFilename()));
             return tempFileVO;
         } catch (IOException e) {
             throw new BusinessException(ResultEnum.FILE_UPLOAD_FAILED);

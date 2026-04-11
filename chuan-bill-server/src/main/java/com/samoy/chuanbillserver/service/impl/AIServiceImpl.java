@@ -45,18 +45,23 @@ public class AIServiceImpl implements IAIService {
     private IBillService billService;
 
     @Override
-    public BillVO ocr(String fileId) {
+    public BillVO ocr(String fileId, String fileExt) {
         // 1. 通过fileId获取临时文件
         Path tempFile = Paths.get(SystemConstants.TEMP_FILE_UPLOAD_DIR, fileId);
         if (!PathUtil.exists(tempFile, false)) {
             throw new BusinessException(ResultEnum.FILE_NOT_FOUND);
         }
+        Path tempPath = Paths.get(fileId + "." + fileExt);
+        String mimeType = PathUtil.getMimeType(tempPath);
+        // 如果不是图片，抛出异常
+        if (!mimeType.startsWith("image")) {
+            throw new BusinessException(ResultEnum.FILE_NOT_IMAGE);
+        }
         // 2. 读取文件，将其转换为base64
-        String imageBase64 = String.format(
-                "data:%s;base64,%s", PathUtil.getMimeType(tempFile), Base64.encode(PathUtil.readBytes(tempFile)));
+        String imageBase64 = String.format("data:%s;base64,%s", mimeType, Base64.encode(PathUtil.readBytes(tempFile)));
         // 3. 调用OCR Agent
         try {
-            ApplicationResult result = agentUtil.callAgent("帮我提取账单信息", imageBase64);
+            ApplicationResult result = agentUtil.callAgent(recognitionAppId, "帮我提取账单信息", imageBase64);
             String output = result.getOutput().getText();
             JSON json = JSONUtil.parse(output);
             BillVO billVO = json.getByPath("ocrResult", BillVO.class);
@@ -94,9 +99,9 @@ public class AIServiceImpl implements IAIService {
         List<BillVO> billVOList = billService.getBillList(userId, billListDTO);
         StringBuilder sb = new StringBuilder();
         sb.append("请分析以下账单数据：\n");
-        sb.append(String.format("【%s收入】：%s\n", month, vo.getIncome()));
-        sb.append(String.format("【%s支出】：%s\n", month, vo.getExpense()));
-        sb.append(String.format("【%s结余】：%s\n", month, vo.getBalance()));
+        sb.append(String.format("【%s收入】：%s%n", month, vo.getIncome()));
+        sb.append(String.format("【%s支出】：%s%n", month, vo.getExpense()));
+        sb.append(String.format("【%s结余】：%s%n", month, vo.getBalance()));
         sb.append(String.format("【%s账单明细】%n%s", month, JSONUtil.toJsonPrettyStr(billVOList)));
         log.debug("查询语句：\n{}", sb);
         try {

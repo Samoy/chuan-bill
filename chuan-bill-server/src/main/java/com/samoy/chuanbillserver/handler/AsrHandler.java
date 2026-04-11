@@ -77,6 +77,7 @@ public class AsrHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         ByteBuffer payload = message.getPayload();
+        log.info("收到音频数据:{}", payload);
         AsrSession asrSession = asrSessionMap.get(session.getId());
         if (ObjectUtil.isNull(asrSession) || !asrSession.isRecognizing()) {
             sendMessage(session, new WebSocketMessage<>("error", "语音识别未开始", null));
@@ -91,7 +92,7 @@ public class AsrHandler extends AbstractWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String sessionId = session.getId();
         log.info("WebSocket 连接关闭 sessionId={}, status={}", sessionId, status);
 
@@ -102,7 +103,7 @@ public class AsrHandler extends AbstractWebSocketHandler {
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+    public void handleTransportError(WebSocketSession session, Throwable exception) {
         log.error("WebSocket 传输错误 sessionId={}", session.getId(), exception);
         AsrSession asrSession = asrSessionMap.get(session.getId());
         if (ObjectUtil.isNotNull(asrSession)) {
@@ -110,29 +111,38 @@ public class AsrHandler extends AbstractWebSocketHandler {
         }
     }
 
-    private void handleStartRecognition(WebSocketSession session, AsrSession asrSession, AsrCommand command) {
-        String format = ObjectUtil.isNotEmpty(command.getFormat()) ? command.getFormat() : "pcm";
-        int sampleRate = ObjectUtil.isNotEmpty(command.getSampleRate()) ? command.getSampleRate() : 16000;
-        String[] languageHints =
-                ObjectUtil.isNotEmpty(command.getLanguageHints()) ? command.getLanguageHints() : new String[] {"zh"};
+    private void handleStartRecognition(WebSocketSession session, AsrSession asrSession, AsrCommand command)
+            throws IOException {
+        try {
+            String format = ObjectUtil.isNotEmpty(command.getFormat()) ? command.getFormat() : "pcm";
+            int sampleRate = ObjectUtil.isNotEmpty(command.getSampleRate()) ? command.getSampleRate() : 16000;
+            String[] languageHints = ObjectUtil.isNotEmpty(command.getLanguageHints())
+                    ? command.getLanguageHints()
+                    : new String[] {"zh"};
 
-        // 初始化语音识别
-        asrService.startAsr(asrSession, format, sampleRate, languageHints, new IAsrService.AsrCallback() {
-            @Override
-            public void onResult(RecognitionResult result) {
-                handleAsrResult(session, result);
-            }
+            // 初始化语音识别
+            asrService.startAsr(asrSession, format, sampleRate, languageHints, new IAsrService.AsrCallback() {
+                @Override
+                public void onResult(RecognitionResult result) {
+                    handleAsrResult(session, result);
+                }
 
-            @Override
-            public void onError(Exception e) {
-                handleAsrError(session, e);
-            }
+                @Override
+                public void onError(Exception e) {
+                    handleAsrError(session, e);
+                }
 
-            @Override
-            public void onCompleted() {
-                handleAsrCompleted(session);
-            }
-        });
+                @Override
+                public void onCompleted() {
+                    handleAsrCompleted(session);
+                }
+            });
+            asrSession.setRecognizing(true);
+            sendMessage(session, new WebSocketMessage<>("started", "语音识别已开始", null));
+        } catch (IOException e) {
+            log.error("启动语音识别失败", e);
+            sendMessage(session, new WebSocketMessage<>("error", "启动语音识别失败:" + e.getMessage(), null));
+        }
     }
 
     private void handleStopRecognition(WebSocketSession session, AsrSession asrSession) {
@@ -157,7 +167,7 @@ public class AsrHandler extends AbstractWebSocketHandler {
         asrResultVO.setBeginTime(result.getSentence().getBeginTime());
         asrResultVO.setEndTime(result.getSentence().getEndTime());
         try {
-            sendMessage(session, new WebSocketMessage<>("result", "null", asrResultVO));
+            sendMessage(session, new WebSocketMessage<>("result", null, asrResultVO));
         } catch (IOException e) {
             log.error("处理语音识别结果时出错", e);
         }

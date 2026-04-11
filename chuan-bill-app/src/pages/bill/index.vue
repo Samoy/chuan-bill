@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { BillListDTO, BillVO } from '@/api/globals'
-import FilterModal from './components/FilterModal.vue'
-import QuickBillModal from './components/QuickBillModal.vue'
+import dayjs from 'dayjs'
 
 definePage({
   name: 'bill',
@@ -18,6 +17,9 @@ const filterParams = ref<Optional<BillListDTO>>()
 const isFiltered = ref()
 const showFilterModal = ref(false)
 const showQuickBillModal = ref(false)
+const showBillDetailModal = ref(false)
+const currentBill = ref<BillVO>()
+const isEditBill = ref(false)
 
 const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
 
@@ -26,7 +28,7 @@ const page = ref(1)
 const loadingMoreStatus = ref<'loading' | 'finished' | 'error'>()
 
 async function getBillList() {
-  const res = await Apis.bill.getBillList({
+  const res = await Apis.bill.getPageBillList({
     params: {
       page: page.value,
       size: 10,
@@ -63,6 +65,34 @@ function submitFilter(result: Optional<BillListDTO>, filtered?: boolean) {
   isFiltered.value = filtered
   showFilterModal.value = false
   refresh()
+}
+
+function onClickBill(bill: BillVO) {
+  currentBill.value = bill
+  showBillDetailModal.value = true
+}
+
+function addBill() {
+  isEditBill.value = false
+  showQuickBillModal.value = true
+}
+
+function editBill(bill: BillVO) {
+  isEditBill.value = true
+  currentBill.value = bill
+  showQuickBillModal.value = true
+}
+
+function submitBill() {
+  showQuickBillModal.value = false
+  refresh()
+}
+
+function isSameMonth(currentTime?: string, comparedTime?: string) {
+  if (!currentTime || !comparedTime) {
+    return false
+  }
+  return dayjs(currentTime).isSame(dayjs(comparedTime), 'month')
 }
 
 onLoad(() => {
@@ -105,15 +135,20 @@ onReachBottom(() => {
 
     <!-- 分页列表区域 -->
     <view class="mb-9 box-border flex flex-col gap-3 px-3 pb-3">
-      <bill-item v-for="bill in billList" :key="bill.id" :bill="bill" />
+      <template v-for="(bill, index) in billList" :key="bill.id">
+        <BillSection v-if="!isSameMonth(bill.time, billList?.[index - 1]?.time)" :month="dayjs(bill.time!).format('YYYY-MM')" custom-class="mt-3" />
+        <BillItem :bill="bill" @click="onClickBill(bill)" />
+      </template>
       <wd-loadmore :state="loadingMoreStatus" finished-text="没有更多数据了" custom-class="h-8!" @reload="refresh" />
     </view>
+    <!-- 账单详情弹框 -->
+    <BillDetailModal v-if="currentBill" v-model="showBillDetailModal" :bill="currentBill" @delete="refresh" @update="editBill" />
     <!-- 筛选弹框 -->
     <FilterModal v-model="showFilterModal" @submit="submitFilter" />
     <!-- FAB 按钮 -->
-    <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="showQuickBillModal = true" />
+    <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="addBill" />
     <!-- 快速记账模态框 -->
-    <QuickBillModal v-model="showQuickBillModal" @success="refresh" />
+    <QuickBillModal v-model="showQuickBillModal" :is-edit="isEditBill" :bill="currentBill" @success="submitBill" />
   </view>
 </template>
 

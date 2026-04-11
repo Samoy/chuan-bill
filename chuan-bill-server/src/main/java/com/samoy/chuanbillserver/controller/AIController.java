@@ -21,8 +21,8 @@ public class AIController {
 
     @GetMapping("/ocr")
     @Operation(summary = "ocr识别", description = "ocr识别图片中的账单信息")
-    public Result<BillVO> ocr(String fileId) {
-        return Result.success(aiService.ocr(fileId));
+    public Result<BillVO> ocr(String fileId, String fileExt) {
+        return Result.success(aiService.ocr(fileId, fileExt));
     }
 
     @GetMapping("/text")

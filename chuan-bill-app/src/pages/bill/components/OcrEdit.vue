@@ -32,10 +32,11 @@ const toast = useGlobalToast()
 
 async function startTask() {
   const fileId = tempFileInfo.value?.fileId
-  if (fileId) {
+  const fileExt = tempFileInfo.value?.fileExt
+  if (fileId && fileExt) {
     taskStatus.value = TaskStatus.Pending
     try {
-      const res = await Apis.ai.ocr({ params: { fileId } })
+      const res = await Apis.ai.ocr({ params: { fileId, fileExt } })
       if (res.code === 200) {
         toast.success('识别成功')
         taskResult.value = res.data
@@ -65,11 +66,16 @@ function uploadSuccess(e: UploadSuccessEvent) {
     else {
       tempFileInfoRes = res as ResultTempFileVO
     }
-    tempFileInfo.value = tempFileInfoRes.data
+    if (tempFileInfoRes.success) {
+      tempFileInfo.value = tempFileInfoRes.data
+      if (tempFileInfo.value) {
+        startTask()
+        return
+      }
+    }
   }
-  if (tempFileInfo.value) {
-    startTask()
-  }
+  toast.error('图片上传失败')
+  taskStatus.value = TaskStatus.UploadFailed
 }
 
 function reset() {
@@ -99,7 +105,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/temp/upload`
         reupload
         :header="{
           // FIXME：暂时使用固定token
-          token: 'VmkIL7QUN2B2LgLsbcqZdKdqrbnbDa4FQcch2E0qGt3Le6vihyd0sxzyRXDTS3ov',
+          token: 'LKr82GJOAIwZAN2uPQzls2y2DOzZ05dzzlqikZvMRdlPgdHOpoRNmOUDpfsX3oOX',
         }"
         :custom-class="`w-full! h-full! ${taskStatus !== TaskStatus.UploadFailed ? 'wd-upload-success' : ''}`"
         :custom-preview-class="`${taskStatus !== TaskStatus.Pending ? 'border-2 border-dashed rounded-xl border-gray-200 dark:border-gray-600' : ''}`"

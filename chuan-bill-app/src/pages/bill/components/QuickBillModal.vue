@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AddBillDTO, BillVO } from '@/api/globals'
+import type { AddBillDTO, BillVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
 import ManualEdit from './ManualEdit.vue'
 import OcrEdit from './OcrEdit.vue'
@@ -12,8 +12,13 @@ defineOptions({
   },
 })
 
+const props = defineProps<{
+  isEdit?: boolean
+  bill?: BillVO
+}>()
+
 const emit = defineEmits<{
-  success: [result: AddBillDTO]
+  success: [result: AddBillDTO | UpdateBillDTO ]
 }>()
 
 // 记账方式选项
@@ -51,6 +56,11 @@ function ocrSubmit(result: BillVO) {
   source.value = 'manual'
 }
 
+function voiceSubmit(result: BillVO) {
+  convertBillVOToAddBillDTO(result)
+  source.value = 'manual'
+}
+
 function resetBillForm() {
   billForm.value = {
     name: '',
@@ -64,20 +74,52 @@ function resetBillForm() {
   }
 }
 
-async function manualSubmit(addBillDTO: AddBillDTO) {
+async function manualSubmit(billDTO: AddBillDTO | UpdateBillDTO) {
+  if (props.isEdit) {
+    updateBill({
+      id: props.bill!.id!,
+      ...billDTO,
+    })
+    return
+  }
+  addBill(billDTO as AddBillDTO)
+}
+
+async function addBill(billDTO: AddBillDTO) {
   const res = await Apis.bill.addBill({
     data: {
-      ...addBillDTO,
-      time: dayjs(addBillDTO.time).format('YYYY-MM-DD HH:mm'),
+      ...billDTO,
+      time: dayjs(billDTO.time).format('YYYY-MM-DD HH:mm'),
     },
   })
   if (res.success) {
     toast.success('添加成功')
     show.value = false
     resetBillForm()
-    emit('success', addBillDTO)
+    emit('success', billDTO)
   }
 }
+
+async function updateBill(billDTO: UpdateBillDTO) {
+  const res = await Apis.bill.updateBill({
+    data: {
+      ...billDTO,
+      time: dayjs(billDTO.time).format('YYYY-MM-DD HH:mm'),
+    },
+  })
+  if (res.success) {
+    toast.success('修改成功')
+    show.value = false
+    resetBillForm()
+    emit('success', billDTO)
+  }
+}
+
+watch(() => props.bill, (newVal) => {
+  if (newVal) {
+    convertBillVOToAddBillDTO(newVal)
+  }
+}, { immediate: true, deep: true })
 </script>
 
 <template>
@@ -85,6 +127,7 @@ async function manualSubmit(addBillDTO: AddBillDTO) {
     v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
     :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
+    <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-5 h-4 w-4 text-black/65" @click="resetBillForm" />
     <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
         ref="segmentedRef"
@@ -105,6 +148,9 @@ async function manualSubmit(addBillDTO: AddBillDTO) {
       </template>
       <template v-else-if="source === 'ocr'">
         <OcrEdit @submit="ocrSubmit" />
+      </template>
+      <template v-else-if="source === 'voice'">
+        <VoiceEdit @submit="voiceSubmit" />
       </template>
     </view>
   </wd-action-sheet>

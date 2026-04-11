@@ -7,8 +7,10 @@ export {}
 declare global {
   const $$userConfigMap: typeof import('./api/index')['$$userConfigMap']
   const Apis: typeof import('./api/index')['Apis']
+  const AsrClient: typeof import('./composables/useAsr')['AsrClient']
   const CommonUtil: typeof import('wot-design-uni')['CommonUtil']
   const EffectScope: typeof import('vue')['EffectScope']
+  const WebSocketStatus: typeof import('./composables/useAsr')['WebSocketStatus']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const alovaInstance: typeof import('./api/index')['alovaInstance']
   const api: typeof import('./api/index')['default']
@@ -24,6 +26,7 @@ declare global {
   const controlledRef: typeof import('@vueuse/core')['controlledRef']
   const createApis: typeof import('./api/createApis')['createApis']
   const createApp: typeof import('vue')['createApp']
+  const createAsr: typeof import('./composables/useAsr')['createAsr']
   const createEventHook: typeof import('@vueuse/core')['createEventHook']
   const createGlobalState: typeof import('@vueuse/core')['createGlobalState']
   const createInjectionState: typeof import('@vueuse/core')['createInjectionState']
@@ -170,6 +173,7 @@ declare global {
   const useArrayReduce: typeof import('@vueuse/core')['useArrayReduce']
   const useArraySome: typeof import('@vueuse/core')['useArraySome']
   const useArrayUnique: typeof import('@vueuse/core')['useArrayUnique']
+  const useAsr: typeof import('./composables/useAsr')['useAsr']
   const useAsyncQueue: typeof import('@vueuse/core')['useAsyncQueue']
   const useAsyncState: typeof import('@vueuse/core')['useAsyncState']
   const useAttrs: typeof import('vue')['useAttrs']
@@ -356,6 +360,9 @@ declare global {
   // @ts-ignore
   export type { Component, ComponentPublicInstance, ComputedRef, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { WebSocketStatus } from './composables/useAsr'
+  import('./composables/useAsr')
 }
 // for vue template auto import
 import { UnwrapRef } from 'vue'
@@ -364,8 +371,10 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly $$userConfigMap: UnwrapRef<typeof import('./api/index')['$$userConfigMap']>
     readonly Apis: UnwrapRef<typeof import('./api/index')['Apis']>
+    readonly AsrClient: UnwrapRef<typeof import('./composables/useAsr')['AsrClient']>
     readonly CommonUtil: UnwrapRef<typeof import('wot-design-uni')['CommonUtil']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly WebSocketStatus: UnwrapRef<typeof import('./composables/useAsr')['WebSocketStatus']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly alovaInstance: UnwrapRef<typeof import('./api/index')['alovaInstance']>
     readonly api: UnwrapRef<typeof import('./api/index')['default']>
@@ -381,6 +390,7 @@ declare module 'vue' {
     readonly controlledRef: UnwrapRef<typeof import('@vueuse/core')['controlledRef']>
     readonly createApis: UnwrapRef<typeof import('./api/createApis')['createApis']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
+    readonly createAsr: UnwrapRef<typeof import('./composables/useAsr')['createAsr']>
     readonly createEventHook: UnwrapRef<typeof import('@vueuse/core')['createEventHook']>
     readonly createGlobalState: UnwrapRef<typeof import('@vueuse/core')['createGlobalState']>
     readonly createInjectionState: UnwrapRef<typeof import('@vueuse/core')['createInjectionState']>
@@ -526,6 +536,7 @@ declare module 'vue' {
     readonly useArrayReduce: UnwrapRef<typeof import('@vueuse/core')['useArrayReduce']>
     readonly useArraySome: UnwrapRef<typeof import('@vueuse/core')['useArraySome']>
     readonly useArrayUnique: UnwrapRef<typeof import('@vueuse/core')['useArrayUnique']>
+    readonly useAsr: UnwrapRef<typeof import('./composables/useAsr')['useAsr']>
     readonly useAsyncQueue: UnwrapRef<typeof import('@vueuse/core')['useAsyncQueue']>
     readonly useAsyncState: UnwrapRef<typeof import('@vueuse/core')['useAsyncState']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>

@@ -51,6 +51,7 @@ public class AsrServiceImpl implements IAsrService {
             session.setSender(sender);
 
             Flowable<ByteBuffer> audioSource = Flowable.create(sender::setEmitter, BackpressureStrategy.BUFFER);
+
             Disposable disposable = recognition
                     .streamCall(param, audioSource)
                     .subscribe(
@@ -61,6 +62,7 @@ public class AsrServiceImpl implements IAsrService {
                             e -> {
                                 log.error("语音识别错误: {}", e.getMessage());
                                 callback.onError(e instanceof Exception error ? error : new RuntimeException(e));
+                                closeRecognition(recognition);
                             },
                             () -> {
                                 log.info("语音识别完成");
@@ -82,7 +84,7 @@ public class AsrServiceImpl implements IAsrService {
         try {
             recognition.getDuplexApi().close(1000, "Recognition ended");
         } catch (Exception e) {
-            log.error("关闭识别器失败", e);
+            log.warn("关闭识别器失败", e);
         }
     }
 
@@ -102,7 +104,9 @@ public class AsrServiceImpl implements IAsrService {
         @Override
         public void send(ByteBuffer audioData) {
             // 实现发送音频数据的逻辑
-            if (!running.get()) return;
+            if (!running.get()) {
+                return;
+            }
 
             if (emitter == null || emitter.isCancelled()) {
                 log.warn("FlowableEmitter未初始化或者已取消");

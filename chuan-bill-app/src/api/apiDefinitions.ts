@@ -20,7 +20,7 @@ export default {
   'user.updateProfile': ['POST', '/user/updateProfile'],
   'user.updatePasswordByOld': ['POST', '/user/updatePasswordByOld'],
   'user.updatePasswordByCode': ['POST', '/user/updatePasswordByCode'],
-  'file.uploadTempFile': ['POST', '/file/uploadTempFile'],
+  'file.uploadTempFile': ['POST', '/file/temp/upload'],
   'bill.updateBill': ['POST', '/bill/update'],
   'bill.deleteBill': ['POST', '/bill/delete'],
   'bill.addBill': ['POST', '/bill/add'],
@@ -30,9 +30,11 @@ export default {
   'user.getProfile': ['GET', '/user/profile'],
   'user.hasPassword': ['GET', '/user/hasPassword'],
   'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
+  'bill.getPageBillList': ['GET', '/bill/page-list'],
   'bill.getMonthlyStats': ['GET', '/bill/monthly-stats'],
-  'bill.getBillList': ['GET', '/bill/list'],
   'bill.getBillDetail': ['GET', '/bill/detail'],
   'bill.getCategories': ['GET', '/bill/categories'],
-  'ai.ocr': ['GET', '/ai/ocr']
+  'ai.text': ['GET', '/ai/text'],
+  'ai.ocr': ['GET', '/ai/ocr'],
+  'ai.analysis': ['GET', '/ai/analysis']
 };

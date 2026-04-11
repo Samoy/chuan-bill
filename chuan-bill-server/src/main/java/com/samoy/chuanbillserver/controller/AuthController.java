@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.samoy.chuanbillserver.dto.LoginByPasswordDTO;
 import com.samoy.chuanbillserver.dto.LoginByPhoneDTO;
 import com.samoy.chuanbillserver.dto.SendCodeDTO;
@@ -58,6 +59,7 @@ public class AuthController {
      */
     @PostMapping("/sendCode")
     @Operation(summary = "发送验证码", description = "向指定手机号发送短信验证码")
+    @SaIgnore
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {
         verificationCodeService.sendCode(sendCodeDTO.getPhone());
         return Result.success();

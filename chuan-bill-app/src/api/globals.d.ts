@@ -89,16 +89,6 @@ type Alova2Method<
       >
     : never;
 
-export interface BillMonthlyStatsDTO {
-  /**
-   * 月份，格式为YYYY-MM
-   */
-  month: string;
-  /**
-   * 家庭ID，用于查询家庭账单统计信息
-   */
-  familyId?: string;
-}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -121,7 +111,6 @@ export interface BillListDTO {
    * 支付方式 ID
    */
   paymentMethodId?: string;
-
   /**
    * 最小金额
    */
@@ -142,6 +131,16 @@ export interface BillListDTO {
    * 每页数量
    */
   size: number;
+}
+export interface BillMonthlyStatsDTO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month: string;
+  /**
+   * 家庭ID，用于查询家庭账单统计信息
+   */
+  familyId?: string;
 }
 export interface UserProfileUpdateDTO {
   /**
@@ -217,7 +216,7 @@ export interface UpdateBillDTO {
   /**
    * 账单金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 账单备注
    */
@@ -384,6 +383,10 @@ export interface TempFileVO {
    * 临时文件大小
    */
   fileSize?: number;
+  /**
+   * 临时文件扩展名
+   */
+  fileExt?: string;
 }
 export interface ResultTempFileVO {
   code?: number;
@@ -427,34 +430,6 @@ export interface ResultTokenVO {
    * 令牌响应
    */
   data?: TokenVO;
-  timestamp?: number;
-  success?: boolean;
-}
-export interface BillMonthlyStatsVO {
-  /**
-   * 月份，格式为YYYY-MM
-   */
-  month?: string;
-  /**
-   * 支出金额
-   */
-  expense?: number;
-  /**
-   * 收入金额
-   */
-  income?: number;
-  /**
-   * 结余金额
-   */
-  balance?: number;
-}
-export interface ResultBillMonthlyStatsVO {
-  code?: number;
-  message?: string;
-  /**
-   * 账单月度统计信息
-   */
-  data?: BillMonthlyStatsVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -524,7 +499,7 @@ export interface BillVO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: string;
+  source: 'manual' | 'ocr' | 'voice';
   /**
    * 家庭 ID
    */
@@ -547,6 +522,34 @@ export interface ResultIPageBillVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface BillMonthlyStatsVO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month?: string;
+  /**
+   * 支出金额
+   */
+  expense?: number;
+  /**
+   * 收入金额
+   */
+  income?: number;
+  /**
+   * 结余金额
+   */
+  balance?: number;
+}
+export interface ResultBillMonthlyStatsVO {
+  code?: number;
+  message?: string;
+  /**
+   * 账单月度统计信息
+   */
+  data?: BillMonthlyStatsVO;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface ResultBillVO {
   code?: number;
   message?: string;
@@ -561,6 +564,13 @@ export interface ResultListCategoryVO {
   code?: number;
   message?: string;
   data?: CategoryVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultString {
+  code?: number;
+  message?: string;
+  data?: string;
   timestamp?: number;
   success?: boolean;
 }
@@ -765,7 +775,7 @@ declare global {
        *
        * [POST] 上传临时文件
        *
-       * **path:** /file/uploadTempFile
+       * **path:** /file/temp/upload
        *
        * ---
        *
@@ -789,6 +799,8 @@ declare global {
        *     fileId?: string
        *     // 临时文件大小
        *     fileSize?: number
+       *     // 临时文件扩展名
+       *     fileExt?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -994,66 +1006,9 @@ declare global {
       /**
        * ---
        *
-       * [GET] 获取月度统计
-       *
-       * **path:** /bill/monthly-stats
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 账单月度统计参数
-       *   billMonthlyStatsDTO: {
-       *     // 月份，格式为YYYY-MM
-       *     month: string
-       *     // 家庭ID，用于查询家庭账单统计信息
-       *     familyId?: string
-       *   }
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // 账单月度统计信息
-       *   data?: {
-       *     // 月份，格式为YYYY-MM
-       *     month?: string
-       *     // 支出金额
-       *     expense?: number
-       *     // 收入金额
-       *     income?: number
-       *     // 结余金额
-       *     balance?: number
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getMonthlyStats<
-        Config extends Alova2MethodConfig<ResultBillMonthlyStatsVO> & {
-          params: {
-            /**
-             * 账单月度统计参数
-             */
-            billMonthlyStatsDTO: BillMonthlyStatsDTO;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultBillMonthlyStatsVO, 'bill.getMonthlyStats', Config>;
-      /**
-       * ---
-       *
        * [GET] 获取账单列表
        *
-       * **path:** /bill/list
+       * **path:** /bill/page-list
        *
        * ---
        *
@@ -1070,6 +1025,8 @@ declare global {
        *     categoryId?: string
        *     // 账单类型：income-收入，expense-支出，空字符串：全部
        *     type?: string
+       *     // 支付方式 ID
+       *     paymentMethodId?: string
        *     // 最小金额
        *     minAmount?: number
        *     // 最大金额
@@ -1156,13 +1113,65 @@ declare global {
        * }
        * ```
        */
-      getBillList<
+      getPageBillList<
         Config extends Alova2MethodConfig<ResultIPageBillVO> & {
           params: BillListDTO;
         }
       >(
         config: Config
-      ): Alova2Method<ResultIPageBillVO, 'bill.getBillList', Config>;
+      ): Alova2Method<ResultIPageBillVO, 'bill.getPageBillList', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取月度统计
+       *
+       * **path:** /bill/monthly-stats
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 账单月度统计参数
+       *   billMonthlyStatsDTO: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 账单月度统计信息
+       *   data?: {
+       *     // 月份，格式为YYYY-MM
+       *     month?: string
+       *     // 支出金额
+       *     expense?: number
+       *     // 收入金额
+       *     income?: number
+       *     // 结余金额
+       *     balance?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMonthlyStats<
+        Config extends Alova2MethodConfig<ResultBillMonthlyStatsVO> & {
+          params: BillMonthlyStatsDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBillMonthlyStatsVO, 'bill.getMonthlyStats', Config>;
       /**
        * ---
        *
@@ -1457,7 +1466,95 @@ declare global {
       /**
        * ---
        *
-       * [GET] ocr
+       * [GET] 文本识别
+       *
+       * **path:** /ai/text
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   text: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 账单信息
+       *   data?: {
+       *     // 账单 ID
+       *     id?: string
+       *     // 账单名称
+       *     name?: string
+       *     // 分类信息
+       *     category?: {
+       *       // 分类 ID
+       *       id?: string
+       *       // 分类名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 分类类型：income-收入，expense-支出
+       *       type?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
+       *     // 支付方式信息
+       *     paymentMethod?: {
+       *       // 支付方式 ID
+       *       id?: string
+       *       // 支付方式名称
+       *       name?: string
+       *       // 图标 URL
+       *       icon?: string
+       *       // 排序
+       *       sortOrder?: number
+       *       // 是否默认
+       *       isDefault?: boolean
+       *       // 用户 ID
+       *       userId?: string
+       *     }
+       *     // 账单类型：income-收入，expense-支出
+       *     type?: string
+       *     // 账单金额
+       *     amount?: number
+       *     // 账单时间
+       *     time?: string
+       *     // 账单备注
+       *     remark?: string
+       *     // 账单来源：manual-手动，ocr-图片识别，voice-语音
+       *     source?: string
+       *     // 家庭 ID
+       *     familyId?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      text<
+        Config extends Alova2MethodConfig<ResultBillVO> & {
+          params: {
+            text: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBillVO, 'ai.text', Config>;
+      /**
+       * ---
+       *
+       * [GET] ocr识别
        *
        * **path:** /ai/ocr
        *
@@ -1467,6 +1564,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   fileId: string
+       *   fileExt: string
        * }
        * ```
        *
@@ -1537,11 +1635,50 @@ declare global {
         Config extends Alova2MethodConfig<ResultBillVO> & {
           params: {
             fileId: string;
+            fileExt: string;
           };
         }
       >(
         config: Config
       ): Alova2Method<ResultBillVO, 'ai.ocr', Config>;
+      /**
+       * ---
+       *
+       * [GET] 分析
+       *
+       * **path:** /ai/analysis
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   month: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: string
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      analysis<
+        Config extends Alova2MethodConfig<ResultString> & {
+          params: {
+            month: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultString, 'ai.analysis', Config>;
     };
   }
 

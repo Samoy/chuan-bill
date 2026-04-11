@@ -45,6 +45,7 @@ public enum ResultEnum {
     // 文件错误码 3000+
     FILE_NOT_FOUND(3001, "文件不存在"),
     FILE_UPLOAD_FAILED(3002, "文件上传失败"),
+    FILE_NOT_IMAGE(3003, "不是图片文件"),
     ;
 
     private final Integer code;

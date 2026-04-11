@@ -98,7 +98,7 @@ export function transformUnoCSS(cssName: string) {
  * @param t 时间
  * @returns 友好时间
  */
-export function friendlyTime(t: string | number | Date): string {
+export function friendlyTime(t?: string | number | Date): string {
   const d = dayjs(t)
   const n = dayjs()
   const f = 'HH:mm'

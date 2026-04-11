@@ -25,8 +25,10 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_phone: 手机号登录查询，唯一索引
+    -- 2. idx_create_time: 用户注册时间排序/统计
     UNIQUE KEY `idx_phone` (`phone`),
-    KEY `idx_status` (`status`),
     KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户表';
 
@@ -45,9 +47,11 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    KEY `idx_type` (`type`),
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_sort_order` (`sort_order`)
+    -- 索引优化说明：
+    -- 1. idx_user_type_sort: 查询用户某类型类目并按排序展示（最常用场景）
+    -- 2. idx_user_id: 查询用户的所有类目
+    KEY `idx_user_type_sort` (`user_id`, `type`, `sort_order`),
+    KEY `idx_user_id` (`user_id`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '类目表';
 
 -- ===============================
@@ -64,8 +68,11 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_sort_order` (`sort_order`)
+    -- 索引优化说明：
+    -- 1. idx_user_sort: 查询用户支付方式并按排序展示（最常用场景）
+    -- 2. idx_user_id: 查询用户的所有支付方式
+    KEY `idx_user_sort` (`user_id`, `sort_order`),
+    KEY `idx_user_id` (`user_id`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '支付方式表';
 
 -- ===============================
@@ -82,6 +89,9 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_invite_code: 通过邀请码查询家庭，唯一索引
+    -- 2. idx_owner_id: 查询用户创建的家庭（MyBatis-Plus软删除会自动附加deleted条件）
     UNIQUE KEY `idx_invite_code` (`invite_code`),
     KEY `idx_owner_id` (`owner_id`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '家庭表';
@@ -100,10 +110,13 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_family_user: 查询某用户是否在某家庭中，唯一索引
+    -- 2. idx_family_owner: 查询家庭的户主（高频操作：验证权限）
+    -- 3. idx_user_id: 查询用户加入的所有家庭
     UNIQUE KEY `idx_family_user` (`family_id`, `user_id`),
-    KEY `idx_family_id` (`family_id`),
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_is_owner` (`is_owner`)
+    KEY `idx_family_owner` (`family_id`, `is_owner`),
+    KEY `idx_user_id` (`user_id`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '家庭成员表';
 
 -- ===============================
@@ -121,9 +134,12 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    KEY `idx_family_id` (`family_id`),
+    -- 索引优化说明：
+    -- 1. idx_family_status: 查询某家庭的待处理申请（高频：户主查看申请列表）
+    -- 2. idx_user_id: 查询用户发出的所有申请
+    -- 3. idx_create_time: 申请列表按时间排序
+    KEY `idx_family_status` (`family_id`, `status`),
     KEY `idx_user_id` (`user_id`),
-    KEY `idx_status` (`status`),
     KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '家庭加入申请表';
 
@@ -146,15 +162,21 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_family_id` (`family_id`),
+    -- 索引优化说明：
+    -- 1. idx_user_type_time: 查询用户某类型账单的时间范围（最高频：统计收支）
+    -- 2. idx_user_time: 查询用户账单按时间排序/筛选
+    -- 3. idx_family_type_time: 查询家庭某类型账单的时间范围（家庭统计）
+    -- 4. idx_family_time: 查询家庭账单按时间排序/筛选
+    -- 5. idx_category_id: 按类目统计（如查看某类支出总额）
+    -- 6. idx_payment_method_id: 按支付方式统计
+    -- 7. idx_create_time: 账单列表按创建时间排序
+    KEY `idx_user_type_time` (`user_id`, `type`, `time`),
+    KEY `idx_user_time` (`user_id`, `time`),
+    KEY `idx_family_type_time` (`family_id`, `type`, `time`),
+    KEY `idx_family_time` (`family_id`, `time`),
     KEY `idx_category_id` (`category_id`),
     KEY `idx_payment_method_id` (`payment_method_id`),
-    KEY `idx_type` (`type`),
-    KEY `idx_time` (`time`),
-    KEY `idx_create_time` (`create_time`),
-    KEY `idx_user_time` (`user_id`, `time`),
-    KEY `idx_family_time` (`family_id`, `time`)
+    KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '账单表';
 
 -- ===============================
@@ -171,8 +193,10 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_family_id` (`family_id`),
+    -- 索引优化说明：
+    -- 1. idx_user_month: 查询用户某月预算，唯一索引（用户每月只有一个预算）
+    -- 2. idx_family_month: 查询家庭某月预算，唯一索引（家庭每月只有一个预算）
+    -- 注意：单字段idx_user_id/idx_family_id冗余，复合索引前缀已覆盖
     UNIQUE KEY `idx_user_month` (`user_id`, `month`),
     UNIQUE KEY `idx_family_month` (`family_id`, `month`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '预算表';
@@ -193,11 +217,15 @@ CREATE TABLE
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_user_status_time: 查询用户未读消息并按时间排序（最高频：消息列表）
+    -- 2. idx_user_id: 查询用户的所有消息
+    -- 3. idx_related: 根据相关ID查询消息（如查看某账单的所有消息）
+    -- 4. idx_create_time: 消息列表按时间排序
+    KEY `idx_user_status_time` (`user_id`, `status`, `create_time`),
     KEY `idx_user_id` (`user_id`),
-    KEY `idx_type` (`type`),
-    KEY `idx_status` (`status`),
-    KEY `idx_create_time` (`create_time`),
-    KEY `idx_user_status` (`user_id`, `status`)
+    KEY `idx_related` (`related_id`, `related_type`),
+    KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '消息表';
 
 -- ===============================

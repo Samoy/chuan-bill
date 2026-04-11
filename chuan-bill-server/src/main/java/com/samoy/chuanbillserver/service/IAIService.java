@@ -8,9 +8,10 @@ public interface IAIService {
      * 通过文件id进行ocr识别
      *
      * @param fileId 文件id
+     * @param fileExt 文件扩展名
      * @return 识别结果
      */
-    BillVO ocr(String fileId);
+    BillVO ocr(String fileId, String fileExt);
 
     /**
      * 通过文本进行识别

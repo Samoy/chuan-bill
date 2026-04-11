@@ -4,7 +4,7 @@
     <select id="selectMonthlyStats" resultType="java.math.BigDecimal">
         SELECT
             SUM(amount) as total_amount
-        FROM bill
+        FROM t_bill
         WHERE user_id = #{userId}
             AND time &gt;= #{startTime}
             AND time &lt;= #{endTime}

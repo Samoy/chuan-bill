@@ -78,7 +78,7 @@ export const alovaInstance = createAlova({
   statesHook: vueHook,
   beforeRequest: (method) => {
     // FIXME: 临时使用
-    method.config.headers.token = 'VmkIL7QUN2B2LgLsbcqZdKdqrbnbDa4FQcch2E0qGt3Le6vihyd0sxzyRXDTS3ov'
+    method.config.headers.token = 'LKr82GJOAIwZAN2uPQzls2y2DOzZ05dzzlqikZvMRdlPgdHOpoRNmOUDpfsX3oOX'
     // Add content type for POST/PUT/PATCH requests
     if (['POST', 'PUT', 'PATCH'].includes(method.type)) {
       method.config.headers['Content-Type'] = 'application/json'

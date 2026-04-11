@@ -19,11 +19,11 @@ public interface BillMapper extends BaseMapper<Bill> {
      *
      * @param userId    用户id
      * @param familyId  家庭id
-     * @param income    收入还是支出
+     * @param type    收入还是支出
      * @param startTime 开始时间
      * @param endTime   结束时间
      * @return 金额
      */
     BigDecimal selectMonthlyStats(
-            String userId, String familyId, String income, LocalDateTime startTime, LocalDateTime endTime);
+            String userId, String familyId, String type, LocalDateTime startTime, LocalDateTime endTime);
 }
