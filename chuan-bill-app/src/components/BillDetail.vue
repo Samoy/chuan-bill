@@ -18,7 +18,7 @@ const { bill, customClass, customStyle } = defineProps<{
 </script>
 
 <template>
-  <view class="box-border w-full flex flex-col gap-2 dark:border-gray-700 dark:bg-gray-800" :class="customClass" :style="customStyle">
+  <view class="box-border w-full flex flex-col gap-2" :class="customClass" :style="customStyle">
     <!-- 头部：金额、名称 -->
     <view class="box-border w-full flex flex-col items-center">
       <view class="text-2xl font-bold" :class="bill.type === 'income' ? 'text-green-500' : 'text-red-500'">
@@ -29,7 +29,7 @@ const { bill, customClass, customStyle } = defineProps<{
       </view>
     </view>
     <!-- 中间：属性列表 -->
-    <view class="mt-2 flex flex-col gap-4 border-1 border-gray-100 rounded-2xl border-solid bg-gray-50 px-4 py-3">
+    <view class="mt-2 flex flex-col gap-4 border-1 border-gray-100 rounded-2xl border-solid bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
       <view class="flex justify-between text-sm">
         <view class="flex items-center text-gray-400">
           <text class="i-lucide:tag mr-1" />

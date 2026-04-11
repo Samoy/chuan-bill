@@ -77,7 +77,6 @@ public class AsrHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         ByteBuffer payload = message.getPayload();
-        log.info("收到音频数据:{}", payload);
         AsrSession asrSession = asrSessionMap.get(session.getId());
         if (ObjectUtil.isNull(asrSession) || !asrSession.isRecognizing()) {
             sendMessage(session, new WebSocketMessage<>("error", "语音识别未开始", null));

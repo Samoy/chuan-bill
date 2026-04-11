@@ -32,6 +32,7 @@ const source = ref('manual')
 const show = defineModel<boolean>({ default: false })
 const segmentedRef = ref()
 const toast = useGlobalToast()
+const message = useGlobalMessage()
 const billForm = ref<AddBillDTO>({ name: '', type: 'expense', amount: '', time: '', source: 'manual' })
 
 function convertBillVOToAddBillDTO(billVO: BillVO) {
@@ -115,6 +116,15 @@ async function updateBill(billDTO: UpdateBillDTO) {
   }
 }
 
+function showInfo() {
+  message.alert({
+    title: '提示',
+    msg: '暂不支持多笔账单',
+    zIndex: 1000,
+    confirmButtonText: '我知道了',
+  })
+}
+
 watch(() => props.bill, (newVal) => {
   if (newVal) {
     convertBillVOToAddBillDTO(newVal)
@@ -127,7 +137,9 @@ watch(() => props.bill, (newVal) => {
     v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
     :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
-    <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-5 h-4 w-4 text-black/65" @click="resetBillForm" />
+    <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-5.5 box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
+    <text v-else class="i-lucide:info absolute right-10 top-5.5 box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
+
     <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
         ref="segmentedRef"

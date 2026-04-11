@@ -322,7 +322,6 @@ export function useAsr() {
         for (let i = 0; i < inputData.length; i++) {
           int16Data[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768))
         }
-        console.log('[ASR] 发送音频数据', int16Data.buffer)
         client?.sendAudioData(int16Data.buffer)
       }
       isRecording = true
