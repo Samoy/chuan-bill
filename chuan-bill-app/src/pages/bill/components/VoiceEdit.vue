@@ -118,6 +118,7 @@ async function touchEnd() {
 }
 
 function reset() {
+  taskStatus.value = TaskStatus.Idle
   asrText.value = ''
   webSocketError.value = false
   isRecording.value = false

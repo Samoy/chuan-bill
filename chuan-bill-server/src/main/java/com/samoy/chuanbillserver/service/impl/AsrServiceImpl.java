@@ -99,7 +99,7 @@ public class AsrServiceImpl implements IAsrService {
         @Setter
         private Recognition recognition;
 
-        private final AtomicBoolean running = new AtomicBoolean(false);
+        private final AtomicBoolean running = new AtomicBoolean(true);
 
         @Override
         public void send(ByteBuffer audioData) {

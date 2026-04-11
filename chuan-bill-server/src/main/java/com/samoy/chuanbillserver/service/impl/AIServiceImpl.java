@@ -77,7 +77,8 @@ public class AIServiceImpl implements IAIService {
     @Override
     public BillVO text(String text) {
         try {
-            ApplicationResult result = agentUtil.callAgent(recognitionAppId, "[%s]，从上述文本中帮我提取账单信息", text);
+            ApplicationResult result =
+                    agentUtil.callAgent(recognitionAppId, String.format("[%s]，从上述文本中帮我提取账单信息", text));
             String output = result.getOutput().getText();
             JSON json = JSONUtil.parse(output);
             return json.getByPath("nlpResult", BillVO.class);
