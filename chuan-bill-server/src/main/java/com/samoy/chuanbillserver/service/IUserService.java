@@ -33,6 +33,14 @@ public interface IUserService extends IService<User> {
     TokenVO loginByPhone(LoginByPhoneDTO loginDTO);
 
     /**
+     * 微信登录
+     *
+     * @param loginDTO 登录信息
+     * @return TokenVO
+     */
+    TokenVO loginByWechat(LoginByWechatDTO loginDTO);
+
+    /**
      * 根据旧密码修改密码
      *
      * @param updateDTO 修改信息
@@ -71,4 +79,9 @@ public interface IUserService extends IService<User> {
      * @return boolean
      */
     boolean hasPassword(String userId);
+
+    /**
+     * 登出
+     */
+    void logout();
 }

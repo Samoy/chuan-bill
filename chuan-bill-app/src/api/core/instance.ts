@@ -8,7 +8,8 @@ import { handleAlovaError, handleAlovaResponse } from './handlers'
 function createLoadingManager() {
   let activeCount = 0
   let isShowing = false
-  const loading = useGlobalLoading()
+  let loading: ReturnType<typeof useGlobalLoading>
+
   const pendingTimers = new Map<string, ReturnType<typeof setTimeout> | null>()
 
   const generateId = (() => {
@@ -18,6 +19,7 @@ function createLoadingManager() {
 
   return {
     start(method: Method) {
+      loading = useGlobalLoading()
       const shouldShow = !method.config.meta?.silent
       const delay = method.config.meta?.loadingDelay ?? 300
       const text = method.config.meta?.loadingText || '请稍候...'
@@ -77,8 +79,11 @@ export const alovaInstance = createAlova({
   }),
   statesHook: vueHook,
   beforeRequest: (method) => {
-    // FIXME: 临时使用
-    method.config.headers.token = 'LKr82GJOAIwZAN2uPQzls2y2DOzZ05dzzlqikZvMRdlPgdHOpoRNmOUDpfsX3oOX'
+    // 从 userStore 动态读取 token
+    const userStore = useUserStore()
+    if (userStore.token) {
+      method.config.headers.token = userStore.token
+    }
     // Add content type for POST/PUT/PATCH requests
     if (['POST', 'PUT', 'PATCH'].includes(method.type)) {
       method.config.headers['Content-Type'] = 'application/json'

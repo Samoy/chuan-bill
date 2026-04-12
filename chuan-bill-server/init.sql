@@ -15,7 +15,8 @@ USE `chuan_bill`;
 CREATE TABLE
   IF NOT EXISTS `t_user` (
     `id` VARCHAR(64) PRIMARY KEY NOT NULL COMMENT '用户ID',
-    `phone` VARCHAR(11) NOT NULL COMMENT '手机号',
+    `phone` VARCHAR(11) DEFAULT NULL COMMENT '手机号',
+    `openid` VARCHAR(64) DEFAULT NULL COMMENT '微信 openid',
     `password` VARCHAR(128) DEFAULT NULL COMMENT '密码',
     `nickname` VARCHAR(64) NOT NULL COMMENT '昵称',
     `avatar` VARCHAR(512) DEFAULT NULL COMMENT '头像',
@@ -26,9 +27,11 @@ CREATE TABLE
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
     -- 索引优化说明：
-    -- 1. idx_phone: 手机号登录查询，唯一索引
-    -- 2. idx_create_time: 用户注册时间排序/统计
-    UNIQUE KEY `idx_phone` (`phone`),
+    -- 1. idx_phone: 手机号登录查询
+    -- 2. idx_openid: 微信 openid 登录查询，唯一索引
+    -- 3. idx_create_time: 用户注册时间排序/统计
+    KEY `idx_phone` (`phone`),
+    UNIQUE KEY `idx_openid` (`openid`),
     KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户表';
 

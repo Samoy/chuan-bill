@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.dao.BillMapper;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
+import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
@@ -32,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -82,6 +84,36 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             bill.setFamilyId(addBillDTO.getFamilyId());
         }
         return this.save(bill);
+    }
+
+    @Override
+    public int batchCreate(String userId, BatchCreateBillDTO dto) {
+        List<AddBillDTO> bills = dto.getBills();
+        if (bills == null || bills.isEmpty()) {
+            return 0;
+        }
+        // 转换为 Bill 实体列表
+        List<Bill> billList = bills.stream()
+                .map(addBillDTO -> {
+                    Bill bill = new Bill();
+                    bill.setUserId(userId);
+                    bill.setName(addBillDTO.getName());
+                    bill.setCategoryId(addBillDTO.getCategoryId());
+                    bill.setPaymentMethodId(addBillDTO.getPaymentMethodId());
+                    bill.setType(addBillDTO.getType());
+                    bill.setAmount(addBillDTO.getAmount());
+                    bill.setTime(addBillDTO.getTime());
+                    bill.setRemark(addBillDTO.getRemark());
+                    bill.setSource(addBillDTO.getSource() != null ? addBillDTO.getSource() : "manual");
+                    if (addBillDTO.getFamilyId() != null) {
+                        bill.setFamilyId(addBillDTO.getFamilyId());
+                    }
+                    return bill;
+                })
+                .toList();
+        // 使用 MyBatis-Plus 的 saveBatch 批量保存
+        ((IBillService) AopContext.currentProxy()).saveBatch(billList);
+        return billList.size();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.samoy.chuanbillserver.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.samoy.chuanbillserver.dto.LoginByPasswordDTO;
 import com.samoy.chuanbillserver.dto.LoginByPhoneDTO;
+import com.samoy.chuanbillserver.dto.LoginByWechatDTO;
 import com.samoy.chuanbillserver.dto.SendCodeDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
@@ -52,6 +53,18 @@ public class AuthController {
     }
 
     /**
+     * 微信登录
+     *
+     * @param loginDTO 登录信息
+     * @return 登录结果
+     */
+    @PostMapping("/loginByWechat")
+    @Operation(summary = "微信登录", description = "使用微信小程序 code 进行登录")
+    public Result<TokenVO> loginByWechat(@Validated @RequestBody LoginByWechatDTO loginDTO) {
+        return Result.success(userService.loginByWechat(loginDTO));
+    }
+
+    /**
      * 发送验证码
      *
      * @param sendCodeDTO 发送验证码请求体，包含手机号
@@ -62,6 +75,13 @@ public class AuthController {
     @SaIgnore
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {
         verificationCodeService.sendCode(sendCodeDTO.getPhone());
+        return Result.success();
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "登出", description = "用户登出，清除登录信息")
+    public Result<Void> logout() {
+        userService.logout();
         return Result.success();
     }
 }

@@ -13,4 +13,6 @@ export default {
 
 <template>
   <slot />
+  <!-- 登录弹框 -->
+  <LoginPopup />
 </template>

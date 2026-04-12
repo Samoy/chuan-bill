@@ -51,3 +51,8 @@ dashscope:
     app-id: ${DASHSCOPE_BILL_RECOGNITION_APP_ID}
   bill-analysis:
     app-id: ${DASHSCOPE_BILL_ANALYSIS_APP_ID}
+
+wx:
+  miniapp:
+    appid: ${WX_MINIAPP_APPID:}
+    secret: ${WX_MINIAPP_SECRET:}

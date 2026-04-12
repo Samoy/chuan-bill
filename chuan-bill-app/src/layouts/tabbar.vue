@@ -44,4 +44,6 @@ export default {
       :value="getTabbarItemValue(item.name)" :title="item.title" :icon="item.icon"
     />
   </wd-tabbar>
+  <!-- 登录弹框 -->
+  <LoginPopup />
 </template>

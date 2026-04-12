@@ -7,7 +7,18 @@
  * @FilePath: /wot-starter/src/api/core/handlers.ts
  */
 import type { Method } from 'alova'
-import router from '@/router'
+
+// 防止重复弹出登录弹框的标记
+let isShowingLoginPopup = false
+
+// 获取 useAuthCheck 的引用（延迟获取以避免循环依赖）
+let authCheckRef: ReturnType<typeof useAuthCheck> | null = null
+function getAuthCheck() {
+  if (!authCheckRef) {
+    authCheckRef = useAuthCheck()
+  }
+  return authCheckRef
+}
 
 // Custom error class for API errors
 export class ApiError extends Error {
@@ -39,14 +50,31 @@ export async function handleAlovaResponse(
   const { statusCode, data } = response as UniNamespace.RequestSuccessCallbackResult
 
   function handleError(code: number) {
-    // 处理401/403错误（如果不是在handleAlovaResponse中处理的）
+    // 处理401/403错误
     if ((code === 401 || code === 403)) {
-    // 如果是未授权错误，清除用户信息并跳转到登录页
+      // 防止重复弹出
+      if (isShowingLoginPopup) {
+        throw new ApiError('登录已过期，请重新登录！', code, data)
+      }
+      isShowingLoginPopup = true
+
+      // 清除过期登录信息
+      useUserStore().logout()
+
+      // 提示用户
       globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
-      const timer = setTimeout(() => {
-        clearTimeout(timer)
-        router.replaceAll({ name: 'login' })
-      }, 500)
+
+      // 接入 useAuthCheck 弹出登录弹框
+      const authCheck = getAuthCheck()
+      authCheck.showLoginPopup.value = true
+
+      // 监听弹框关闭，重置标记
+      const unwatch = watch(() => authCheck.showLoginPopup.value, (visible) => {
+        if (!visible) {
+          isShowingLoginPopup = false
+          unwatch()
+        }
+      })
 
       throw new ApiError('登录已过期，请重新登录！', code, data)
     }
@@ -87,12 +115,28 @@ export function handleAlovaError(error: any, method: Method) {
 
   // 处理401/403错误（如果不是在handleAlovaResponse中处理的）
   if (error instanceof ApiError && (error.code === 401 || error.code === 403)) {
-    // 如果是未授权错误，清除用户信息并跳转到登录页
-    globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
-    const timer = setTimeout(() => {
-      clearTimeout(timer)
-      router.replaceAll({ name: 'login' })
-    }, 500)
+    // 防止重复弹出
+    if (!isShowingLoginPopup) {
+      isShowingLoginPopup = true
+
+      // 清除过期登录信息
+      useUserStore().logout()
+
+      // 提示用户
+      globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
+
+      // 接入 useAuthCheck 弹出登录弹框
+      const authCheck = getAuthCheck()
+      authCheck.showLoginPopup.value = true
+
+      // 监听弹框关闭，重置标记
+      const unwatch = watch(() => authCheck.showLoginPopup.value, (visible) => {
+        if (!visible) {
+          isShowingLoginPopup = false
+          unwatch()
+        }
+      })
+    }
     throw new ApiError('登录已过期，请重新登录！', error.code, error.data)
   }
 

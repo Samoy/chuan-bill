@@ -38,6 +38,12 @@ public class User implements Serializable {
     private String phone;
 
     /**
+     * 微信 openid
+     */
+    @TableField("openid")
+    private String openid;
+
+    /**
      * 密码
      */
     @TableField("password")

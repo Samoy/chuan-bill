@@ -9,6 +9,10 @@ defineOptions({
   },
 })
 
+const { isGuestMode } = defineProps<{
+  isGuestMode?: boolean
+}>()
+
 const emit = defineEmits<{
   submit: [data: AddBillDTO]
 }>()
@@ -109,16 +113,19 @@ function sumbit() {
       </view>
     </view>
     <wd-divider custom-class="!mt-2 !px-0" />
-    <view class="mt-3 flex items-center justify-between text-xs text-gray-500">
-      <text>共享到家庭</text>
-      <wd-switch v-model="isShared" size="18px" />
-    </view>
-    <template v-if="isShared">
-      <wd-picker
-        v-model="formData.familyId" custom-class="mt-3" title="请选择所要共享的家庭"
-        prop="familyId"
-        :rules="[{ required: true, message: '请选择所要共享的家庭' }]"
-      />
+    <!-- 游客模式下不显示家庭共享 -->
+    <template v-if="!isGuestMode">
+      <view class="mt-3 flex items-center justify-between text-xs text-gray-500">
+        <text>共享到家庭</text>
+        <wd-switch v-model="isShared" size="18px" />
+      </view>
+      <template v-if="isShared">
+        <wd-picker
+          v-model="formData.familyId" custom-class="mt-3" title="请选择所要共享的家庭"
+          prop="familyId"
+          :rules="[{ required: true, message: '请选择所要共享的家庭' }]"
+        />
+      </template>
     </template>
     <view class="mt-3 text-xs text-gray-500">
       备注(可选)

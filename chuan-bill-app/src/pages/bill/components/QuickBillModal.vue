@@ -15,19 +15,31 @@ defineOptions({
 const props = defineProps<{
   isEdit?: boolean
   bill?: BillVO
+  source?: 'manual' | 'ocr' | 'voice'
+  isGuestMode?: boolean
 }>()
 
 const emit = defineEmits<{
-  success: [result: AddBillDTO | UpdateBillDTO ]
+  success: [result: AddBillDTO | UpdateBillDTO]
+  localSubmit: [data: any]
 }>()
 
 // 记账方式选项
-const sourceOptions = [
+const allSourceOptions = [
   { payload: { label: '手动添加', icon: 'i-lucide:square-pen' }, value: 'manual' },
   { payload: { label: '图片识别', icon: 'i-lucide:camera' }, value: 'ocr' },
   { payload: { label: '语音识别', icon: 'i-lucide:mic' }, value: 'voice' },
 ]
-const source = ref('manual')
+
+// 游客模式下只显示手动添加
+const sourceOptions = computed(() => {
+  if (props.isGuestMode) {
+    return allSourceOptions.filter(opt => opt.value === 'manual')
+  }
+  return allSourceOptions
+})
+
+const source = ref(props.source || 'manual')
 
 const show = defineModel<boolean>({ default: false })
 const segmentedRef = ref()

@@ -1,5 +1,7 @@
 package com.samoy.chuanbillserver.service.impl;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -19,6 +21,7 @@ import com.samoy.chuanbillserver.vo.TokenVO;
 import com.samoy.chuanbillserver.vo.UserVO;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private IVerificationCodeService verificationCodeService;
+
+    @Resource
+    private WxMaService wxMaService;
 
     @Override
     public TokenVO loginByPassword(LoginByPasswordDTO loginDTO) {
@@ -80,6 +86,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         return genTokenVO(user);
+    }
+
+    @Override
+    public TokenVO loginByWechat(LoginByWechatDTO loginDTO) {
+        if (CharSequenceUtil.isBlank(loginDTO.getCode())) {
+            throw new BusinessException(ResultEnum.PARAM_VALID_ERROR, "微信登录 code 不能为空");
+        }
+        try {
+            // 通过 code 获取 openid
+            WxMaJscode2SessionResult session = wxMaService.jsCode2SessionInfo(loginDTO.getCode());
+            String openid = session.getOpenid();
+            if (CharSequenceUtil.isBlank(openid)) {
+                throw new BusinessException(ResultEnum.LOGIN_ERROR, "获取微信 openid 失败");
+            }
+
+            // 通过 openid 查找用户
+            User user = getByOpenid(openid);
+            if (user == null) {
+                // 用户不存在，创建新用户
+                user = new User();
+                user.setOpenid(openid);
+                user.setNickname("微信用户" + UUID.randomUUID().toString().substring(0, 8));
+                save(user);
+            }
+
+            return genTokenVO(user);
+        } catch (Exception e) {
+            throw new BusinessException(ResultEnum.LOGIN_ERROR, "微信登录失败: " + e.getMessage());
+        }
     }
 
     @Override
@@ -171,6 +206,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return this.getOne(queryWrapper);
     }
 
+    /**
+     * 通过 openid 查询用户
+     *
+     * @param openid 微信 openid
+     * @return 用户实体
+     */
+    private User getByOpenid(String openid) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getOpenid, openid).eq(User::getStatus, SystemConstants.USER_STATUS_NORMAL);
+        return this.getOne(queryWrapper);
+    }
+
     @NotNull private TokenVO genTokenVO(User user) {
         // 更新用户最后登录时间
         user.setLastLoginTime(LocalDateTime.now());
@@ -185,7 +232,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         tokenVO.setToken(token);
         tokenVO.setUserId(user.getId());
         tokenVO.setNickname(user.getNickname());
-        tokenVO.setExpireTime(StpUtil.getTokenTimeout());
+        // 将剩余秒数转换为绝对过期时间戳（毫秒）
+        long timeoutSeconds = StpUtil.getTokenTimeout();
+        long expireAtMillis = timeoutSeconds > 0 ? System.currentTimeMillis() + timeoutSeconds * 1000 : -1;
+        tokenVO.setExpireTime(expireAtMillis);
         return tokenVO;
+    }
+
+    @Override
+    public void logout() {
+        String userId = StpUtil.getLoginIdAsString();
+        StpUtil.logout(userId);
     }
 }

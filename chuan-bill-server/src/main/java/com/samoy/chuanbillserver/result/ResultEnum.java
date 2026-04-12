@@ -32,6 +32,8 @@ public enum ResultEnum {
     PHONE_MISSING(1007, "手机号不能为空"),
     PASSWORD_MISSING(1008, "密码不能为空"),
     PASSWORD_NOT_SET(1009, "密码未设置"),
+    LOGIN_ERROR(1010, "登录失败"),
+    PARAM_VALID_ERROR(1011, "参数校验失败"),
 
     // 业务错误码（账单相关） 2000+
     BILL_NOT_FOUND(2001, "账单不存在"),

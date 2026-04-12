@@ -3,6 +3,7 @@ package com.samoy.chuanbillserver.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
+import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
@@ -56,6 +57,13 @@ public class BillController {
     public Result<Boolean> addBill(@Validated @RequestBody AddBillDTO addBillDTO) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(billService.addBill(userId, addBillDTO));
+    }
+
+    @PostMapping("/batchCreate")
+    @Operation(summary = "批量添加账单", description = "批量创建账单记录，用于数据同步")
+    public Result<Integer> batchCreate(@Validated @RequestBody BatchCreateBillDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(billService.batchCreate(userId, dto));
     }
 
     @PostMapping("/update")

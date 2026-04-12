@@ -3,6 +3,7 @@ package com.samoy.chuanbillserver.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
+import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
@@ -47,6 +48,15 @@ public interface IBillService extends IService<Bill> {
      * @return 是否添加成功
      */
     boolean addBill(String userId, AddBillDTO addBillDTO);
+
+    /**
+     * 批量添加账单
+     *
+     * @param userId 用户ID
+     * @param dto    批量账单信息
+     * @return 成功创建的条数
+     */
+    int batchCreate(String userId, BatchCreateBillDTO dto);
 
     /**
      * 更新账单
