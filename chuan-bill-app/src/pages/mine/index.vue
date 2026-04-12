@@ -8,13 +8,13 @@ definePage({
 })
 
 // 鉴权检查
-const { isLoggedIn, showLoginPopup } = useAuthCheck()
+const user = useUserStore()
 const userStore = useUserStore()
-const localBillStore = useLocalBillStore()
+const billStore = useBillStore()
 
 // 登录价值特性
 const loginFeatures = [
-  { icon: 'i-lucide:camera', text: '图片识别记账' },
+  { icon: 'i-lucide:camera', text: '图片记账' },
   { icon: 'i-lucide:mic', text: '语音记账' },
   { icon: 'i-lucide:cloud-sync', text: '云端同步' },
   { icon: 'i-lucide:smartphone', text: '多设备访问' },
@@ -30,7 +30,7 @@ const menuList = [
 
 // 跳转到登录
 function goToLogin() {
-  showLoginPopup.value = true
+  user.showLoginPopup = true
 }
 
 // 退出登录
@@ -42,7 +42,7 @@ function logout() {
 <template>
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 未登录状态 -->
-    <template v-if="!isLoggedIn">
+    <template v-if="!user.isLoggedIn">
       <!-- 顶部登录入口 -->
       <view class="mx-3 rounded-2xl bg-white p-6 shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view class="flex items-center gap-4" @click="goToLogin">
@@ -80,7 +80,7 @@ function logout() {
       </view>
 
       <!-- 本地数据提示 -->
-      <view v-if="localBillStore.hasPendingBills" class="mx-3 rounded-2xl bg-orange-50 p-4 dark:bg-orange-900/20">
+      <view v-if="billStore" class="mx-3 rounded-2xl bg-orange-50 p-4 dark:bg-orange-900/20">
         <view class="flex items-center gap-3">
           <view class="h-10 w-10 flex items-center justify-center rounded-full bg-orange-100 dark:bg-orange-800">
             <view class="i-lucide:database h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -90,7 +90,7 @@ function logout() {
               您有本地账单数据
             </text>
             <text class="mt-0.5 block text-xs text-orange-600 dark:text-orange-300">
-              {{ localBillStore.bills.length }} 笔账单待同步到云端
+              {{ billStore.localBillList.length }} 笔账单待同步到云端
             </text>
           </view>
           <wd-button type="warning" size="small" @click="goToLogin">

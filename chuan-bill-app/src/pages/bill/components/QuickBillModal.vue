@@ -25,27 +25,22 @@ const emit = defineEmits<{
 }>()
 
 // 记账方式选项
-const allSourceOptions = [
+const sourceOptions = [
   { payload: { label: '手动添加', icon: 'i-lucide:square-pen' }, value: 'manual' },
   { payload: { label: '图片识别', icon: 'i-lucide:camera' }, value: 'ocr' },
   { payload: { label: '语音识别', icon: 'i-lucide:mic' }, value: 'voice' },
 ]
 
-// 游客模式下只显示手动添加
-const sourceOptions = computed(() => {
-  if (props.isGuestMode) {
-    return allSourceOptions.filter(opt => opt.value === 'manual')
-  }
-  return allSourceOptions
-})
-
-const source = ref(props.source || 'manual')
+const source = ref('manual')
 
 const show = defineModel<boolean>({ default: false })
 const segmentedRef = ref()
 const toast = useGlobalToast()
 const message = useGlobalMessage()
 const billForm = ref<AddBillDTO>({ name: '', type: 'expense', amount: '', time: '', source: 'manual' })
+const user = useUserStore()
+const billStore = useBillStore()
+const isLoggedIn = computed(() => user.isLoggedIn)
 
 function convertBillVOToAddBillDTO(billVO: BillVO) {
   billForm.value.name = billVO.name!
@@ -99,6 +94,11 @@ async function manualSubmit(billDTO: AddBillDTO | UpdateBillDTO) {
 }
 
 async function addBill(billDTO: AddBillDTO) {
+  if (!isLoggedIn.value) {
+    billStore.addLocalBill(billDTO)
+    addBillSuccess(billDTO)
+    return
+  }
   const res = await Apis.bill.addBill({
     data: {
       ...billDTO,
@@ -106,14 +106,23 @@ async function addBill(billDTO: AddBillDTO) {
     },
   })
   if (res.success) {
-    toast.success('添加成功')
-    show.value = false
-    resetBillForm()
-    emit('success', billDTO)
+    addBillSuccess(billDTO)
   }
 }
 
+function addBillSuccess(billDTO: AddBillDTO) {
+  toast.success('添加成功')
+  show.value = false
+  resetBillForm()
+  emit('success', billDTO)
+}
+
 async function updateBill(billDTO: UpdateBillDTO) {
+  if (!isLoggedIn.value) {
+    billStore.updateLocalBill(billDTO)
+    updateBillSuccess(billDTO)
+    return
+  }
   const res = await Apis.bill.updateBill({
     data: {
       ...billDTO,
@@ -121,11 +130,15 @@ async function updateBill(billDTO: UpdateBillDTO) {
     },
   })
   if (res.success) {
-    toast.success('修改成功')
-    show.value = false
-    resetBillForm()
-    emit('success', billDTO)
+    updateBillSuccess(billDTO)
   }
+}
+
+function updateBillSuccess(billDTO: UpdateBillDTO) {
+  toast.success('修改成功')
+  show.value = false
+  resetBillForm()
+  emit('success', billDTO)
 }
 
 function showInfo() {
@@ -141,6 +154,9 @@ watch(() => props.bill, (newVal) => {
   if (newVal) {
     convertBillVOToAddBillDTO(newVal)
   }
+  else {
+    resetBillForm()
+  }
 }, { immediate: true, deep: true })
 </script>
 
@@ -150,7 +166,7 @@ watch(() => props.bill, (newVal) => {
     :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
     <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-5.5 box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
-    <text v-else class="i-lucide:info absolute right-10 top-5.5 box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
+    <text v-else-if="isLoggedIn" class="i-lucide:info absolute right-10 top-5.5 box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
 
     <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented

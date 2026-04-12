@@ -208,7 +208,7 @@ export interface UpdateBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type?: string;
+  type: 'income' | 'expense';
   /**
    * 账单时间
    */
@@ -258,13 +258,25 @@ export interface AddBillDTO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: string;
+  source?: 'manual' | 'ocr' | 'voice';
+}
+export interface BatchCreateBillDTO {
+  /**
+   * 账单列表
+   */
+  bills: AddBillDTO[];
 }
 export interface SendCodeDTO {
   /**
    * 手机号
    */
   phone: string;
+}
+export interface LoginByWechatDTO {
+  /**
+   * 微信登录 code
+   */
+  code: string;
 }
 export interface LoginByPhoneDTO {
   /**
@@ -285,6 +297,13 @@ export interface LoginByPasswordDTO {
    * 密码
    */
   password: string;
+}
+export interface ResultVoid {
+  code?: number;
+  message?: string;
+  data?: null;
+  timestamp?: number;
+  success?: boolean;
 }
 export interface UserVO {
   /**
@@ -398,10 +417,10 @@ export interface ResultTempFileVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface ResultVoid {
+export interface ResultInteger {
   code?: number;
   message?: string;
-  data?: null;
+  data?: number;
   timestamp?: number;
   success?: boolean;
 }
@@ -499,7 +518,7 @@ export interface BillVO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source: 'manual' | 'ocr' | 'voice';
+  source?: 'manual' | 'ocr' | 'voice';
   /**
    * 家庭 ID
    */
@@ -530,15 +549,15 @@ export interface BillMonthlyStatsVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
   /**
    * 结余金额
    */
-  balance?: number;
+  balance?: string;
 }
 export interface ResultBillMonthlyStatsVO {
   code?: number;
@@ -911,6 +930,65 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultBoolean, 'bill.deleteBill', Config>;
+      /**
+       * ---
+       *
+       * [POST] 批量添加账单
+       *
+       * **path:** /bill/batchCreate
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 账单列表
+       *   // [items] start
+       *   // 添加账单请求
+       *   // [items] end
+       *   bills: Array<{
+       *     // 账单名称
+       *     name: string
+       *     // 分类 ID
+       *     categoryId: string
+       *     // 支付方式 ID
+       *     paymentMethodId?: string
+       *     // 账单类型：income-收入，expense-支出
+       *     type: string
+       *     // 账单金额
+       *     amount: number
+       *     // 账单时间
+       *     time: string
+       *     // 账单备注
+       *     remark?: string
+       *     // 家庭 ID（可选）
+       *     familyId?: string
+       *     // 账单来源：manual-手动，ocr-图片识别，voice-语音
+       *     source?: string
+       *   }>
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: number
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      batchCreate<
+        Config extends Alova2MethodConfig<ResultInteger> & {
+          data: BatchCreateBillDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultInteger, 'bill.batchCreate', Config>;
       /**
        * ---
        *
@@ -1363,6 +1441,76 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultVoid, 'auth.sendCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 登出
+       *
+       * **path:** /auth/logout
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      logout<Config extends Alova2MethodConfig<ResultVoid>>(
+        config?: Config
+      ): Alova2Method<ResultVoid, 'auth.logout', Config>;
+      /**
+       * ---
+       *
+       * [POST] 微信登录
+       *
+       * **path:** /auth/loginByWechat
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 微信登录 code
+       *   code: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 令牌响应
+       *   data?: {
+       *     // 访问令牌
+       *     token?: string
+       *     // 过期时间（毫秒）
+       *     expireTime?: number
+       *     // 用户 ID
+       *     userId?: string
+       *     // 用户昵称
+       *     nickname?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      loginByWechat<
+        Config extends Alova2MethodConfig<ResultTokenVO> & {
+          data: LoginByWechatDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultTokenVO, 'auth.loginByWechat', Config>;
       /**
        * ---
        *

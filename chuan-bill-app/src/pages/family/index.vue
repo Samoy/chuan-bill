@@ -8,7 +8,7 @@ definePage({
 })
 
 // 鉴权检查
-const { isLoggedIn, showLoginPopup } = useAuthCheck()
+const user = useUserStore()
 
 // 家庭功能特性列表
 const features = [
@@ -36,14 +36,14 @@ const features = [
 
 // 跳转到登录
 function goToLogin() {
-  showLoginPopup.value = true
+  user.showLoginPopup = true
 }
 </script>
 
 <template>
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 未登录状态 -->
-    <template v-if="!isLoggedIn">
+    <template v-if="!user.isLoggedIn">
       <!-- 顶部介绍卡片 -->
       <view class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
         <view class="mb-4 flex items-center gap-3">

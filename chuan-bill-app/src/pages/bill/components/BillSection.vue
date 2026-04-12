@@ -16,11 +16,12 @@ const { month, customClass, customStyle } = defineProps<{
 }>()
 
 const statistics = ref<BillMonthlyStatsVO>()
+const billStore = useBillStore()
 
 onMounted(async () => {
-  const res = await Apis.bill.getMonthlyStats({ params: { month } })
-  if (res.success) {
-    statistics.value = res.data
+  const res = await billStore.getMonthlyBillStats(month)
+  if (res) {
+    statistics.value = res
   }
 })
 </script>

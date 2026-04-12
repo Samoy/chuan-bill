@@ -63,7 +63,7 @@ const { bill, customClass, customStyle } = defineProps<{
           <text>来源</text>
         </view>
         <text>
-          {{ SOURCE_MAP[bill.source] || '未知' }}
+          {{ SOURCE_MAP[bill.source!] || '未知' }}
         </text>
       </view>
       <view v-if="bill.remark" class="flex flex-col justify-between gap-2 text-sm">

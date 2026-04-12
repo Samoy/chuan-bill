@@ -9,10 +9,6 @@ defineOptions({
   },
 })
 
-const { isGuestMode } = defineProps<{
-  isGuestMode?: boolean
-}>()
-
 const emit = defineEmits<{
   submit: [data: AddBillDTO]
 }>()
@@ -26,6 +22,7 @@ interface PickerOption {
 const form = ref()
 const isShared = ref(false)
 const billStore = useBillStore()
+const user = useUserStore()
 
 const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'manual', type: 'expense' } })
 const categoryOptions = computed<PickerOption[]>(() => billStore.getCategoryList(formData.value.type).map(category => ({ label: category.name, value: category.id })))
@@ -114,7 +111,7 @@ function sumbit() {
     </view>
     <wd-divider custom-class="!mt-2 !px-0" />
     <!-- 游客模式下不显示家庭共享 -->
-    <template v-if="!isGuestMode">
+    <template v-if="user.isLoggedIn">
       <view class="mt-3 flex items-center justify-between text-xs text-gray-500">
         <text>共享到家庭</text>
         <wd-switch v-model="isShared" size="18px" />
@@ -136,7 +133,7 @@ function sumbit() {
       :maxlength="500"
       show-word-limit
     />
-    <wd-button size="large" type="primary" block custom-class="!pos-absolute bottom-[10px] left-4 right-4 z-1" @click="sumbit">
+    <wd-button type="primary" block custom-class="!pos-absolute bottom-[10px] left-4 right-4 z-1" @click="sumbit">
       保存
     </wd-button>
   </wd-form>

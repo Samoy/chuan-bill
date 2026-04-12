@@ -2,7 +2,6 @@
 import type { TokenVO } from '@/api/globals'
 
 // ========== 状态管理 ==========
-const { showLoginPopup, onLoginSuccess, onLoginCancel } = useAuthCheck()
 const userStore = useUserStore()
 const toast = useGlobalToast()
 
@@ -81,7 +80,7 @@ async function handleLoginSuccess(tokenVO: TokenVO) {
   })
 
   // 3. 调用成功回调
-  onLoginSuccess()
+  userStore.onLoginSuccess()
 
   // 4. 显示成功提示
   toast.success('登录成功')
@@ -200,7 +199,7 @@ async function handleWechatLogin() {
 
 // ========== 弹框关闭处理 ==========
 function handleClose() {
-  onLoginCancel()
+  userStore.onLoginCancel()
   resetForm()
 }
 
@@ -222,7 +221,7 @@ export default {
 
 <template>
   <wd-popup
-    v-model="showLoginPopup"
+    v-model="userStore.showLoginPopup"
     :z-index="9999"
     position="bottom"
     :close-on-click-modal="true"

@@ -43,6 +43,7 @@ declare module 'vue' {
     WdRadioGroup: typeof import('wot-design-uni/components/wd-radio-group/wd-radio-group.vue')['default']
     WdSearch: typeof import('wot-design-uni/components/wd-search/wd-search.vue')['default']
     WdSegmented: typeof import('wot-design-uni/components/wd-segmented/wd-segmented.vue')['default']
+    WdStatusTip: typeof import('wot-design-uni/components/wd-status-tip/wd-status-tip.vue')['default']
     WdSticky: typeof import('wot-design-uni/components/wd-sticky/wd-sticky.vue')['default']
     WdSwitch: typeof import('wot-design-uni/components/wd-switch/wd-switch.vue')['default']
     WdTab: typeof import('wot-design-uni/components/wd-tab/wd-tab.vue')['default']

@@ -31,6 +31,7 @@ const taskStatus = ref(TaskStatus.Idle)
 const billVO = ref<BillVO>()
 const toast = useGlobalToast()
 const shadowColor = ref('var(--color-primary)')
+const user = useUserStore()
 
 async function initAsr() {
   await asrClient.init({
@@ -134,42 +135,52 @@ watch(() => isCanceled.value, (newVal) => {
 
 <template>
   <view class="flex flex-col items-center justify-center gap-3 px-3 pb-3">
-    <template v-if="taskStatus === TaskStatus.Success && billVO">
-      <view class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
-        <!-- 成功图标 -->
-        <wd-icon name="check-circle" size="20px" color="green" />
-      </view>
-      <bill-card :bill="billVO" custom-class="w-full flex" />
-      <view class="box-border w-full flex gap-3">
-        <wd-button plain custom-class="flex-1" @click="reset">
-          重新识别
-        </wd-button>
-        <wd-button custom-class="flex-1" @click="emit('submit', billVO)">
-          确认入账
-        </wd-button>
-      </view>
-      <text class="text-center text-xs text-gray-300 dark:text-gray-600">
-        内容由AI生成，可能出现错误，请仔细辨别。
+    <template v-if="!user.isLoggedIn">
+      <text class="mb-2 mt-10 text-xs text-gray-500">
+        登录后即可解锁语音输入账单功能
       </text>
+      <wd-button block custom-class="mb-7 w-200px" @click="user.showLoginPopup = true">
+        立即登录
+      </wd-button>
     </template>
     <template v-else>
-      <view
-        class="box-border h-20 w-full flex items-center justify-center overflow-y-auto rounded-lg bg-primary/10 p-3 shadow-sm"
-        :style="{ visibility: (isRecording || asrText) ? 'visible' : 'hidden' }"
-      >
-        {{ asrText }}
-      </view>
-      <view class="text-xs text-gray-400">
-        {{ tipText }}
-      </view>
-      <view
-        class="relative h-16 w-16 flex select-none items-center justify-center rounded-full bg-primary"
-        :class="{ 'mic': isRecording, 'bg-red-500': isCanceled }" @touchmove.prevent.stop="touchMove"
-        @touchstart.prevent.stop="touchStart" @touchend.prevent.stop="touchEnd"
-      >
-        <wd-loading v-if="taskStatus === TaskStatus.Pending" color="#ffffff" />
-        <text v-else class="i-lucide:mic z-1 text-2xl text-white" />
-      </view>
+      <template v-if="taskStatus === TaskStatus.Success && billVO">
+        <view class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
+          <!-- 成功图标 -->
+          <wd-icon name="check-circle" size="20px" color="green" />
+        </view>
+        <bill-card :bill="billVO" custom-class="w-full flex" />
+        <view class="box-border w-full flex gap-3">
+          <wd-button plain custom-class="flex-1" @click="reset">
+            重新识别
+          </wd-button>
+          <wd-button custom-class="flex-1" @click="emit('submit', billVO)">
+            确认入账
+          </wd-button>
+        </view>
+        <text class="text-center text-xs text-gray-300 dark:text-gray-600">
+          内容由AI生成，可能出现错误，请仔细辨别。
+        </text>
+      </template>
+      <template v-else>
+        <view
+          class="box-border h-20 w-full flex items-center justify-center overflow-y-auto rounded-lg bg-primary/10 p-3 shadow-sm"
+          :style="{ visibility: (isRecording || asrText) ? 'visible' : 'hidden' }"
+        >
+          {{ asrText }}
+        </view>
+        <view class="text-xs text-gray-400">
+          {{ tipText }}
+        </view>
+        <view
+          class="relative h-16 w-16 flex select-none items-center justify-center rounded-full bg-primary"
+          :class="{ 'mic': isRecording, 'bg-red-500': isCanceled }" @touchmove.prevent.stop="touchMove"
+          @touchstart.prevent.stop="touchStart" @touchend.prevent.stop="touchEnd"
+        >
+          <wd-loading v-if="taskStatus === TaskStatus.Pending" color="#ffffff" />
+          <text v-else class="i-lucide:mic z-1 text-2xl text-white" />
+        </view>
+      </template>
     </template>
   </view>
 </template>
