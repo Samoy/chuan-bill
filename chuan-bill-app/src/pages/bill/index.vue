@@ -229,7 +229,7 @@ watch(() => user.isLoggedIn, (newVal) => {
     <view v-else class="mt-10vh flex flex-col items-center justify-center gap-5">
       <wd-status-tip tip="您还没有任何账单数据，快来记一笔吧！">
         <template #image>
-          <image mode="aspectFit" class="h-30 w-80" src="http://tddhe5cbj.hb-bkt.clouddn.com/%E7%BC%BA%E7%9C%81%E9%A1%B5-%E6%97%A0%E8%B4%A6%E5%8D%95.svg?e=1775985202&token=Y2r94IGt-ICQY9ugsbJp8SdmPJGGEZKRZLYuZlV4:owqhpZb2g8kywzqAOGf5MK3WvTg=" />
+          <image mode="aspectFit" class="h-30 w-80" src="https://cdn.chuanbill.samoy.site/default/nodata.svg" />
         </template>
       </wd-status-tip>
       <wd-button type="primary" @click="addBill">

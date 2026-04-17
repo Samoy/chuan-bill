@@ -75,10 +75,5 @@ export default <Config>{
    * extension only
    * whether to automatically update the interface, enabled by default, check every 5 minutes, closed when set to `false`
    */
-  autoUpdate: {
-    // Update when editor is launched
-    launchEditor: true,
-    // Check for updates every 5 minutes
-    interval: 5 * 60 * 1000,
-  },
+  autoUpdate: false,
 }

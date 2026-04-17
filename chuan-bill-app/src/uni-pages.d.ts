@@ -5,8 +5,10 @@
 
 type _LocationUrl =
   "/pages/bill/index" |
+  "/pages/agreement/index" |
   "/pages/family/index" |
   "/pages/mine/index" |
+  "/pages/privacy/index" |
   "/pages/statistics/index";
 
 interface NavigateToOptions {

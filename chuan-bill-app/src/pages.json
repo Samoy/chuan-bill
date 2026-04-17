@@ -51,7 +51,27 @@
       "style": {
         "navigationBarTitleText": "统计"
       }
+    },
+    // #ifdef H5
+    {
+      "path": "pages/agreement/index",
+      "type": "page",
+      "name": "agreement",
+      "style": {
+        "navigationBarTitleText": "用户协议"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/privacy/index",
+      "type": "page",
+      "name": "privacy",
+      "style": {
+        "navigationBarTitleText": "隐私政策"
+      }
     }
+    // #endif
   ],
   "subPackages": [],
   "tabBar": {
