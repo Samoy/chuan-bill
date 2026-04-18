@@ -49,7 +49,7 @@
       <if test="familyId != null">
             AND family_id = #{familyId}
         </if>
-      GROUP BY DATE(time)
-      ORDER BY DATE(time)
+      GROUP BY DATE_FORMAT(time, '%Y-%m-%d')
+      ORDER BY DATE_FORMAT(time, '%Y-%m-%d')
     </select>
 </mapper>

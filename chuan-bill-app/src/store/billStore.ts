@@ -39,7 +39,6 @@ export const useBillStore = defineStore('bill', () => {
       }
       return
     }
-    console.log('使用本地支付类别列表')
     paymentMethodList.value = LOCAL_PAYMENT_METHOD_LIST
   }
 
@@ -54,7 +53,6 @@ export const useBillStore = defineStore('bill', () => {
       }
       return
     }
-    console.log('使用本地支付类别列表')
     categoryListMap.value = {
       expense: LOCAL_PAY_CATEGORY_LIST.filter(item => item.type === 'expense'),
       income: LOCAL_PAY_CATEGORY_LIST.filter(item => item.type === 'income'),

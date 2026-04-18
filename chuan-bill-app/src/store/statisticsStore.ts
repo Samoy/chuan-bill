@@ -43,7 +43,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
     categoryLoading.value = true
     try {
       if (user.isLoggedIn) {
-        const res = await Apis.statistics.getCategoryStats({ params: { dto: { month, type } } })
+        const res = await Apis.statistics.getCategoryStats({ params: { month, type } })
         if (res.success && res.data) {
           categoryData.value = res.data.map(item => ({
             categoryId: item.categoryId ?? '',
@@ -115,7 +115,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
       const incomes = Array.from({ length: daysInMonth }, () => 0)
 
       if (user.isLoggedIn) {
-        const res = await Apis.statistics.getDailyTrend({ params: { dto: { month } } })
+        const res = await Apis.statistics.getDailyTrend({ params: { month } })
         if (res.success && res.data) {
           for (const item of res.data) {
             if (item.date) {

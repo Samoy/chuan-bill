@@ -222,7 +222,7 @@ export interface UpdateBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type?: string;
+  type: 'income' | 'expense';
   /**
    * 账单时间
    */
@@ -474,15 +474,15 @@ export interface BillMonthlyStatsVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
   /**
    * 结余金额
    */
-  balance?: number;
+  balance?: string;
 }
 export interface ResultBillMonthlyStatsVO {
   code?: number;
@@ -665,7 +665,7 @@ declare global {
        *
        * [POST] 更新用户资料
        *
-       * **path:** /user/updateProfile
+       * **path:** /user/profile/update
        *
        * ---
        *
@@ -708,7 +708,7 @@ declare global {
        *
        * [POST] 通过旧密码修改密码
        *
-       * **path:** /user/updatePasswordByOld
+       * **path:** /user/password/update-by-old
        *
        * ---
        *
@@ -749,7 +749,7 @@ declare global {
        *
        * [POST] 通过验证码修改密码
        *
-       * **path:** /user/updatePasswordByCode
+       * **path:** /user/password/update-by-code
        *
        * ---
        *
@@ -833,7 +833,7 @@ declare global {
        *
        * [GET] 检查是否设置了密码
        *
-       * **path:** /user/hasPassword
+       * **path:** /user/has-password
        *
        * ---
        *
@@ -1473,7 +1473,7 @@ declare global {
        *
        * [POST] 发送验证码
        *
-       * **path:** /auth/sendCode
+       * **path:** /auth/send-code
        *
        * ---
        *
@@ -1533,7 +1533,7 @@ declare global {
        *
        * [POST] 微信登录
        *
-       * **path:** /auth/loginByWechat
+       * **path:** /auth/login-wechat
        *
        * ---
        *
@@ -1580,7 +1580,7 @@ declare global {
        *
        * [POST] 手机号登录
        *
-       * **path:** /auth/loginByPhone
+       * **path:** /auth/login-phone
        *
        * ---
        *
@@ -1629,7 +1629,7 @@ declare global {
        *
        * [POST] 密码登录
        *
-       * **path:** /auth/loginByPassword
+       * **path:** /auth/login-password
        *
        * ---
        *
@@ -1779,12 +1779,7 @@ declare global {
        */
       getDailyTrend<
         Config extends Alova2MethodConfig<ResultListDailyTrendVO> & {
-          params: {
-            /**
-             * 账单月度统计参数
-             */
-            dto: BillMonthlyStatsDTO;
-          };
+          params: BillMonthlyStatsDTO;
         }
       >(
         config: Config
@@ -1842,12 +1837,7 @@ declare global {
        */
       getCategoryStats<
         Config extends Alova2MethodConfig<ResultListCategoryStatisticsVO> & {
-          params: {
-            /**
-             * 分类统计参数
-             */
-            dto: StatisticsCategoryDTO;
-          };
+          params: StatisticsCategoryDTO;
         }
       >(
         config: Config

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BillListDTO, BillVO } from '@/api/globals'
+import type { AddBillDTO, BillListDTO, BillVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
@@ -21,6 +21,7 @@ definePage({
 // 鉴权检查
 const user = useUserStore()
 const billStore = useBillStore()
+const statisStore = useStatisticsStore()
 const message = useGlobalMessage()
 
 const searchValue = ref('')
@@ -153,7 +154,8 @@ function editBill(bill: BillVO) {
   showQuickBillModal.value = true
 }
 
-function submitBill() {
+function submitBill(bill: AddBillDTO | UpdateBillDTO) {
+  statisStore.fetchAll(dayjs(bill.time).format('YYYY-MM'))
   showQuickBillModal.value = false
   currentBill.value = undefined
   refresh()

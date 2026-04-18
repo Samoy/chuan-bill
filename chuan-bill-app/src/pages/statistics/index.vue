@@ -57,6 +57,7 @@ function onMonthSelect({ value }: { value: string }) {
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
+  statisticsStore.aiSuggestion = ''
 }, { immediate: true })
 
 // 监听登录状态变化，重新获取
@@ -68,26 +69,28 @@ watch(() => user.isLoggedIn, () => {
 <template>
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 月份选择器 -->
-    <view class="mx-3 flex items-center justify-center gap-4">
-      <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="prevMonth">
-        <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
-      </view>
-      <wd-picker
-        v-model="currentMonth"
-        v-model:visible="showMonthPicker"
-        :columns="monthOptions"
-        title="选择月份"
-        @confirm="onMonthSelect"
-      >
-        <view class="flex items-center gap-1 text-lg font-500" @click="showMonthPicker = true">
-          <text>{{ currentMonth }}</text>
-          <view class="i-lucide:chevron-down h-4 w-4 text-gray-400" />
+    <wd-sticky :z-index="10">
+      <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc]">
+        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="prevMonth">
+          <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
         </view>
-      </wd-picker>
-      <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="nextMonth">
-        <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
+        <wd-picker
+          v-model="currentMonth"
+          v-model:visible="showMonthPicker"
+          :columns="monthOptions"
+          title="选择月份"
+          @confirm="onMonthSelect"
+        >
+          <view class="flex items-center gap-1 text-lg font-500" @click="showMonthPicker = true">
+            <text>{{ currentMonth }}</text>
+            <view class="i-lucide:chevron-down h-4 w-4 text-gray-400" />
+          </view>
+        </wd-picker>
+        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="nextMonth">
+          <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
+        </view>
       </view>
-    </view>
+    </wd-sticky>
 
     <!-- 概览卡片 -->
     <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
@@ -140,6 +143,6 @@ watch(() => user.isLoggedIn, () => {
     </view>
 
     <!-- 底部间距（给 tabbar 留空间） -->
-    <view class="h-20" />
+    <view class="h-10" />
   </view>
 </template>
