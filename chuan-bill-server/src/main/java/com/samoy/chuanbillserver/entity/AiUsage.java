@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import lombok.ToString;
 
 /**
  * <p>
- * 家庭加入申请表
+ * AI使用次数统计表
  * </p>
  *
  * @author Samoy
@@ -20,22 +21,16 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName("t_family_join_apply")
-public class FamilyJoinApply implements Serializable {
+@TableName("t_ai_usage")
+public class AiUsage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 家庭加入申请ID
+     * 主键ID
      */
     @TableId("id")
     private String id;
-
-    /**
-     * 家庭ID
-     */
-    @TableField("family_id")
-    private String familyId;
 
     /**
      * 用户ID
@@ -44,28 +39,16 @@ public class FamilyJoinApply implements Serializable {
     private String userId;
 
     /**
-     * 申请备注
+     * 使用日期
      */
-    @TableField("remark")
-    private String remark;
+    @TableField("usage_date")
+    private LocalDate usageDate;
 
     /**
-     * 申请状态，0待处理，1同意，2拒绝
+     * 当日AI分析调用次数
      */
-    @TableField("status")
-    private Boolean status;
-
-    /**
-     * 处理申请的用户ID
-     */
-    @TableField("handle_user_id")
-    private String handleUserId;
-
-    /**
-     * 处理时间
-     */
-    @TableField("handle_time")
-    private LocalDateTime handleTime;
+    @TableField("analysis_count")
+    private Integer analysisCount;
 
     /**
      * 创建时间

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.samoy.chuanbillserver.dao.AiUsageMapper">
+
+    <!-- 原子递增当日AI分析调用次数，不存在则插入 -->
+    <insert id="incrementAnalysisCount">
+        INSERT INTO t_ai_usage (id, user_id, usage_date, analysis_count)
+        VALUES (REPLACE(UUID(), '-', ''), #{userId}, #{usageDate}, 1)
+        ON DUPLICATE KEY UPDATE analysis_count = analysis_count + 1
+    </insert>
+
+</mapper>

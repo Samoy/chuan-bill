@@ -11,7 +11,7 @@ import lombok.ToString;
 
 /**
  * <p>
- * 家庭加入申请表
+ * AI分析建议表
  * </p>
  *
  * @author Samoy
@@ -20,22 +20,16 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName("t_family_join_apply")
-public class FamilyJoinApply implements Serializable {
+@TableName("t_ai_suggestion")
+public class AiSuggestion implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 家庭加入申请ID
+     * 主键ID
      */
     @TableId("id")
     private String id;
-
-    /**
-     * 家庭ID
-     */
-    @TableField("family_id")
-    private String familyId;
 
     /**
      * 用户ID
@@ -44,28 +38,16 @@ public class FamilyJoinApply implements Serializable {
     private String userId;
 
     /**
-     * 申请备注
+     * 月份，格式YYYY-MM
      */
-    @TableField("remark")
-    private String remark;
+    @TableField("month")
+    private String month;
 
     /**
-     * 申请状态，0待处理，1同意，2拒绝
+     * AI分析内容
      */
-    @TableField("status")
-    private Boolean status;
-
-    /**
-     * 处理申请的用户ID
-     */
-    @TableField("handle_user_id")
-    private String handleUserId;
-
-    /**
-     * 处理时间
-     */
-    @TableField("handle_time")
-    private LocalDateTime handleTime;
+    @TableField("content")
+    private String content;
 
     /**
      * 创建时间

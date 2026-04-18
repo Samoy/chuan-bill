@@ -18,6 +18,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
   const categoryData = ref<CategoryStatItem[]>([])
   const dailyTrend = ref<{ days: string[], expenses: number[], incomes: number[] } | null>(null)
   const aiSuggestion = ref<string>('')
+  const aiCached = ref(false)
+  const aiRemainingCount = ref(-1)
   const overviewLoading = ref(false)
   const categoryLoading = ref(false)
   const trendLoading = ref(false)
@@ -156,25 +158,55 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
   /**
    * 获取AI消费建议（登录后可用）
+   * @param month 月份
+   * @param regenerate 是否重新生成
    */
-  async function fetchAiSuggestion(month: string) {
+  async function fetchAiSuggestion(month: string, regenerate = false) {
     if (!user.isLoggedIn)
       return
     aiLoading.value = true
     try {
-      const res = await Apis.ai.analysis({ params: { month } })
-      if (res.success) {
-        aiSuggestion.value = res.data ?? ''
+      const res = await Apis.ai.analysis({ params: { month, regenerate } })
+      if (res.success && res.data) {
+        aiSuggestion.value = res.data.content ?? ''
+        aiCached.value = res.data.cached ?? false
+        aiRemainingCount.value = res.data.remainingCount ?? -1
       }
       else {
         aiSuggestion.value = ''
+        aiCached.value = false
       }
     }
     catch {
       aiSuggestion.value = ''
+      aiCached.value = false
     }
     finally {
       aiLoading.value = false
+    }
+  }
+
+  /**
+   * 获取缓存的AI建议（不触发AI生成，无缓存时返回空）
+   */
+  async function fetchAiSuggestionCached(month: string) {
+    if (!user.isLoggedIn)
+      return
+    try {
+      const res = await Apis.ai.analysis({ params: { month }, meta: { silent: true } } as any)
+      if (res.success && res.data) {
+        aiSuggestion.value = res.data.content ?? ''
+        aiCached.value = res.data.cached ?? false
+        aiRemainingCount.value = res.data.remainingCount ?? -1
+      }
+      else {
+        aiSuggestion.value = ''
+        aiCached.value = false
+      }
+    }
+    catch {
+      aiSuggestion.value = ''
+      aiCached.value = false
     }
   }
 
@@ -194,6 +226,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
     categoryData.value = []
     dailyTrend.value = null
     aiSuggestion.value = ''
+    aiCached.value = false
+    aiRemainingCount.value = -1
     overviewLoading.value = false
     categoryLoading.value = false
     trendLoading.value = false
@@ -205,6 +239,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
     categoryData,
     dailyTrend,
     aiSuggestion,
+    aiCached,
+    aiRemainingCount,
     overviewLoading,
     categoryLoading,
     trendLoading,
@@ -213,6 +249,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
     fetchCategoryBreakdown,
     fetchDailyTrend,
     fetchAiSuggestion,
+    fetchAiSuggestionCached,
     fetchAll,
     reset,
   }

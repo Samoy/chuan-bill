@@ -11,11 +11,17 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
+import com.samoy.chuanbillserver.entity.AiSuggestion;
+import com.samoy.chuanbillserver.entity.User;
 import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IAIService;
+import com.samoy.chuanbillserver.service.IAiSuggestionService;
+import com.samoy.chuanbillserver.service.IAiUsageService;
 import com.samoy.chuanbillserver.service.IBillService;
+import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.utils.AgentUtil;
+import com.samoy.chuanbillserver.vo.AiAnalysisVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import jakarta.annotation.Resource;
@@ -43,6 +49,15 @@ public class AIServiceImpl implements IAIService {
 
     @Resource
     private IBillService billService;
+
+    @Resource
+    private IUserService userService;
+
+    @Resource
+    private IAiSuggestionService aiSuggestionService;
+
+    @Resource
+    private IAiUsageService aiUsageService;
 
     @Override
     public BillVO ocr(String fileId, String fileExt) {
@@ -88,8 +103,54 @@ public class AIServiceImpl implements IAIService {
     }
 
     @Override
-    public String analysis(String month) {
+    public AiAnalysisVO analysis(String month, boolean regenerate) {
         String userId = StpUtil.getLoginIdAsString();
+        User user = userService.getById(userId);
+        boolean isVip = Boolean.TRUE.equals(user.getIsVip());
+
+        // 非重新生成时，优先返回缓存
+        if (!regenerate) {
+            AiSuggestion suggestion = aiSuggestionService.getByUserIdAndMonth(userId, month);
+            if (suggestion != null) {
+                AiAnalysisVO vo = new AiAnalysisVO();
+                vo.setContent(suggestion.getContent());
+                vo.setCached(true);
+                vo.setRemainingCount(aiUsageService.getRemainingCount(userId, isVip));
+                return vo;
+            }
+            return null;
+        }
+
+        // 需要调用AI生成（无缓存或重新生成）
+        int remainingCount = aiUsageService.getRemainingCount(userId, isVip);
+        if (remainingCount <= 0 && !isVip) {
+            throw new BusinessException(ResultEnum.AI_ANALYSIS_RATE_LIMITED);
+        }
+
+        // 调用DashScope生成分析
+        String analysisText = generateAnalysis(userId, month);
+
+        // 持久化建议
+        aiSuggestionService.saveOrUpdateSuggestion(userId, month, analysisText);
+
+        // 递增每日使用次数（VIP也需要记录，但不受限制）
+        aiUsageService.incrementUsage(userId);
+
+        AiAnalysisVO vo = new AiAnalysisVO();
+        vo.setContent(analysisText);
+        vo.setCached(false);
+        vo.setRemainingCount(aiUsageService.getRemainingCount(userId, isVip));
+        return vo;
+    }
+
+    /**
+     * 调用DashScope生成账单分析
+     *
+     * @param userId 用户ID
+     * @param month 月份
+     * @return 分析文本
+     */
+    private String generateAnalysis(String userId, String month) {
         BillMonthlyStatsVO vo = billService.getMonthlyStats(userId, new BillMonthlyStatsDTO(month, null));
         BillListDTO billListDTO = new BillListDTO();
         YearMonth yearMonth = YearMonth.parse(month, DateTimeFormatter.ofPattern("yyyy-MM"));

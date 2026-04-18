@@ -43,6 +43,7 @@ public enum ResultEnum {
     BILL_OCR_FAILED(2101, "账单OCR识别失败"),
     BILL_TEXT_FAILED(2102, "账单文本识别失败"),
     BILL_ANALYSIS_FAILED(2103, "账单分析失败"),
+    AI_ANALYSIS_RATE_LIMITED(2104, "今日AI分析次数已用完"),
 
     // 文件错误码 3000+
     FILE_NOT_FOUND(3001, "文件不存在"),

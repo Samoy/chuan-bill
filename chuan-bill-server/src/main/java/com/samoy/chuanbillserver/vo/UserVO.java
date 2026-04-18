@@ -26,6 +26,9 @@ public class UserVO {
     @Schema(description = "状态：false-禁用，true-正常", example = "true")
     private Boolean status;
 
+    @Schema(description = "是否VIP", example = "false")
+    private Boolean isVip;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Schema(description = "最后登录时间", example = "2024-01-01 12:00:00")
     private LocalDateTime lastLoginTime;

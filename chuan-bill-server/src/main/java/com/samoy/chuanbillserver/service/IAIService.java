@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.service;
 
+import com.samoy.chuanbillserver.vo.AiAnalysisVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 
 public interface IAIService {
@@ -25,7 +26,8 @@ public interface IAIService {
      * 通过月份进行账单分析
      *
      * @param month 月份
+     * @param regenerate 是否重新生成
      * @return 分析结果
      */
-    String analysis(String month);
+    AiAnalysisVO analysis(String month, boolean regenerate);
 }

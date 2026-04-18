@@ -15,7 +15,7 @@ import lombok.ToString;
  * </p>
  *
  * @author Samoy
- * @since 2026-03-14
+ * @since 2026-04-18
  */
 @Getter
 @Setter
@@ -72,6 +72,12 @@ public class User implements Serializable {
      */
     @TableField("status")
     private Boolean status;
+
+    /**
+     * 是否是VIP，0否，1是
+     */
+    @TableField("is_vip")
+    private Boolean isVip;
 
     /**
      * 最后登录时间

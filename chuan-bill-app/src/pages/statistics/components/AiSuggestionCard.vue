@@ -8,6 +8,8 @@ const props = defineProps<{
   month: string
 }>()
 
+const AI_DAILY_LIMIT = 5
+
 const user = useUserStore()
 const statisticsStore = useStatisticsStore()
 
@@ -18,8 +20,23 @@ function handleLogin() {
 }
 
 function fetchAnalysis() {
-  statisticsStore.fetchAiSuggestion(props.month)
+  statisticsStore.fetchAiSuggestion(props.month, !!statisticsStore.aiSuggestion)
 }
+
+const remainingLabel = computed(() => {
+  const count = statisticsStore.aiRemainingCount
+  if (count < 0)
+    return ''
+  return `(${count}/${AI_DAILY_LIMIT})`
+})
+
+const isDisabled = computed(() => {
+  return statisticsStore.aiRemainingCount === 0
+})
+
+watch(() => props.month, () => {
+  statisticsStore.aiSuggestion = ''
+})
 </script>
 
 <template>
@@ -45,29 +62,40 @@ function fetchAnalysis() {
       <wd-skeleton :row="4" animation="gradient" />
     </view>
 
-    <!-- 已有数据 -->
+    <!-- 已有数据（缓存或新生成） -->
     <view v-else-if="statisticsStore.aiSuggestion">
       <view class="text-sm text-gray-600 leading-relaxed dark:text-gray-300">
         {{ statisticsStore.aiSuggestion }}
       </view>
-      <view class="mt-2 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-        <view class="i-lucide:info text-10px" />
-        <text>内容由AI生成，仅供参考</text>
+      <!-- 生成按钮 -->
+      <view class="mt-3">
+        <view
+          class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 shadow-md transition-transform active:scale-95"
+          :class="{ 'ai-btn-disabled': isDisabled }"
+          @click="!isDisabled && fetchAnalysis()"
+        >
+          <view class="i-lucide:sparkles" />
+          <text>{{ isDisabled ? '今日次数已用完' : '重新生成' }} {{ remainingLabel }}</text>
+        </view>
       </view>
     </view>
 
     <!-- 已登录但无数据 -->
     <view v-else class="flex flex-col items-center gap-3 py-6">
-      <text class="text-sm text-gray-400">
-        点击按钮获取本月消费分析
-      </text>
       <view
-        class="ai-btn flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 shadow-md transition-transform active:scale-95"
-        @click="fetchAnalysis"
+        class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 shadow-md transition-transform active:scale-95"
+        :class="{ 'ai-btn-disabled': isDisabled }"
+        @click="!isDisabled && fetchAnalysis()"
       >
-        <view class="i-lucide:sparkles text-base" />
-        <text>获取AI分析</text>
+        <view class="i-lucide:sparkles" />
+        <text>{{ isDisabled ? '今日次数已用完' : '获取AI分析' }} {{ remainingLabel }}</text>
       </view>
+    </view>
+
+    <!-- AI免责提示 -->
+    <view v-if="statisticsStore.aiSuggestion" class="mt-3 flex items-center justify-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+      <view class="i-lucide:info text-10px" />
+      <text>内容由AI生成，仅供参考</text>
     </view>
   </view>
 </template>
@@ -78,6 +106,18 @@ function fetchAnalysis() {
 
   &:active {
     opacity: 0.85;
+  }
+}
+
+.ai-btn-disabled {
+  background: linear-gradient(135deg, #9ca3af, #9ca3af);
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: auto;
+
+  &:active {
+    opacity: 0.6;
+    transform: none;
   }
 }
 </style>

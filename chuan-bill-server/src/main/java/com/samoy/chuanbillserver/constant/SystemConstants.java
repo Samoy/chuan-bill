@@ -31,4 +31,9 @@ public class SystemConstants {
      * 临时文件上传目录
      */
     public static final String TEMP_FILE_UPLOAD_DIR = "temp/upload/";
+
+    /**
+     * 普通用户每日AI分析次数限制
+     */
+    public static final int AI_DAILY_LIMIT_NORMAL = 5;
 }

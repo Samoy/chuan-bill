@@ -650,6 +650,18 @@ export interface ResultListCategoryVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface AiAnalysisVO {
+  content?: string;
+  cached?: boolean;
+  remainingCount?: number;
+}
+export interface ResultAiAnalysisVO {
+  code?: number;
+  message?: string;
+  data?: AiAnalysisVO;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface ResultString {
   code?: number;
   message?: string;
@@ -2035,6 +2047,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   month: string
+       *   regenerate?: boolean
        * }
        * ```
        *
@@ -2045,21 +2058,26 @@ declare global {
        * type Response = {
        *   code?: number
        *   message?: string
-       *   data?: string
+       *   data?: {
+       *     content?: string
+       *     cached?: boolean
+       *     remainingCount?: number
+       *   }
        *   timestamp?: number
        *   success?: boolean
        * }
        * ```
        */
       analysis<
-        Config extends Alova2MethodConfig<ResultString> & {
+        Config extends Alova2MethodConfig<ResultAiAnalysisVO> & {
           params: {
             month: string;
+            regenerate?: boolean;
           };
         }
       >(
         config: Config
-      ): Alova2Method<ResultString, 'ai.analysis', Config>;
+      ): Alova2Method<ResultAiAnalysisVO, 'ai.analysis', Config>;
     };
   }
 

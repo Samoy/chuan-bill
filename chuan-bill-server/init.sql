@@ -22,6 +22,7 @@ CREATE TABLE
     `avatar` VARCHAR(512) DEFAULT NULL COMMENT '头像',
     `gender` TINYINT (2) NOT NULL DEFAULT 0 COMMENT '性别，0未知，1男，2女',
     `status` TINYINT (1) NOT NULL DEFAULT 1 COMMENT '状态，0禁用，1启用',
+    `is_vip` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否VIP，0否，1是',
     `last_login_time` DATETIME DEFAULT NULL COMMENT '最后登录时间',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -230,6 +231,40 @@ CREATE TABLE
     KEY `idx_related` (`related_id`, `related_type`),
     KEY `idx_create_time` (`create_time`)
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '消息表';
+
+-- ===============================
+-- AI分析建议表(t_ai_suggestion)
+-- ===============================
+CREATE TABLE
+  IF NOT EXISTS `t_ai_suggestion` (
+    `id` VARCHAR(64) PRIMARY KEY NOT NULL COMMENT '主键ID',
+    `user_id` VARCHAR(64) NOT NULL COMMENT '用户ID',
+    `month` VARCHAR(7) NOT NULL COMMENT '月份，格式YYYY-MM',
+    `content` TEXT NOT NULL COMMENT 'AI分析内容',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_user_month: 查询用户某月的AI建议，唯一索引（用户每月只有一条建议）
+    UNIQUE KEY `idx_user_month` (`user_id`, `month`)
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI分析建议表';
+
+-- ===============================
+-- AI使用次数统计表(t_ai_usage)
+-- ===============================
+CREATE TABLE
+  IF NOT EXISTS `t_ai_usage` (
+    `id` VARCHAR(64) PRIMARY KEY NOT NULL COMMENT '主键ID',
+    `user_id` VARCHAR(64) NOT NULL COMMENT '用户ID',
+    `usage_date` DATE NOT NULL COMMENT '使用日期',
+    `analysis_count` INT NOT NULL DEFAULT 0 COMMENT '当日AI分析调用次数',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+    -- 索引优化说明：
+    -- 1. idx_user_date: 查询用户某日的AI使用次数，唯一索引（支持ON DUPLICATE KEY UPDATE原子递增）
+    UNIQUE KEY `idx_user_date` (`user_id`, `usage_date`)
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI使用次数统计表';
 
 -- ===============================
 -- 初始化系统预设类目

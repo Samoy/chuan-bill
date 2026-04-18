@@ -2,6 +2,7 @@ package com.samoy.chuanbillserver.controller;
 
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IAIService;
+import com.samoy.chuanbillserver.vo.AiAnalysisVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,8 +34,10 @@ public class AIController {
     }
 
     @GetMapping("/analysis")
-    @Operation(summary = "分析", description = "分析账单信息")
-    public Result<String> analysis(@Validated @Pattern(regexp = "^\\d{4}-\\d{2}$") String month) {
-        return Result.success(aiService.analysis(month));
+    @Operation(summary = "分析", description = "分析账单信息，优先返回缓存结果，regenerate=true时重新生成")
+    public Result<AiAnalysisVO> analysis(
+            @Validated @Pattern(regexp = "^\\d{4}-\\d{2}$") String month,
+            @RequestParam(defaultValue = "false") boolean regenerate) {
+        return Result.success(aiService.analysis(month, regenerate));
     }
 }

@@ -57,12 +57,13 @@ function onMonthSelect({ value }: { value: string }) {
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
-  statisticsStore.aiSuggestion = ''
+  statisticsStore.fetchAiSuggestionCached(month)
 }, { immediate: true })
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
 })
 </script>
 
