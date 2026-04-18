@@ -89,6 +89,30 @@ type Alova2Method<
       >
     : never;
 
+export interface BillMonthlyStatsDTO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month: string;
+  /**
+   * 家庭ID，用于查询家庭账单统计信息
+   */
+  familyId?: string;
+}
+export interface StatisticsCategoryDTO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month: string;
+  /**
+   * 账单类型：income-收入，expense-支出
+   */
+  type: string;
+  /**
+   * 家庭ID，用于查询家庭账单统计信息
+   */
+  familyId?: string;
+}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -131,16 +155,6 @@ export interface BillListDTO {
    * 每页数量
    */
   size: number;
-}
-export interface BillMonthlyStatsDTO {
-  /**
-   * 月份，格式为YYYY-MM
-   */
-  month: string;
-  /**
-   * 家庭ID，用于查询家庭账单统计信息
-   */
-  familyId?: string;
 }
 export interface UserProfileUpdateDTO {
   /**
@@ -208,7 +222,7 @@ export interface UpdateBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: 'income' | 'expense';
+  type?: string;
   /**
    * 账单时间
    */
@@ -452,6 +466,84 @@ export interface ResultTokenVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface BillMonthlyStatsVO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month?: string;
+  /**
+   * 支出金额
+   */
+  expense?: number;
+  /**
+   * 收入金额
+   */
+  income?: number;
+  /**
+   * 结余金额
+   */
+  balance?: number;
+}
+export interface ResultBillMonthlyStatsVO {
+  code?: number;
+  message?: string;
+  /**
+   * 账单月度统计信息
+   */
+  data?: BillMonthlyStatsVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface DailyTrendVO {
+  /**
+   * 日期，格式为YYYY-MM-DD
+   */
+  date?: string;
+  /**
+   * 支出金额
+   */
+  expense?: number;
+  /**
+   * 收入金额
+   */
+  income?: number;
+}
+export interface ResultListDailyTrendVO {
+  code?: number;
+  message?: string;
+  data?: DailyTrendVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface CategoryStatisticsVO {
+  /**
+   * 分类ID
+   */
+  categoryId?: string;
+  /**
+   * 分类名称
+   */
+  categoryName?: string;
+  /**
+   * 分类图标
+   */
+  categoryIcon?: string;
+  /**
+   * 金额
+   */
+  amount?: number;
+  /**
+   * 占比百分比
+   */
+  percentage?: number;
+}
+export interface ResultListCategoryStatisticsVO {
+  code?: number;
+  message?: string;
+  data?: CategoryStatisticsVO[];
+  timestamp?: number;
+  success?: boolean;
+}
 export interface CategoryVO {
   /**
    * 分类 ID
@@ -528,44 +620,16 @@ export interface IPageBillVO {
   size?: number;
   records?: BillVO[];
   current?: number;
-  total?: number;
   /**
    * @deprecated
    */
   pages?: number;
+  total?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
   message?: string;
   data?: IPageBillVO;
-  timestamp?: number;
-  success?: boolean;
-}
-export interface BillMonthlyStatsVO {
-  /**
-   * 月份，格式为YYYY-MM
-   */
-  month?: string;
-  /**
-   * 支出金额
-   */
-  expense?: string;
-  /**
-   * 收入金额
-   */
-  income?: string;
-  /**
-   * 结余金额
-   */
-  balance?: string;
-}
-export interface ResultBillMonthlyStatsVO {
-  code?: number;
-  message?: string;
-  /**
-   * 账单月度统计信息
-   */
-  data?: BillMonthlyStatsVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -1182,9 +1246,9 @@ declare global {
        *       familyId?: string
        *     }>
        *     current?: number
-       *     total?: number
        *     // [deprecated]
        *     pages?: number
+       *     total?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1609,6 +1673,185 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTokenVO, 'auth.loginByPassword', Config>;
+    };
+    statistics: {
+      /**
+       * ---
+       *
+       * [GET] 获取月度统计概览
+       *
+       * **path:** /statistics/overview
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 账单月度统计参数
+       *   dto: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 账单月度统计信息
+       *   data?: {
+       *     // 月份，格式为YYYY-MM
+       *     month?: string
+       *     // 支出金额
+       *     expense?: number
+       *     // 收入金额
+       *     income?: number
+       *     // 结余金额
+       *     balance?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getOverview<
+        Config extends Alova2MethodConfig<ResultBillMonthlyStatsVO> & {
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            dto: BillMonthlyStatsDTO;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBillMonthlyStatsVO, 'statistics.getOverview', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取每日收支趋势
+       *
+       * **path:** /statistics/daily-trend
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 账单月度统计参数
+       *   dto: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 每日收支趋势
+       *   // [items] end
+       *   data?: Array<{
+       *     // 日期，格式为YYYY-MM-DD
+       *     date?: string
+       *     // 支出金额
+       *     expense?: number
+       *     // 收入金额
+       *     income?: number
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getDailyTrend<
+        Config extends Alova2MethodConfig<ResultListDailyTrendVO> & {
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            dto: BillMonthlyStatsDTO;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListDailyTrendVO, 'statistics.getDailyTrend', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取分类统计
+       *
+       * **path:** /statistics/category
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 分类统计参数
+       *   dto: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 账单类型：income-收入，expense-支出
+       *     type: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 分类统计信息
+       *   // [items] end
+       *   data?: Array<{
+       *     // 分类ID
+       *     categoryId?: string
+       *     // 分类名称
+       *     categoryName?: string
+       *     // 分类图标
+       *     categoryIcon?: string
+       *     // 金额
+       *     amount?: number
+       *     // 占比百分比
+       *     percentage?: number
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getCategoryStats<
+        Config extends Alova2MethodConfig<ResultListCategoryStatisticsVO> & {
+          params: {
+            /**
+             * 分类统计参数
+             */
+            dto: StatisticsCategoryDTO;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListCategoryStatisticsVO, 'statistics.getCategoryStats', Config>;
     };
     ai: {
       /**

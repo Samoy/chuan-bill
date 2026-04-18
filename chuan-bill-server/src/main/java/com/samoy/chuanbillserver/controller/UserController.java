@@ -29,7 +29,7 @@ public class UserController {
         return Result.success(userService.getProfileById(userId));
     }
 
-    @PostMapping("/updateProfile")
+    @PostMapping("/profile/update")
     @Operation(summary = "更新用户资料", description = "更新用户的昵称、头像、性别等信息")
     public Result<Boolean> updateProfile(@Validated @RequestBody UserProfileUpdateDTO updateDTO) {
         String userId = StpUtil.getLoginIdAsString();
@@ -37,7 +37,7 @@ public class UserController {
         return Result.success(userService.updateUserProfile(updateDTO));
     }
 
-    @PostMapping("/updatePasswordByOld")
+    @PostMapping("/password/update-by-old")
     @Operation(summary = "通过旧密码修改密码", description = "使用原密码设置新密码")
     public Result<Boolean> updatePasswordByOld(@Validated @RequestBody UpdatePasswordByOldDTO updateDTO) {
         String userId = StpUtil.getLoginIdAsString();
@@ -45,14 +45,14 @@ public class UserController {
         return Result.success(userService.updatePassWordByOld(updateDTO));
     }
 
-    @PostMapping("/updatePasswordByCode")
+    @PostMapping("/password/update-by-code")
     @SaIgnore
     @Operation(summary = "通过验证码修改密码", description = "使用手机验证码设置新密码（无需登录）")
     public Result<Boolean> updatePasswordByCode(@Validated @RequestBody UpdatePasswordByCodeDTO updateDTO) {
         return Result.success(userService.updatePassWordByCode(updateDTO));
     }
 
-    @GetMapping("/hasPassword")
+    @GetMapping("/has-password")
     @Operation(summary = "检查是否设置了密码", description = "检查当前用户是否已设置登录密码")
     public Result<Boolean> hasPassword() {
         String userId = StpUtil.getLoginIdAsString();

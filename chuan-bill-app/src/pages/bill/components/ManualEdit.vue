@@ -88,7 +88,7 @@ function sumbit() {
       prop="time"
       :rules="[{ required: true, message: '请选择账单时间' }]"
     />
-    <wd-divider custom-class="!mt-2 !px-0" />
+    <wd-divider custom-class="!mt-2 !px-0 dark:hidden!" />
     <view class="mt-3 flex gap-3">
       <view class="flex-1">
         <view class="text-xs text-gray-500">
@@ -109,7 +109,7 @@ function sumbit() {
         />
       </view>
     </view>
-    <wd-divider custom-class="!mt-2 !px-0" />
+    <wd-divider custom-class="!mt-2 !px-0 dark:hidden!" />
     <!-- 游客模式下不显示家庭共享 -->
     <template v-if="user.isLoggedIn">
       <view class="mt-3 flex items-center justify-between text-xs text-gray-500">

@@ -7,11 +7,14 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AiSuggestionCard: typeof import('./pages/statistics/components/AiSuggestionCard.vue')['default']
     BillCard: typeof import('./components/BillCard.vue')['default']
     BillDetail: typeof import('./components/BillDetail.vue')['default']
     BillDetailModal: typeof import('./pages/bill/components/BillDetailModal.vue')['default']
     BillItem: typeof import('./components/BillItem.vue')['default']
     BillSection: typeof import('./pages/bill/components/BillSection.vue')['default']
+    CategoryChart: typeof import('./pages/statistics/components/CategoryChart.vue')['default']
+    DailyTrendChart: typeof import('./pages/statistics/components/DailyTrendChart.vue')['default']
     DemoBlock: typeof import('./components/DemoBlock.vue')['default']
     FilterModal: typeof import('./pages/bill/components/FilterModal.vue')['default']
     GlobalLoading: typeof import('./components/GlobalLoading.vue')['default']
@@ -22,6 +25,7 @@ declare module 'vue' {
     OcrEdit: typeof import('./pages/bill/components/OcrEdit.vue')['default']
     PrivacyPopup: typeof import('./components/PrivacyPopup.vue')['default']
     QuickBillModal: typeof import('./pages/bill/components/QuickBillModal.vue')['default']
+    UniEcharts: typeof import('uni-echarts')['default']
     VoiceEdit: typeof import('./pages/bill/components/VoiceEdit.vue')['default']
     WdActionSheet: typeof import('wot-design-uni/components/wd-action-sheet/wd-action-sheet.vue')['default']
     WdBadge: typeof import('wot-design-uni/components/wd-badge/wd-badge.vue')['default']
@@ -44,6 +48,7 @@ declare module 'vue' {
     WdRadioGroup: typeof import('wot-design-uni/components/wd-radio-group/wd-radio-group.vue')['default']
     WdSearch: typeof import('wot-design-uni/components/wd-search/wd-search.vue')['default']
     WdSegmented: typeof import('wot-design-uni/components/wd-segmented/wd-segmented.vue')['default']
+    WdSkeleton: typeof import('wot-design-uni/components/wd-skeleton/wd-skeleton.vue')['default']
     WdStatusTip: typeof import('wot-design-uni/components/wd-status-tip/wd-status-tip.vue')['default']
     WdSticky: typeof import('wot-design-uni/components/wd-sticky/wd-sticky.vue')['default']
     WdSwitch: typeof import('wot-design-uni/components/wd-switch/wd-switch.vue')['default']

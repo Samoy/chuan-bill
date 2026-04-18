@@ -34,7 +34,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
-    @PostMapping("/loginByPassword")
+    @PostMapping("/login-password")
     @Operation(summary = "密码登录", description = "使用手机号和密码进行登录")
     public Result<TokenVO> loginByPassword(@Validated @RequestBody LoginByPasswordDTO loginDTO) {
         return Result.success(userService.loginByPassword(loginDTO));
@@ -46,7 +46,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
-    @PostMapping("/loginByPhone")
+    @PostMapping("/login-phone")
     @Operation(summary = "手机号登录", description = "使用手机号和验证码进行登录")
     public Result<TokenVO> loginByPhone(@Validated @RequestBody LoginByPhoneDTO loginDTO) {
         return Result.success(userService.loginByPhone(loginDTO));
@@ -58,7 +58,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
-    @PostMapping("/loginByWechat")
+    @PostMapping("/login-wechat")
     @Operation(summary = "微信登录", description = "使用微信小程序 code 进行登录")
     public Result<TokenVO> loginByWechat(@Validated @RequestBody LoginByWechatDTO loginDTO) {
         return Result.success(userService.loginByWechat(loginDTO));
@@ -70,7 +70,7 @@ public class AuthController {
      * @param sendCodeDTO 发送验证码请求体，包含手机号
      * @return 发送结果
      */
-    @PostMapping("/sendCode")
+    @PostMapping("/send-code")
     @Operation(summary = "发送验证码", description = "向指定手机号发送短信验证码")
     @SaIgnore
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {

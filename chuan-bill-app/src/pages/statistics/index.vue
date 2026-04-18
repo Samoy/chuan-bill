@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import AiSuggestionCard from './components/AiSuggestionCard.vue'
+import CategoryChart from './components/CategoryChart.vue'
+import DailyTrendChart from './components/DailyTrendChart.vue'
+import { setupEcharts } from './echarts-setup'
 
 definePage({
   name: 'statistics',
@@ -8,6 +12,11 @@ definePage({
     navigationBarTitleText: '统计',
   },
 })
+
+setupEcharts()
+
+const statisticsStore = useStatisticsStore()
+const user = useUserStore()
 
 // 当前选中的月份
 const currentMonth = ref(dayjs().format('YYYY-MM'))
@@ -44,6 +53,16 @@ function onMonthSelect({ value }: { value: string }) {
   currentMonth.value = value
   showMonthPicker.value = false
 }
+
+// 监听月份变化，获取统计数据
+watch(currentMonth, (month) => {
+  statisticsStore.fetchAll(month)
+}, { immediate: true })
+
+// 监听登录状态变化，重新获取
+watch(() => user.isLoggedIn, () => {
+  statisticsStore.fetchAll(currentMonth.value)
+})
 </script>
 
 <template>
@@ -53,7 +72,6 @@ function onMonthSelect({ value }: { value: string }) {
       <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="prevMonth">
         <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
       </view>
-      <!-- 月份选择器弹框 -->
       <wd-picker
         v-model="currentMonth"
         v-model:visible="showMonthPicker"
@@ -70,5 +88,58 @@ function onMonthSelect({ value }: { value: string }) {
         <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
       </view>
     </view>
+
+    <!-- 概览卡片 -->
+    <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <view v-if="statisticsStore.overviewLoading" class="py-4">
+        <wd-skeleton :row="1" animation="gradient" />
+      </view>
+      <view v-else class="flex items-center justify-around">
+        <view class="flex flex-col items-center">
+          <text class="text-xs text-gray-400">
+            支出
+          </text>
+          <text class="text-lg text-red-400 font-600">
+            ¥{{ statisticsStore.overview?.expense ?? '0.00' }}
+          </text>
+        </view>
+        <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
+        <view class="flex flex-col items-center">
+          <text class="text-xs text-gray-400">
+            收入
+          </text>
+          <text class="text-lg text-green-500 font-600">
+            ¥{{ statisticsStore.overview?.income ?? '0.00' }}
+          </text>
+        </view>
+        <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
+        <view class="flex flex-col items-center">
+          <text class="text-xs text-gray-400">
+            结余
+          </text>
+          <text class="text-lg text-primary font-600">
+            ¥{{ statisticsStore.overview?.balance ?? '0.00' }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类饼图 -->
+    <view class="mx-3">
+      <CategoryChart :month="currentMonth" />
+    </view>
+
+    <!-- 每日趋势折线图 -->
+    <view class="mx-3">
+      <DailyTrendChart :month="currentMonth" />
+    </view>
+
+    <!-- AI 消费建议 -->
+    <view class="mx-3">
+      <AiSuggestionCard :month="currentMonth" />
+    </view>
+
+    <!-- 底部间距（给 tabbar 留空间） -->
+    <view class="h-20" />
   </view>
 </template>
