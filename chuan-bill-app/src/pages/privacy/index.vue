@@ -113,6 +113,19 @@ const userNotice = `
   </div>
 </div>
 `
+
+const from = ref('')
+
+onLoad((options) => {
+  from.value = options?.from
+  userStore.showLoginPopup = false
+})
+
+onBeforeUnmount(() => {
+  if (from.value === 'login') {
+    userStore.showLoginPopup = true
+  }
+})
 </script>
 
 <template>
