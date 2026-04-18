@@ -36,6 +36,17 @@ public class AiUsageServiceImpl extends ServiceImpl<AiUsageMapper, AiUsage> impl
 
     @Override
     public void incrementUsage(String userId) {
-        baseMapper.incrementAnalysisCount(userId, LocalDate.now());
+        LocalDate today = LocalDate.now();
+        AiUsage usage = getOne(
+                new LambdaQueryWrapper<AiUsage>().eq(AiUsage::getUserId, userId).eq(AiUsage::getUsageDate, today));
+        if (usage == null) {
+            usage = new AiUsage();
+            usage.setUserId(userId);
+            usage.setAnalysisCount(1);
+        } else {
+            usage.setAnalysisCount(usage.getAnalysisCount() + 1);
+        }
+        usage.setUsageDate(today);
+        saveOrUpdate(usage);
     }
 }

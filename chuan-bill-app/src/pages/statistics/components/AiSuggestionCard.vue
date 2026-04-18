@@ -70,7 +70,7 @@ watch(() => props.month, () => {
       <!-- 生成按钮 -->
       <view class="mt-3">
         <view
-          class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 shadow-md transition-transform active:scale-95"
+          class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 transition-transform active:scale-95"
           :class="{ 'ai-btn-disabled': isDisabled }"
           @click="!isDisabled && fetchAnalysis()"
         >
@@ -83,7 +83,7 @@ watch(() => props.month, () => {
     <!-- 已登录但无数据 -->
     <view v-else class="flex flex-col items-center gap-3 py-6">
       <view
-        class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 shadow-md transition-transform active:scale-95"
+        class="ai-btn mx-auto box-border w-fit flex items-center justify-center gap-1.5 rounded-full px-8 py-1.5 text-sm text-white font-500 transition-transform active:scale-95"
         :class="{ 'ai-btn-disabled': isDisabled }"
         @click="!isDisabled && fetchAnalysis()"
       >
