@@ -1,8 +1,10 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.dao.FamilyMapper;
 import com.samoy.chuanbillserver.dto.CreateFamilyDTO;
 import com.samoy.chuanbillserver.dto.HandleJoinApplyDTO;
@@ -55,8 +57,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
     @Resource
     private IMessageService messageService;
 
-    private static final String INVITE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-    private static final int INVITE_CODE_LENGTH = 8;
+    private static final int INVITE_CODE_LENGTH = 6;
 
     @Override
     @Transactional
@@ -73,6 +74,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
         FamilyMember member = new FamilyMember();
         member.setFamilyId(family.getId());
         member.setUserId(userId);
+        member.setNickname(userService.getById(userId).getNickname());
         member.setIsOwner(true);
         member.setJoinTime(LocalDateTime.now());
         familyMemberService.save(member);
@@ -171,6 +173,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
         apply.setUserId(userId);
         apply.setRemark(dto.getRemark());
         apply.setStatus(0);
+        apply.setHandleUserId(family.getOwnerId());
         familyJoinApplyService.save(apply);
 
         // 通知户主
@@ -313,7 +316,10 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
         if (!isOwner(userId, apply.getFamilyId())) {
             throw new BusinessException(ResultEnum.FAMILY_NOT_OWNER);
         }
-        apply.setStatus(dto.getApproved() ? 1 : 2);
+        apply.setStatus(
+                dto.getApproved()
+                        ? SystemConstants.AGREE_FAMILY_MEMBER_APPLY
+                        : SystemConstants.REFUSE_FAMILY_MEMBER_APPLY);
         apply.setHandleUserId(userId);
         apply.setHandleTime(LocalDateTime.now());
         familyJoinApplyService.updateById(apply);
@@ -325,6 +331,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
             member.setUserId(apply.getUserId());
             member.setIsOwner(false);
             member.setJoinTime(LocalDateTime.now());
+            member.setNickname(userService.getById(apply.getUserId()).getNickname());
             familyMemberService.save(member);
 
             // 通知申请人
@@ -385,12 +392,7 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
     // ========== 私有方法 ==========
 
     private String generateInviteCode() {
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < INVITE_CODE_LENGTH; i++) {
-            sb.append(INVITE_CHARS.charAt(random.nextInt(INVITE_CHARS.length())));
-        }
-        return sb.toString();
+        return RandomUtil.randomNumbers(INVITE_CODE_LENGTH);
     }
 
     private FamilyVO convertToFamilyVO(Family family, String userId) {

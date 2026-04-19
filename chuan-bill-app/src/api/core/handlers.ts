@@ -49,7 +49,7 @@ export async function handleAlovaResponse(
   // Extract status code and data from UniApp response
   const { statusCode, data } = response as UniNamespace.RequestSuccessCallbackResult
 
-  function handleError(code: number) {
+  function handleError(code: number, message: string) {
     // 处理401/403错误
     if ((code === 401 || code === 403)) {
       // 防止重复弹出
@@ -81,8 +81,8 @@ export async function handleAlovaResponse(
 
     // Handle HTTP error status codes
     if (code >= 400) {
-      globalToast.error(`Request failed with status: ${code}`)
-      throw new ApiError(`Request failed with status: ${code}`, code, data)
+      globalToast.error(message)
+      throw new ApiError(message, code, data)
     }
   }
 
@@ -90,10 +90,10 @@ export async function handleAlovaResponse(
   const json = data as ApiResponse
 
   if (statusCode >= 400) {
-    handleError(statusCode)
+    handleError(statusCode, response.errMsg || '请求失败')
   }
   if (json.code >= 400) {
-    handleError(json.code)
+    handleError(json.code, json.message || '请求失败')
   }
 
   // Log response in development

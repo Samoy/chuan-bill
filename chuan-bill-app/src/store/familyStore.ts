@@ -1,39 +1,6 @@
+import type { FamilyJoinApplyVO, FamilyMemberVO, FamilyVO } from '@/api/globals'
+
 // 家庭相关类型定义（alova-gen 生成后会由 globals.d.ts 提供）
-interface FamilyVO {
-  id: string
-  name: string
-  avatar: string
-  ownerId: string
-  inviteCode: string
-  description: string
-  memberCount: number
-  isOwner: boolean
-  createTime: string
-}
-
-interface FamilyMemberVO {
-  id: string
-  familyId: string
-  userId: string
-  nickname: string
-  avatar: string
-  isOwner: boolean
-  joinTime: string
-}
-
-interface FamilyJoinApplyVO {
-  id: string
-  familyId: string
-  userId: string
-  nickname: string
-  avatar: string
-  remark: string
-  status: number
-  handleUserId: string
-  handleTime: string
-  createTime: string
-}
-
 export const useFamilyStore = defineStore('family', () => {
   const user = useUserStore()
 
@@ -84,7 +51,7 @@ export const useFamilyStore = defineStore('family', () => {
   async function fetchFamilyDetail(familyId: string) {
     if (!user.isLoggedIn)
       return
-    const res = await Apis.family.getDetail({ params: { familyId } })
+    const res = await Apis.family.getFamilyDetail({ params: { familyId } })
     if (res.success && res.data) {
       currentFamily.value = res.data
       // 更新列表中对应的家庭信息
@@ -99,7 +66,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 创建家庭
    */
   async function createFamily(data: { name: string, avatar?: string, description?: string }) {
-    const res = await Apis.family.create({ data })
+    const res = await Apis.family.createFamily({ data })
     if (res.success && res.data) {
       familyList.value.unshift(res.data)
       currentFamily.value = res.data
@@ -112,7 +79,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 更新家庭信息
    */
   async function updateFamily(data: { id: string, name?: string, avatar?: string, description?: string }) {
-    const res = await Apis.family.update({ data })
+    const res = await Apis.family.updateFamily({ data })
     if (res.success && res.data) {
       const index = familyList.value.findIndex(f => f.id === data.id)
       if (index !== -1) {
@@ -130,7 +97,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 删除家庭
    */
   async function deleteFamily(familyId: string) {
-    const res = await Apis.family.delete({ params: { familyId } })
+    const res = await Apis.family.deleteFamily({ params: { familyId } })
     if (res.success) {
       familyList.value = familyList.value.filter(f => f.id !== familyId)
       if (currentFamily.value?.id === familyId) {
@@ -146,7 +113,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 申请加入家庭
    */
   async function joinFamily(inviteCode: string, remark?: string) {
-    const res = await Apis.family.join({ data: { inviteCode, remark } })
+    const res = await Apis.family.joinFamily({ data: { inviteCode, remark } })
     return res.success ? res.data : null
   }
 
@@ -154,7 +121,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 退出家庭
    */
   async function leaveFamily(familyId: string) {
-    const res = await Apis.family.leave({ params: { familyId } })
+    const res = await Apis.family.leaveFamily({ params: { familyId } })
     if (res.success) {
       familyList.value = familyList.value.filter(f => f.id !== familyId)
       if (currentFamily.value?.id === familyId) {
@@ -181,8 +148,8 @@ export const useFamilyStore = defineStore('family', () => {
   /**
    * 转让户主
    */
-  async function transferOwner(familyId: string, newOwnerId: string) {
-    const res = await Apis.family.transferOwner({ data: { familyId, newOwnerId } })
+  async function transferOwner(familyId: string, targetUserId: string) {
+    const res = await Apis.family.transferOwner({ data: { familyId, targetUserId } })
     if (res.success) {
       // 刷新家庭成员列表
       await fetchMembers(familyId)
@@ -229,7 +196,7 @@ export const useFamilyStore = defineStore('family', () => {
    * 处理加入申请
    */
   async function handleJoinApply(applyId: string, familyId: string, approved: boolean) {
-    const res = await Apis.family.handleApply({ data: { id: applyId, familyId, approved } })
+    const res = await Apis.family.handleJoinApply({ data: { applyId, familyId, approved } })
     if (res.success) {
       // 从待处理列表中移除
       pendingApplies.value = pendingApplies.value.filter(a => a.id !== applyId)

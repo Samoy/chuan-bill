@@ -6,7 +6,10 @@
 type _LocationUrl =
   "/pages/bill/index" |
   "/pages/agreement/index" |
+  "/pages/family/create" |
+  "/pages/family/detail" |
   "/pages/family/index" |
+  "/pages/message/index" |
   "/pages/mine/index" |
   "/pages/privacy/index" |
   "/pages/statistics/index";

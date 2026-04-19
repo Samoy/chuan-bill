@@ -53,7 +53,7 @@ async function markAllRead() {
         const success = await messageStore.markAllAsRead()
         if (success) {
           const toast = useGlobalToast()
-          toast.showToast('已全部标记为已读')
+          toast.show('已全部标记为已读')
         }
       }
     },

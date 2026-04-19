@@ -50,7 +50,7 @@ async function handleCreate() {
         <text class="mb-2 block text-sm text-gray-600">
           家庭描述（可选）
         </text>
-        <wd-textarea v-model="formData.description" placeholder="简单介绍一下你的家庭" :maxlength="200" show-word-limit />
+        <wd-textarea v-model="formData.description" custom-class="p-0!" placeholder="简单介绍一下你的家庭" :maxlength="200" show-word-limit />
       </view>
     </view>
 

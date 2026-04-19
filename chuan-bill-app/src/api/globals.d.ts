@@ -113,6 +113,24 @@ export interface StatisticsCategoryDTO {
    */
   familyId?: string;
 }
+export interface MessageListDTO {
+  /**
+   * 消息类型：system-系统消息，family-家庭消息，bill-账单消息，budget-预算消息
+   */
+  type?: string;
+  /**
+   * 消息状态：0-未读，1-已读
+   */
+  status?: number;
+  /**
+   * 页码
+   */
+  page: number;
+  /**
+   * 每页数量
+   */
+  size: number;
+}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -155,6 +173,10 @@ export interface BillListDTO {
    * 每页数量
    */
   size: number;
+  /**
+   * 家庭 ID，传入则查询家庭账单，不传则查询个人账单
+   */
+  familyId?: string;
 }
 export interface UserProfileUpdateDTO {
   /**
@@ -202,6 +224,78 @@ export interface UpdatePasswordByCodeDTO {
    */
   newPassword: string;
 }
+export interface UpdateFamilyDTO {
+  /**
+   * 家庭ID
+   */
+  id: string;
+  /**
+   * 家庭名称
+   */
+  name?: string;
+  /**
+   * 家庭图标
+   */
+  avatar?: string;
+  /**
+   * 家庭描述
+   */
+  description?: string;
+}
+export interface TransferOwnerDTO {
+  /**
+   * 家庭ID
+   */
+  familyId: string;
+  /**
+   * 新户主用户ID
+   */
+  targetUserId: string;
+}
+export interface RemoveMemberDTO {
+  /**
+   * 家庭ID
+   */
+  familyId: string;
+  /**
+   * 家庭成员记录ID
+   */
+  memberId: string;
+}
+export interface JoinFamilyDTO {
+  /**
+   * 家庭邀请码
+   */
+  inviteCode: string;
+  /**
+   * 申请备注
+   */
+  remark?: string;
+}
+export interface HandleJoinApplyDTO {
+  /**
+   * 申请ID
+   */
+  applyId: string;
+  /**
+   * 是否同意
+   */
+  approved: boolean;
+}
+export interface CreateFamilyDTO {
+  /**
+   * 家庭名称
+   */
+  name: string;
+  /**
+   * 家庭图标
+   */
+  avatar?: string;
+  /**
+   * 家庭描述
+   */
+  description?: string;
+}
 export interface UpdateBillDTO {
   /**
    * 账单 ID
@@ -235,6 +329,10 @@ export interface UpdateBillDTO {
    * 账单备注
    */
   remark?: string;
+  /**
+   * 家庭 ID，为空则属于个人账单
+   */
+  familyId?: string;
 }
 export interface AddBillDTO {
   /**
@@ -312,6 +410,13 @@ export interface LoginByPasswordDTO {
    */
   password: string;
 }
+export interface ResultBoolean {
+  code?: number;
+  message?: string;
+  data?: boolean;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface ResultVoid {
   code?: number;
   message?: string;
@@ -345,6 +450,10 @@ export interface UserVO {
    */
   status?: boolean;
   /**
+   * 是否VIP
+   */
+  isVip?: boolean;
+  /**
    * 最后登录时间
    */
   lastLoginTime?: string;
@@ -367,10 +476,76 @@ export interface ResultUserVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface ResultBoolean {
+export interface UnreadCountVO {
+  /**
+   * 总未读数
+   */
+  total?: number;
+  /**
+   * 家庭相关未读数
+   */
+  familyCount?: number;
+}
+export interface ResultUnreadCountVO {
   code?: number;
   message?: string;
-  data?: boolean;
+  /**
+   * 未读消息数量
+   */
+  data?: UnreadCountVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface FamilyVO {
+  /**
+   * 家庭ID
+   */
+  id?: string;
+  /**
+   * 家庭名称
+   */
+  name?: string;
+  /**
+   * 家庭图标
+   */
+  avatar?: string;
+  /**
+   * 家庭描述
+   */
+  description?: string;
+  /**
+   * 户主ID
+   */
+  ownerId?: string;
+  /**
+   * 户主昵称
+   */
+  ownerNickname?: string;
+  /**
+   * 户主头像
+   */
+  ownerAvatar?: string;
+  /**
+   * 邀请码
+   */
+  inviteCode?: string;
+  /**
+   * 成员数量
+   */
+  memberCount?: number;
+  /**
+   * 当前用户是否户主
+   */
+  isOwner?: boolean;
+  /**
+   * 创建时间
+   */
+  createTime?: string;
+}
+export interface ResultListFamilyVO {
+  code?: number;
+  message?: string;
+  data?: FamilyVO[];
   timestamp?: number;
   success?: boolean;
 }
@@ -407,6 +582,13 @@ export interface ResultListPaymentMethodVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface ResultString {
+  code?: number;
+  message?: string;
+  data?: string;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface TempFileVO {
   /**
    * 临时文件ID
@@ -420,6 +602,10 @@ export interface TempFileVO {
    * 临时文件扩展名
    */
   fileExt?: string;
+  /**
+   * 临时文件访问URL
+   */
+  fileUrl?: string;
 }
 export interface ResultTempFileVO {
   code?: number;
@@ -428,6 +614,72 @@ export interface ResultTempFileVO {
    * 临时文件信息
    */
   data?: TempFileVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultFamilyVO {
+  code?: number;
+  message?: string;
+  /**
+   * 家庭信息
+   */
+  data?: FamilyVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface FamilyJoinApplyVO {
+  /**
+   * 申请ID
+   */
+  id?: string;
+  /**
+   * 家庭ID
+   */
+  familyId?: string;
+  /**
+   * 家庭名称
+   */
+  familyName?: string;
+  /**
+   * 申请人用户ID
+   */
+  userId?: string;
+  /**
+   * 申请人昵称
+   */
+  userNickname?: string;
+  /**
+   * 申请人头像
+   */
+  userAvatar?: string;
+  /**
+   * 申请备注
+   */
+  remark?: string;
+  /**
+   * 申请状态：0待处理，1同意，2拒绝
+   */
+  status?: number;
+  /**
+   * 处理人用户ID
+   */
+  handleUserId?: string;
+  /**
+   * 处理时间
+   */
+  handleTime?: string;
+  /**
+   * 创建时间
+   */
+  createTime?: string;
+}
+export interface ResultFamilyJoinApplyVO {
+  code?: number;
+  message?: string;
+  /**
+   * 家庭加入申请信息
+   */
+  data?: FamilyJoinApplyVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -544,6 +796,105 @@ export interface ResultListCategoryStatisticsVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface MessageVO {
+  /**
+   * 消息ID
+   */
+  id?: string;
+  /**
+   * 消息标题
+   */
+  title?: string;
+  /**
+   * 消息内容
+   */
+  content?: string;
+  /**
+   * 消息类型：system-系统消息，family-家庭消息，bill-账单消息，budget-预算消息
+   */
+  type?: string;
+  /**
+   * 消息状态：0未读，1已读
+   */
+  status?: number;
+  /**
+   * 相关ID
+   */
+  relatedId?: string;
+  /**
+   * 相关类型：family-家庭，bill-账单，budget-预算
+   */
+  relatedType?: string;
+  /**
+   * 创建时间
+   */
+  createTime?: string;
+}
+export interface IPageMessageVO {
+  size?: number;
+  total?: number;
+  records?: MessageVO[];
+  current?: number;
+  /**
+   * @deprecated
+   */
+  pages?: number;
+}
+export interface ResultIPageMessageVO {
+  code?: number;
+  message?: string;
+  data?: IPageMessageVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultListFamilyJoinApplyVO {
+  code?: number;
+  message?: string;
+  data?: FamilyJoinApplyVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface FamilyMemberVO {
+  /**
+   * 成员记录ID
+   */
+  id?: string;
+  /**
+   * 家庭ID
+   */
+  familyId?: string;
+  /**
+   * 用户ID
+   */
+  userId?: string;
+  /**
+   * 家庭内昵称
+   */
+  nickname?: string;
+  /**
+   * 用户昵称
+   */
+  userNickname?: string;
+  /**
+   * 用户头像
+   */
+  userAvatar?: string;
+  /**
+   * 是否户主
+   */
+  isOwner?: boolean;
+  /**
+   * 加入时间
+   */
+  joinTime?: string;
+}
+export interface ResultListFamilyMemberVO {
+  code?: number;
+  message?: string;
+  data?: FamilyMemberVO[];
+  timestamp?: number;
+  success?: boolean;
+}
 export interface CategoryVO {
   /**
    * 分类 ID
@@ -615,16 +966,20 @@ export interface BillVO {
    * 家庭 ID
    */
   familyId?: string;
+  /**
+   * 家庭名称
+   */
+  familyName?: string;
 }
 export interface IPageBillVO {
   size?: number;
+  total?: number;
   records?: BillVO[];
   current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  total?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -651,21 +1006,26 @@ export interface ResultListCategoryVO {
   success?: boolean;
 }
 export interface AiAnalysisVO {
+  /**
+   * AI分析内容
+   */
   content?: string;
+  /**
+   * 是否为缓存结果
+   */
   cached?: boolean;
+  /**
+   * 今日剩余分析次数，-1表示无限制(VIP)
+   */
   remainingCount?: number;
 }
 export interface ResultAiAnalysisVO {
   code?: number;
   message?: string;
+  /**
+   * AI分析结果
+   */
   data?: AiAnalysisVO;
-  timestamp?: number;
-  success?: boolean;
-}
-export interface ResultString {
-  code?: number;
-  message?: string;
-  data?: string;
   timestamp?: number;
   success?: boolean;
 }
@@ -825,6 +1185,8 @@ declare global {
        *     gender?: string
        *     // 状态：false-禁用，true-正常
        *     status?: boolean
+       *     // 是否VIP
+       *     isVip?: boolean
        *     // 最后登录时间
        *     lastLoginTime?: string
        *     // 创建时间
@@ -864,7 +1226,219 @@ declare global {
         config?: Config
       ): Alova2Method<ResultBoolean, 'user.hasPassword', Config>;
     };
+    message: {
+      /**
+       * ---
+       *
+       * [POST] 标记消息已读
+       *
+       * **path:** /message/mark-read
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 消息ID
+       *   id: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      markAsRead<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          params: {
+            /**
+             * 消息ID
+             */
+            id: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'message.markAsRead', Config>;
+      /**
+       * ---
+       *
+       * [POST] 全部标记已读
+       *
+       * **path:** /message/mark-all-read
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      markAllAsRead<Config extends Alova2MethodConfig<ResultBoolean>>(
+        config?: Config
+      ): Alova2Method<ResultBoolean, 'message.markAllAsRead', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取未读消息数量
+       *
+       * **path:** /message/unread-count
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 未读消息数量
+       *   data?: {
+       *     // 总未读数
+       *     total?: number
+       *     // 家庭相关未读数
+       *     familyCount?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getUnreadCount<Config extends Alova2MethodConfig<ResultUnreadCountVO>>(
+        config?: Config
+      ): Alova2Method<ResultUnreadCountVO, 'message.getUnreadCount', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取消息列表
+       *
+       * **path:** /message/page-list
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 消息列表查询参数
+       *   dto: {
+       *     // 消息类型：system-系统消息，family-家庭消息，bill-账单消息，budget-预算消息
+       *     type?: string
+       *     // 消息状态：0-未读，1-已读
+       *     status?: number
+       *     // 页码
+       *     page: number
+       *     // 每页数量
+       *     size: number
+       *   }
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: {
+       *     size?: number
+       *     total?: number
+       *     // [items] start
+       *     // 消息信息
+       *     // [items] end
+       *     records?: Array<{
+       *       // 消息ID
+       *       id?: string
+       *       // 消息标题
+       *       title?: string
+       *       // 消息内容
+       *       content?: string
+       *       // 消息类型：system-系统消息，family-家庭消息，bill-账单消息，budget-预算消息
+       *       type?: string
+       *       // 消息状态：0未读，1已读
+       *       status?: number
+       *       // 相关ID
+       *       relatedId?: string
+       *       // 相关类型：family-家庭，bill-账单，budget-预算
+       *       relatedType?: string
+       *       // 创建时间
+       *       createTime?: string
+       *     }>
+       *     current?: number
+       *     // [deprecated]
+       *     pages?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMessageList<
+        Config extends Alova2MethodConfig<ResultIPageMessageVO> & {
+          params: {
+            /**
+             * 消息列表查询参数
+             */
+            dto: MessageListDTO;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultIPageMessageVO, 'message.getMessageList', Config>;
+    };
     file: {
+      /**
+       * ---
+       *
+       * [POST] 上传文件到R2
+       *
+       * **path:** /file/upload
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   file: Blob
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: string
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      uploadTempFileToR2<
+        Config extends Alova2MethodConfig<ResultString> & {
+          params: {
+            file: Blob;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultString, 'file.uploadTempFileToR2', Config>;
       /**
        * ---
        *
@@ -896,6 +1470,8 @@ declare global {
        *     fileSize?: number
        *     // 临时文件扩展名
        *     fileExt?: string
+       *     // 临时文件访问URL
+       *     fileUrl?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -911,6 +1487,691 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTempFileVO, 'file.uploadTempFile', Config>;
+    };
+    family: {
+      /**
+       * ---
+       *
+       * [POST] 更新家庭信息
+       *
+       * **path:** /family/update
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 家庭ID
+       *   id: string
+       *   // 家庭名称
+       *   name?: string
+       *   // 家庭图标
+       *   avatar?: string
+       *   // 家庭描述
+       *   description?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 家庭信息
+       *   data?: {
+       *     // 家庭ID
+       *     id?: string
+       *     // 家庭名称
+       *     name?: string
+       *     // 家庭图标
+       *     avatar?: string
+       *     // 家庭描述
+       *     description?: string
+       *     // 户主ID
+       *     ownerId?: string
+       *     // 户主昵称
+       *     ownerNickname?: string
+       *     // 户主头像
+       *     ownerAvatar?: string
+       *     // 邀请码
+       *     inviteCode?: string
+       *     // 成员数量
+       *     memberCount?: number
+       *     // 当前用户是否户主
+       *     isOwner?: boolean
+       *     // 创建时间
+       *     createTime?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      updateFamily<
+        Config extends Alova2MethodConfig<ResultFamilyVO> & {
+          data: UpdateFamilyDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultFamilyVO, 'family.updateFamily', Config>;
+      /**
+       * ---
+       *
+       * [POST] 转让户主
+       *
+       * **path:** /family/transfer-owner
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 家庭ID
+       *   familyId: string
+       *   // 新户主用户ID
+       *   targetUserId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      transferOwner<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: TransferOwnerDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'family.transferOwner', Config>;
+      /**
+       * ---
+       *
+       * [POST] 移除家庭成员
+       *
+       * **path:** /family/remove-member
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 家庭ID
+       *   familyId: string
+       *   // 家庭成员记录ID
+       *   memberId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      removeMember<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: RemoveMemberDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'family.removeMember', Config>;
+      /**
+       * ---
+       *
+       * [POST] 刷新邀请码
+       *
+       * **path:** /family/refresh-invite-code
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: string
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      refreshInviteCode<
+        Config extends Alova2MethodConfig<ResultString> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultString, 'family.refreshInviteCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 退出家庭
+       *
+       * **path:** /family/leave
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      leaveFamily<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'family.leaveFamily', Config>;
+      /**
+       * ---
+       *
+       * [POST] 申请加入家庭
+       *
+       * **path:** /family/join
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 家庭邀请码
+       *   inviteCode: string
+       *   // 申请备注
+       *   remark?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 家庭加入申请信息
+       *   data?: {
+       *     // 申请ID
+       *     id?: string
+       *     // 家庭ID
+       *     familyId?: string
+       *     // 家庭名称
+       *     familyName?: string
+       *     // 申请人用户ID
+       *     userId?: string
+       *     // 申请人昵称
+       *     userNickname?: string
+       *     // 申请人头像
+       *     userAvatar?: string
+       *     // 申请备注
+       *     remark?: string
+       *     // 申请状态：0待处理，1同意，2拒绝
+       *     status?: number
+       *     // 处理人用户ID
+       *     handleUserId?: string
+       *     // 处理时间
+       *     handleTime?: string
+       *     // 创建时间
+       *     createTime?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      joinFamily<
+        Config extends Alova2MethodConfig<ResultFamilyJoinApplyVO> & {
+          data: JoinFamilyDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultFamilyJoinApplyVO, 'family.joinFamily', Config>;
+      /**
+       * ---
+       *
+       * [POST] 处理加入申请
+       *
+       * **path:** /family/handle-apply
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 申请ID
+       *   applyId: string
+       *   // 是否同意
+       *   approved: boolean
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      handleJoinApply<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: HandleJoinApplyDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'family.handleJoinApply', Config>;
+      /**
+       * ---
+       *
+       * [POST] 删除家庭
+       *
+       * **path:** /family/delete
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      deleteFamily<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'family.deleteFamily', Config>;
+      /**
+       * ---
+       *
+       * [POST] 创建家庭
+       *
+       * **path:** /family/create
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 家庭名称
+       *   name: string
+       *   // 家庭图标
+       *   avatar?: string
+       *   // 家庭描述
+       *   description?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 家庭信息
+       *   data?: {
+       *     // 家庭ID
+       *     id?: string
+       *     // 家庭名称
+       *     name?: string
+       *     // 家庭图标
+       *     avatar?: string
+       *     // 家庭描述
+       *     description?: string
+       *     // 户主ID
+       *     ownerId?: string
+       *     // 户主昵称
+       *     ownerNickname?: string
+       *     // 户主头像
+       *     ownerAvatar?: string
+       *     // 邀请码
+       *     inviteCode?: string
+       *     // 成员数量
+       *     memberCount?: number
+       *     // 当前用户是否户主
+       *     isOwner?: boolean
+       *     // 创建时间
+       *     createTime?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      createFamily<
+        Config extends Alova2MethodConfig<ResultFamilyVO> & {
+          data: CreateFamilyDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultFamilyVO, 'family.createFamily', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取待处理的加入申请
+       *
+       * **path:** /family/pending-applies
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 家庭加入申请信息
+       *   // [items] end
+       *   data?: Array<{
+       *     // 申请ID
+       *     id?: string
+       *     // 家庭ID
+       *     familyId?: string
+       *     // 家庭名称
+       *     familyName?: string
+       *     // 申请人用户ID
+       *     userId?: string
+       *     // 申请人昵称
+       *     userNickname?: string
+       *     // 申请人头像
+       *     userAvatar?: string
+       *     // 申请备注
+       *     remark?: string
+       *     // 申请状态：0待处理，1同意，2拒绝
+       *     status?: number
+       *     // 处理人用户ID
+       *     handleUserId?: string
+       *     // 处理时间
+       *     handleTime?: string
+       *     // 创建时间
+       *     createTime?: string
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getPendingApplies<
+        Config extends Alova2MethodConfig<ResultListFamilyJoinApplyVO> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListFamilyJoinApplyVO, 'family.getPendingApplies', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取我的家庭列表
+       *
+       * **path:** /family/my-families
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 家庭信息
+       *   // [items] end
+       *   data?: Array<{
+       *     // 家庭ID
+       *     id?: string
+       *     // 家庭名称
+       *     name?: string
+       *     // 家庭图标
+       *     avatar?: string
+       *     // 家庭描述
+       *     description?: string
+       *     // 户主ID
+       *     ownerId?: string
+       *     // 户主昵称
+       *     ownerNickname?: string
+       *     // 户主头像
+       *     ownerAvatar?: string
+       *     // 邀请码
+       *     inviteCode?: string
+       *     // 成员数量
+       *     memberCount?: number
+       *     // 当前用户是否户主
+       *     isOwner?: boolean
+       *     // 创建时间
+       *     createTime?: string
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMyFamilies<Config extends Alova2MethodConfig<ResultListFamilyVO>>(
+        config?: Config
+      ): Alova2Method<ResultListFamilyVO, 'family.getMyFamilies', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取家庭成员列表
+       *
+       * **path:** /family/members
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 家庭成员信息
+       *   // [items] end
+       *   data?: Array<{
+       *     // 成员记录ID
+       *     id?: string
+       *     // 家庭ID
+       *     familyId?: string
+       *     // 用户ID
+       *     userId?: string
+       *     // 家庭内昵称
+       *     nickname?: string
+       *     // 用户昵称
+       *     userNickname?: string
+       *     // 用户头像
+       *     userAvatar?: string
+       *     // 是否户主
+       *     isOwner?: boolean
+       *     // 加入时间
+       *     joinTime?: string
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMembers<
+        Config extends Alova2MethodConfig<ResultListFamilyMemberVO> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListFamilyMemberVO, 'family.getMembers', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取家庭详情
+       *
+       * **path:** /family/detail
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭ID
+       *   familyId: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 家庭信息
+       *   data?: {
+       *     // 家庭ID
+       *     id?: string
+       *     // 家庭名称
+       *     name?: string
+       *     // 家庭图标
+       *     avatar?: string
+       *     // 家庭描述
+       *     description?: string
+       *     // 户主ID
+       *     ownerId?: string
+       *     // 户主昵称
+       *     ownerNickname?: string
+       *     // 户主头像
+       *     ownerAvatar?: string
+       *     // 邀请码
+       *     inviteCode?: string
+       *     // 成员数量
+       *     memberCount?: number
+       *     // 当前用户是否户主
+       *     isOwner?: boolean
+       *     // 创建时间
+       *     createTime?: string
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getFamilyDetail<
+        Config extends Alova2MethodConfig<ResultFamilyVO> & {
+          params: {
+            /**
+             * 家庭ID
+             */
+            familyId: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultFamilyVO, 'family.getFamilyDetail', Config>;
     };
     bill: {
       /**
@@ -941,6 +2202,8 @@ declare global {
        *   amount?: number
        *   // 账单备注
        *   remark?: string
+       *   // 家庭 ID，为空则属于个人账单
+       *   familyId?: string
        * }
        * ```
        *
@@ -1191,6 +2454,8 @@ declare global {
        *     page: number
        *     // 每页数量
        *     size: number
+       *     // 家庭 ID，传入则查询家庭账单，不传则查询个人账单
+       *     familyId?: string
        *   }
        * }
        * ```
@@ -1204,6 +2469,7 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
+       *     total?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -1256,11 +2522,12 @@ declare global {
        *       source?: string
        *       // 家庭 ID
        *       familyId?: string
+       *       // 家庭名称
+       *       familyName?: string
        *     }>
        *     current?: number
        *     // [deprecated]
        *     pages?: number
-       *     total?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1400,6 +2667,8 @@ declare global {
        *     source?: string
        *     // 家庭 ID
        *     familyId?: string
+       *     // 家庭名称
+       *     familyName?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1929,6 +3198,8 @@ declare global {
        *     source?: string
        *     // 家庭 ID
        *     familyId?: string
+       *     // 家庭名称
+       *     familyName?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2018,6 +3289,8 @@ declare global {
        *     source?: string
        *     // 家庭 ID
        *     familyId?: string
+       *     // 家庭名称
+       *     familyName?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2058,9 +3331,13 @@ declare global {
        * type Response = {
        *   code?: number
        *   message?: string
+       *   // AI分析结果
        *   data?: {
+       *     // AI分析内容
        *     content?: string
+       *     // 是否为缓存结果
        *     cached?: boolean
+       *     // 今日剩余分析次数，-1表示无限制(VIP)
        *     remainingCount?: number
        *   }
        *   timestamp?: number

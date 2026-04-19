@@ -36,4 +36,14 @@ public class SystemConstants {
      * 普通用户每日AI分析次数限制
      */
     public static final int AI_DAILY_LIMIT_NORMAL = 5;
+
+    /**
+     * 同意家庭成员申请
+     */
+    public static final int AGREE_FAMILY_MEMBER_APPLY = 1;
+
+    /**
+     * 拒绝家庭成员申请
+     */
+    public static final int REFUSE_FAMILY_MEMBER_APPLY = 2;
 }

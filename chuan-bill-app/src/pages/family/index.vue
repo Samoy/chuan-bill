@@ -11,11 +11,13 @@ const user = useUserStore()
 const familyStore = useFamilyStore()
 const messageStore = useMessageStore()
 const toast = useGlobalToast()
+const router = useRouter()
 
 // 加入家庭弹框
 const showJoinPopup = ref(false)
 const joinForm = ref({ inviteCode: '', remark: '' })
 const joinLoading = ref(false)
+const showKeyboard = ref(false)
 
 // 页面加载时获取数据
 onShow(async () => {
@@ -151,7 +153,7 @@ async function handleJoin() {
     <template v-else>
       <!-- 顶部操作栏 -->
       <view class="mx-3 flex gap-3">
-        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="navigateTo('/subPages/family/create')">
+        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="router.push('/pages/family/create')">
           <view class="flex items-center gap-3">
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:plus h-5 w-5 text-primary" />
@@ -198,7 +200,7 @@ async function handleJoin() {
           v-for="family in familyStore.familyList"
           :key="family.id"
           class="mx-3 mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]"
-          @click="navigateTo(`/subPages/family/detail?familyId=${family.id}`)"
+          @click="router.push(`/pages/family/detail?familyId=${family.id}`)"
         >
           <view class="flex items-center gap-3">
             <!-- 家庭头像 -->
@@ -211,7 +213,7 @@ async function handleJoin() {
                 <text class="text-base font-500">
                   {{ family.name }}
                 </text>
-                <view v-if="family.isOwner" class="rounded bg-primary/10 px-1.5 py-0.5">
+                <view v-if="family.isOwner" class="flex items-center rounded bg-primary/10 px-1.5 py-0.5">
                   <text class="text-xs text-primary">
                     户主
                   </text>
@@ -223,10 +225,6 @@ async function handleJoin() {
             </view>
             <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
           </view>
-          <!-- 家庭描述 -->
-          <text v-if="family.description" class="line-clamp-1 mt-2 block text-xs text-gray-500">
-            {{ family.description }}
-          </text>
         </view>
       </template>
 
@@ -244,32 +242,10 @@ async function handleJoin() {
           创建一个家庭或加入已有家庭
         </text>
       </view>
-
-      <!-- 消息通知入口 -->
-      <view
-        v-if="messageStore.hasUnread"
-        class="mx-3 rounded-2xl bg-blue-50 p-4 dark:bg-blue-900/20"
-        @click="navigateTo('/subPages/message/list')"
-      >
-        <view class="flex items-center gap-3">
-          <view class="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
-            <view class="i-lucide:bell h-5 w-5 text-blue-600" />
-          </view>
-          <view class="flex-1">
-            <text class="block text-sm text-blue-800 font-500 dark:text-blue-200">
-              您有未读消息
-            </text>
-            <text class="mt-0.5 block text-xs text-blue-600 dark:text-blue-300">
-              {{ messageStore.unreadCount.total }} 条未读消息
-            </text>
-          </view>
-          <view class="i-lucide:chevron-right h-4 w-4 text-blue-400" />
-        </view>
-      </view>
     </template>
 
     <!-- 加入家庭弹框 -->
-    <wd-popup v-model="showJoinPopup" position="bottom" custom-style="border-radius: 16px 16px 0 0; padding: 24px;">
+    <wd-popup v-model="showJoinPopup" position="bottom" :z-index="100" custom-class="rounded-2xl rounded-b-0 p-6" closable>
       <view class="mb-4">
         <text class="block text-lg font-500">
           加入家庭
@@ -282,7 +258,11 @@ async function handleJoin() {
         <text class="mb-2 block text-sm text-gray-600">
           邀请码
         </text>
-        <wd-input v-model="joinForm.inviteCode" placeholder="请输入8位邀请码" :maxlength="8" />
+        <wd-password-input v-model="joinForm.inviteCode" :mask="false" :length="6" :focused="showKeyboard" @focus="showKeyboard = true" />
+        <wd-keyboard
+          v-model="joinForm.inviteCode" v-model:visible="showKeyboard" type="number" :maxlength="6" close-text="完成" mode="custom"
+          @blur="showKeyboard = false"
+        />
       </view>
       <view class="mb-4">
         <text class="mb-2 block text-sm text-gray-600">
@@ -290,7 +270,7 @@ async function handleJoin() {
         </text>
         <wd-textarea v-model="joinForm.remark" placeholder="向户主介绍一下自己" :maxlength="200" />
       </view>
-      <wd-button type="primary" block :loading="joinLoading" @click="handleJoin">
+      <wd-button type="primary" block :loading="joinLoading" custom-class="mb-4" @click="handleJoin">
         提交申请
       </wd-button>
     </wd-popup>
