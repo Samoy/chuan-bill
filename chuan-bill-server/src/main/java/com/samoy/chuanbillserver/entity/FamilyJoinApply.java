@@ -53,7 +53,7 @@ public class FamilyJoinApply implements Serializable {
      * 申请状态，0待处理，1同意，2拒绝
      */
     @TableField("status")
-    private Boolean status;
+    private Integer status;
 
     /**
      * 处理申请的用户ID

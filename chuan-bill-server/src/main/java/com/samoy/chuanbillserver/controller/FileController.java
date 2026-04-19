@@ -6,6 +6,7 @@ import com.samoy.chuanbillserver.vo.TempFileVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +20,15 @@ public class FileController {
     private IFileService fileService;
 
     @PostMapping("/temp/upload")
-    @Operation(summary = "上传临时文件", description = "上传临时文件，返回fileId供ocr使用")
+    @Operation(summary = "上传临时文件", description = "上传临时文件到本地，返回fileId供ocr使用")
     public Result<TempFileVO> uploadTempFile(MultipartFile file) {
         return Result.success(fileService.uploadTempFile(file));
+    }
+
+    @PostMapping("/upload")
+    @Operation(summary = "上传文件到R2", description = "上传文件到Cloudflare R2，返回文件URL")
+    public Result<String> uploadTempFileToR2(HttpServletRequest request, MultipartFile file) {
+        String url = fileService.uploadFileToR2(file);
+        return Result.success(url);
     }
 }

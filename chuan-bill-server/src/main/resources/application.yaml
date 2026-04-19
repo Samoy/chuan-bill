@@ -1,6 +1,10 @@
 spring:
   application:
     name: chuan-bill-server
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/chuan_bill?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
@@ -56,3 +60,11 @@ wx:
   miniapp:
     appid: ${WX_MINIAPP_APPID:}
     secret: ${WX_MINIAPP_SECRET:}
+
+
+r2:
+  access-key-id: ${R2_ACCESS_KEY_ID}
+  access-key-secret: ${R2_ACCESS_KEY_SECRET}
+  endpoint: ${R2_ENDPOINT:https://9693a99314db917f71e401a9bc3fdc82.r2.cloudflarestorage.com}
+  bucket-name: ${R2_BUCKET_NAME:chuan-bill}
+  public-url: ${R2_PUBLIC_URL:https://cdn.chuanbill.samoy.site}

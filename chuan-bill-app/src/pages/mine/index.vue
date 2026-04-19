@@ -11,6 +11,7 @@ definePage({
 const user = useUserStore()
 const userStore = useUserStore()
 const billStore = useBillStore()
+const messageStore = useMessageStore()
 
 // 登录价值特性
 const loginFeatures = [
@@ -37,6 +38,13 @@ function goToLogin() {
 function logout() {
   userStore.logout()
 }
+
+// 页面显示时获取未读消息数
+onShow(() => {
+  if (user.isLoggedIn) {
+    messageStore.fetchUnreadCount()
+  }
+})
 </script>
 
 <template>
@@ -138,6 +146,15 @@ function logout() {
             <text class="mt-1 block text-sm text-white/80">
               {{ userStore.phone || '未绑定手机号' }}
             </text>
+          </view>
+          <!-- 消息通知入口 -->
+          <view class="relative" @click="navigateTo('/subPages/message/list')">
+            <view class="h-10 w-10 flex items-center justify-center rounded-full bg-white/20">
+              <view class="i-lucide:bell h-5 w-5" />
+            </view>
+            <view v-if="messageStore.hasUnread" class="absolute right-0 top-0 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
+              {{ messageStore.unreadCount.total > 9 ? '9+' : messageStore.unreadCount.total }}
+            </view>
           </view>
         </view>
       </view>

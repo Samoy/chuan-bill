@@ -12,4 +12,12 @@ public interface IFileService {
      * @return 临时文件信息
      */
     TempFileVO uploadTempFile(MultipartFile file);
+
+    /**
+     * 上传临时文件到 R2
+     *
+     * @param file 文件
+     * @return 文件url
+     */
+    String uploadFileToR2(MultipartFile file);
 }

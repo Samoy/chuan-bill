@@ -1,0 +1,20 @@
+package com.samoy.chuanbillserver.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Data
+@Schema(description = "创建家庭请求")
+public class CreateFamilyDTO {
+
+    @NotBlank(message = "家庭名称不能为空") @Size(max = 20, message = "家庭名称长度不能超过20个字符") @Schema(description = "家庭名称", example = "我的小家", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String name;
+
+    @Schema(description = "家庭图标")
+    private String avatar;
+
+    @Size(max = 200, message = "家庭描述长度不能超过200个字符") @Schema(description = "家庭描述", example = "温馨的三口之家")
+    private String description;
+}

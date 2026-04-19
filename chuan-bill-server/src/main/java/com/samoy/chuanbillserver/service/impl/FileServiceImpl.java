@@ -9,14 +9,32 @@ import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IFileService;
 import com.samoy.chuanbillserver.vo.TempFileVO;
+import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
+@Slf4j
 @Service
 public class FileServiceImpl implements IFileService {
+
+    @Resource
+    private S3Client s3Client;
+
+    @Value("${r2.bucket-name}")
+    private String bucketName;
+
+    @Value("${r2.public-url}")
+    private String publicUrl;
 
     @Override
     public TempFileVO uploadTempFile(MultipartFile file) {
@@ -37,6 +55,24 @@ public class FileServiceImpl implements IFileService {
             return tempFileVO;
         } catch (IOException e) {
             throw new BusinessException(ResultEnum.FILE_UPLOAD_FAILED);
+        }
+    }
+
+    @Override
+    public String uploadFileToR2(MultipartFile file) {
+        String fileName = String.format("%s.%s", IdUtil.objectId(), FileUtil.extName(file.getOriginalFilename()));
+        String fileKey = "upload/" + fileName;
+        try {
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileKey)
+                    .contentType(file.getContentType())
+                    .build();
+            s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
+            return publicUrl + "/" + fileKey;
+        } catch (S3Exception | IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BusinessException(ResultEnum.FILE_UPLOAD_FAILED, "文件上传失败");
         }
     }
 }

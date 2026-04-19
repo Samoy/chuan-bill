@@ -35,4 +35,7 @@ public class UpdateBillDTO {
 
     @Size(max = 500, message = "账单备注长度不能超过 500 个字符") @Schema(description = "账单备注", example = "公司附近的餐厅")
     private String remark;
+
+    @Schema(description = "家庭 ID，为空则属于个人账单", example = "family123")
+    private String familyId;
 }

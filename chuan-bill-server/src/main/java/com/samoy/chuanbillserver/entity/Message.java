@@ -59,7 +59,7 @@ public class Message implements Serializable {
      * 消息状态，0未读，1已读
      */
     @TableField("status")
-    private Boolean status;
+    private Integer status;
 
     /**
      * 相关ID，根据消息类型不同而不同(如家庭id，账单id，预算id等)

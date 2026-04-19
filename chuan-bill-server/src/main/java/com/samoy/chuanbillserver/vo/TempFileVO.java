@@ -14,4 +14,7 @@ public class TempFileVO {
 
     @Schema(description = "临时文件扩展名", example = "png")
     private String fileExt;
+
+    @Schema(description = "临时文件访问URL", example = "https://example.com/temp/xxxx.png")
+    private String fileUrl;
 }

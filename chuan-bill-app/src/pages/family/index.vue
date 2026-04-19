@@ -7,36 +7,42 @@ definePage({
   },
 })
 
-// 鉴权检查
 const user = useUserStore()
+const familyStore = useFamilyStore()
+const messageStore = useMessageStore()
+const toast = useGlobalToast()
 
-// 家庭功能特性列表
-const features = [
-  {
-    icon: 'i-lucide:users',
-    title: '家庭共享',
-    desc: '与家人共同管理家庭财务',
-  },
-  {
-    icon: 'i-lucide:wallet',
-    title: '共同记账',
-    desc: '家庭成员可共同记录收支',
-  },
-  {
-    icon: 'i-lucide:pie-chart',
-    title: '家庭统计',
-    desc: '查看家庭整体财务状况',
-  },
-  {
-    icon: 'i-lucide:shield-check',
-    title: '权限管理',
-    desc: '灵活设置成员权限',
-  },
-]
+// 加入家庭弹框
+const showJoinPopup = ref(false)
+const joinForm = ref({ inviteCode: '', remark: '' })
+const joinLoading = ref(false)
 
-// 跳转到登录
-function goToLogin() {
-  user.showLoginPopup = true
+// 页面加载时获取数据
+onShow(async () => {
+  if (user.isLoggedIn) {
+    await familyStore.fetchFamilyList()
+    await messageStore.fetchUnreadCount()
+  }
+})
+
+// 加入家庭
+async function handleJoin() {
+  if (!joinForm.value.inviteCode.trim()) {
+    toast.warning('请输入邀请码')
+    return
+  }
+  joinLoading.value = true
+  try {
+    const result = await familyStore.joinFamily(joinForm.value.inviteCode.trim(), joinForm.value.remark.trim())
+    if (result) {
+      toast.success('申请已提交，等待户主审批')
+      showJoinPopup.value = false
+      joinForm.value = { inviteCode: '', remark: '' }
+    }
+  }
+  finally {
+    joinLoading.value = false
+  }
 }
 </script>
 
@@ -44,7 +50,6 @@ function goToLogin() {
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 未登录状态 -->
     <template v-if="!user.isLoggedIn">
-      <!-- 顶部介绍卡片 -->
       <view class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
         <view class="mb-4 flex items-center gap-3">
           <view class="h-14 w-14 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
@@ -64,29 +69,66 @@ function goToLogin() {
         </text>
       </view>
 
-      <!-- 功能特性列表 -->
       <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <text class="mb-4 block text-sm font-500">
           功能特性
         </text>
         <view class="grid grid-cols-2 gap-4">
-          <view v-for="(item, index) in features" :key="index" class="flex items-start gap-3">
+          <view class="flex items-start gap-3">
             <view class="h-10 w-10 flex shrink-0 items-center justify-center rounded-xl bg-primary/10">
-              <view class="h-5 w-5 text-primary" :class="item.icon" />
+              <view class="i-lucide:users h-5 w-5 text-primary" />
             </view>
             <view>
               <text class="block text-sm font-500">
-                {{ item.title }}
+                家庭共享
               </text>
               <text class="mt-0.5 block text-xs text-gray-500">
-                {{ item.desc }}
+                与家人共同管理家庭财务
+              </text>
+            </view>
+          </view>
+          <view class="flex items-start gap-3">
+            <view class="h-10 w-10 flex shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:wallet h-5 w-5 text-primary" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                共同记账
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                家庭成员可共同记录收支
+              </text>
+            </view>
+          </view>
+          <view class="flex items-start gap-3">
+            <view class="h-10 w-10 flex shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:pie-chart h-5 w-5 text-primary" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                家庭统计
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                查看家庭整体财务状况
+              </text>
+            </view>
+          </view>
+          <view class="flex items-start gap-3">
+            <view class="h-10 w-10 flex shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:shield-check h-5 w-5 text-primary" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                权限管理
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                灵活设置成员权限
               </text>
             </view>
           </view>
         </view>
       </view>
 
-      <!-- 登录提示卡片 -->
       <view class="mx-3 rounded-2xl bg-white p-6 text-center shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view class="mb-3 flex justify-center">
           <view class="h-16 w-16 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
@@ -99,27 +141,158 @@ function goToLogin() {
         <text class="mb-6 block text-sm text-gray-500">
           创建家庭、邀请成员、共同管理
         </text>
-        <wd-button type="primary" block size="large" @click="goToLogin">
+        <wd-button type="primary" block size="large" @click="user.showLoginPopup = true">
           立即登录
         </wd-button>
       </view>
     </template>
 
-    <!-- 已登录状态（占位） -->
+    <!-- 已登录状态 -->
     <template v-else>
-      <view class="mx-3 rounded-2xl bg-white px-4 py-12 text-center dark:bg-[var(--wot-dark-background2)]">
-        <view class="mb-4 flex justify-center">
+      <!-- 顶部操作栏 -->
+      <view class="mx-3 flex gap-3">
+        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="navigateTo('/subPages/family/create')">
+          <view class="flex items-center gap-3">
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:plus h-5 w-5 text-primary" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                创建家庭
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                创建新的家庭组
+              </text>
+            </view>
+          </view>
+        </view>
+        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="showJoinPopup = true">
+          <view class="flex items-center gap-3">
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
+              <view class="i-lucide:log-in h-5 w-5 text-green-600" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                加入家庭
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                通过邀请码加入
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 我的家庭列表 -->
+      <view v-if="familyStore.familyListLoading" class="mx-3 rounded-2xl bg-white p-6 text-center shadow-sm dark:bg-[var(--wot-dark-background2)]">
+        <wd-loading />
+      </view>
+
+      <template v-else-if="familyStore.hasFamily">
+        <view class="mx-3">
+          <text class="mb-2 block px-1 text-sm text-gray-500 font-500">
+            我的家庭
+          </text>
+        </view>
+        <view
+          v-for="family in familyStore.familyList"
+          :key="family.id"
+          class="mx-3 mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          @click="navigateTo(`/subPages/family/detail?familyId=${family.id}`)"
+        >
+          <view class="flex items-center gap-3">
+            <!-- 家庭头像 -->
+            <view class="h-12 w-12 flex items-center justify-center rounded-xl bg-primary/10">
+              <image v-if="family.avatar" :src="family.avatar" class="h-12 w-12 rounded-xl" mode="aspectFill" />
+              <view v-else class="i-lucide:home h-6 w-6 text-primary" />
+            </view>
+            <view class="flex-1">
+              <view class="flex items-center gap-2">
+                <text class="text-base font-500">
+                  {{ family.name }}
+                </text>
+                <view v-if="family.isOwner" class="rounded bg-primary/10 px-1.5 py-0.5">
+                  <text class="text-xs text-primary">
+                    户主
+                  </text>
+                </view>
+              </view>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                {{ family.memberCount }} 位成员
+              </text>
+            </view>
+            <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+          </view>
+          <!-- 家庭描述 -->
+          <text v-if="family.description" class="line-clamp-1 mt-2 block text-xs text-gray-500">
+            {{ family.description }}
+          </text>
+        </view>
+      </template>
+
+      <!-- 无家庭状态 -->
+      <view v-else class="mx-3 rounded-2xl bg-white p-6 text-center shadow-sm dark:bg-[var(--wot-dark-background2)]">
+        <view class="mb-3 flex justify-center">
           <view class="h-16 w-16 flex items-center justify-center rounded-full bg-primary/10">
             <view class="i-lucide:home h-8 w-8 text-primary" />
           </view>
         </view>
-        <text class="mb-2 block text-lg font-500">
-          家庭功能开发中
+        <text class="mb-1 block text-base font-500">
+          还没有家庭
         </text>
         <text class="block text-sm text-gray-500">
-          敬请期待...
+          创建一个家庭或加入已有家庭
         </text>
       </view>
+
+      <!-- 消息通知入口 -->
+      <view
+        v-if="messageStore.hasUnread"
+        class="mx-3 rounded-2xl bg-blue-50 p-4 dark:bg-blue-900/20"
+        @click="navigateTo('/subPages/message/list')"
+      >
+        <view class="flex items-center gap-3">
+          <view class="h-10 w-10 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
+            <view class="i-lucide:bell h-5 w-5 text-blue-600" />
+          </view>
+          <view class="flex-1">
+            <text class="block text-sm text-blue-800 font-500 dark:text-blue-200">
+              您有未读消息
+            </text>
+            <text class="mt-0.5 block text-xs text-blue-600 dark:text-blue-300">
+              {{ messageStore.unreadCount.total }} 条未读消息
+            </text>
+          </view>
+          <view class="i-lucide:chevron-right h-4 w-4 text-blue-400" />
+        </view>
+      </view>
     </template>
+
+    <!-- 加入家庭弹框 -->
+    <wd-popup v-model="showJoinPopup" position="bottom" custom-style="border-radius: 16px 16px 0 0; padding: 24px;">
+      <view class="mb-4">
+        <text class="block text-lg font-500">
+          加入家庭
+        </text>
+        <text class="mt-1 block text-sm text-gray-500">
+          输入邀请码申请加入家庭
+        </text>
+      </view>
+      <view class="mb-3">
+        <text class="mb-2 block text-sm text-gray-600">
+          邀请码
+        </text>
+        <wd-input v-model="joinForm.inviteCode" placeholder="请输入8位邀请码" :maxlength="8" />
+      </view>
+      <view class="mb-4">
+        <text class="mb-2 block text-sm text-gray-600">
+          备注（可选）
+        </text>
+        <wd-textarea v-model="joinForm.remark" placeholder="向户主介绍一下自己" :maxlength="200" />
+      </view>
+      <wd-button type="primary" block :loading="joinLoading" @click="handleJoin">
+        提交申请
+      </wd-button>
+    </wd-popup>
   </view>
 </template>

@@ -38,4 +38,7 @@ public class BillListDTO {
 
     @Min(value = 1, message = "每页数量不能小于 1") @Schema(description = "每页数量", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer size = 10;
+
+    @Schema(description = "家庭 ID，传入则查询家庭账单，不传则查询个人账单", example = "family123")
+    private String familyId;
 }

@@ -49,6 +49,22 @@ public enum ResultEnum {
     FILE_NOT_FOUND(3001, "文件不存在"),
     FILE_UPLOAD_FAILED(3002, "文件上传失败"),
     FILE_NOT_IMAGE(3003, "不是图片文件"),
+
+    // 家庭相关错误码 4000+
+    FAMILY_NOT_FOUND(4001, "家庭不存在"),
+    FAMILY_NOT_OWNER(4002, "仅户主可执行此操作"),
+    FAMILY_NOT_MEMBER(4003, "您不是该家庭成员"),
+    FAMILY_ALREADY_MEMBER(4004, "您已是该家庭成员"),
+    FAMILY_INVITE_CODE_INVALID(4005, "邀请码无效"),
+    FAMILY_OWNER_CANNOT_LEAVE(4006, "户主不能退出家庭，请先转让户主"),
+    FAMILY_APPLY_NOT_FOUND(4007, "加入申请不存在"),
+    FAMILY_APPLY_ALREADY_PENDING(4008, "您已提交过申请，请等待审批"),
+    FAMILY_APPLY_ALREADY_HANDLED(4009, "该申请已被处理"),
+    FAMILY_TRANSFER_TARGET_NOT_MEMBER(4010, "目标用户不是该家庭成员"),
+    FAMILY_CANNOT_REMOVE_OWNER(4011, "不能移除户主"),
+
+    // 消息相关错误码 4050+
+    MESSAGE_NOT_FOUND(4051, "消息不存在"),
     ;
 
     private final Integer code;

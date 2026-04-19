@@ -19,6 +19,8 @@ const show = defineModel<boolean>()
 const isFiltered = ref(false)
 
 const billStore = useBillStore()
+const familyStore = useFamilyStore()
+const user = useUserStore()
 const formData = ref<Optional<BillListDTO>>({ type: '' })
 
 type DateRange = 'today' | 'week' | 'month' | 'custom'
@@ -41,6 +43,7 @@ let startDate = dayjs().startOf('d').valueOf()
 let endDate = dayjs().endOf('d').valueOf()
 const categoryList = computed(() => billStore.getCategoryList(formData.value.type))
 const paymentMethodList = computed(() => billStore.getPaymentMethodList())
+const familyList = computed(() => familyStore.familyList)
 const dateTime = ref<[number, number]>([startDate, endDate])
 
 function resetFormData() {
@@ -52,6 +55,10 @@ function resetFormData() {
 
 onLoad(async () => {
   billStore.initBillData()
+  // 已登录时加载家庭列表
+  if (user.isLoggedIn && !familyStore.hasFamily) {
+    await familyStore.fetchFamilyList()
+  }
 })
 
 watch(() => dateRange.value, (newVal) => {
@@ -146,6 +153,18 @@ watch(() => formData.value, (newVal) => {
           <wd-radio-group v-model="formData.paymentMethodId" shape="button" custom-class="grid grid-cols-3 gap-2 mt-1">
             <wd-radio v-for="item in paymentMethodList" :key="item.id" :value="item.id!" custom-class="normal-radio">
               <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
+            </wd-radio>
+          </wd-radio-group>
+        </view>
+        <!-- 家庭筛选（仅已登录且有家庭时显示） -->
+        <view v-if="user.isLoggedIn && familyList.length > 0" class="flex flex-col gap-1">
+          <view class="flex items-center gap-2 font-500">
+            <text class="i-lucide:home text-primary" />
+            <text>所属家庭</text>
+          </view>
+          <wd-radio-group v-model="formData.familyId" shape="button" custom-class="grid grid-cols-3 gap-2 mt-1">
+            <wd-radio v-for="item in familyList" :key="item.id" :value="item.id!" custom-class="normal-radio">
+              {{ item.name }}
             </wd-radio>
           </wd-radio-group>
         </view>

@@ -40,4 +40,7 @@ public class BillVO {
 
     @Schema(description = "家庭 ID", example = "family123")
     private String familyId;
+
+    @Schema(description = "家庭名称", example = "小川的家")
+    private String familyName;
 }

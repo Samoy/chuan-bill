@@ -23,18 +23,31 @@ const form = ref()
 const isShared = ref(false)
 const billStore = useBillStore()
 const user = useUserStore()
+const familyStore = useFamilyStore()
 
 const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'manual', type: 'expense' } })
 const categoryOptions = computed<PickerOption[]>(() => billStore.getCategoryList(formData.value.type).map(category => ({ label: category.name, value: category.id })))
 const paymentMethodOptions = computed<PickerOption[]>(() => billStore.getPaymentMethodList().map(paymentMethod => ({ label: paymentMethod.name, value: paymentMethod.id })))
+const familyOptions = computed<PickerOption[]>(() => familyStore.familyList.map(f => ({ label: f.name, value: f.id })))
 
 onLoad(async () => {
   await billStore.initBillData()
+  // 已登录时加载家庭列表
+  if (user.isLoggedIn && !familyStore.hasFamily) {
+    await familyStore.fetchFamilyList()
+  }
 })
 
 watch(() => formData.value.type, () => {
   formData.value.categoryId = undefined
   formData.value.paymentMethodId = undefined
+})
+
+// 关闭家庭共享时清除 familyId
+watch(isShared, (val) => {
+  if (!val) {
+    formData.value.familyId = undefined
+  }
 })
 
 function sumbit() {
@@ -119,7 +132,7 @@ function sumbit() {
       <template v-if="isShared">
         <wd-picker
           v-model="formData.familyId" custom-class="mt-3" title="请选择所要共享的家庭"
-          prop="familyId"
+          :columns="familyOptions" prop="familyId"
           :rules="[{ required: true, message: '请选择所要共享的家庭' }]"
         />
       </template>

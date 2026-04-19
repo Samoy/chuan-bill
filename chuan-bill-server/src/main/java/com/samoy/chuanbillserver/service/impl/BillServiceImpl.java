@@ -15,11 +15,13 @@ import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.entity.Category;
+import com.samoy.chuanbillserver.entity.Family;
 import com.samoy.chuanbillserver.entity.PaymentMethod;
 import com.samoy.chuanbillserver.expection.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
+import com.samoy.chuanbillserver.service.IFamilyService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
@@ -52,6 +54,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     @Resource
     private IPaymentMethodService paymentMethodService;
+
+    @Resource
+    private IFamilyService familyService;
 
     @Override
     public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
@@ -133,6 +138,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         bill.setAmount(updateBillDTO.getAmount());
         bill.setTime(updateBillDTO.getTime());
         bill.setRemark(updateBillDTO.getRemark());
+        if (updateBillDTO.getFamilyId() != null) {
+            bill.setFamilyId(updateBillDTO.getFamilyId());
+        }
         return this.updateById(bill);
     }
 
@@ -191,7 +199,14 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     private LambdaQueryWrapper<Bill> buildQueryWrapper(String userId, BillListDTO billListDTO) {
         LambdaQueryWrapper<Bill> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Bill::getUserId, userId).orderByDesc(Bill::getTime, Bill::getCreateTime);
+
+        // 家庭账单查询：按 familyId 过滤；否则按用户过滤
+        if (ObjectUtil.isNotEmpty(billListDTO.getFamilyId())) {
+            wrapper.eq(Bill::getFamilyId, billListDTO.getFamilyId());
+        } else {
+            wrapper.eq(Bill::getUserId, userId);
+        }
+        wrapper.orderByDesc(Bill::getTime, Bill::getCreateTime);
 
         // 日期范围查询
         if (ObjectUtil.isNotEmpty(billListDTO.getStartDate())) {
@@ -257,6 +272,15 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         billVO.setTime(bill.getTime());
         billVO.setRemark(bill.getRemark());
         billVO.setSource(bill.getSource());
+
+        // 填充家庭名称
+        if (bill.getFamilyId() != null) {
+            Family family = familyService.getById(bill.getFamilyId());
+            if (family != null) {
+                billVO.setFamilyName(family.getName());
+            }
+        }
+
         return billVO;
     }
 
@@ -265,7 +289,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
      * 使用预加载的 Map 避免 N+1 查询问题
      */
     private BillVO getBillVO(
-            Bill bill, Map<String, Category> categoryMap, Map<String, PaymentMethod> paymentMethodMap) {
+            Bill bill,
+            Map<String, Category> categoryMap,
+            Map<String, PaymentMethod> paymentMethodMap,
+            Map<String, Family> familyMap) {
         BillVO billVO = new BillVO();
         billVO.setId(bill.getId());
         billVO.setFamilyId(bill.getFamilyId());
@@ -284,21 +311,30 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         billVO.setTime(bill.getTime());
         billVO.setRemark(bill.getRemark());
         billVO.setSource(bill.getSource());
+
+        // 填充家庭名称
+        Family family = familyMap.get(bill.getFamilyId());
+        if (family != null) {
+            billVO.setFamilyName(family.getName());
+        }
+
         return billVO;
     }
 
     private List<BillVO> convertToBillVOList(List<Bill> billList) {
         Map<String, Category> categoryMap = batchQueryCategories(billList);
         Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billList);
+        Map<String, Family> familyMap = batchQueryFamilies(billList);
         return billList.stream()
-                .map(bill -> getBillVO(bill, categoryMap, paymentMethodMap))
+                .map(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap))
                 .toList();
     }
 
     private IPage<BillVO> convertToBillVOPage(IPage<Bill> billPage) {
         Map<String, Category> categoryMap = batchQueryCategories(billPage.getRecords());
         Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billPage.getRecords());
-        return billPage.convert(bill -> getBillVO(bill, categoryMap, paymentMethodMap));
+        Map<String, Family> familyMap = batchQueryFamilies(billPage.getRecords());
+        return billPage.convert(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap));
     }
 
     private Map<String, Category> batchQueryCategories(List<Bill> billList) {
@@ -327,6 +363,20 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             return paymentMethods.stream()
                     .collect(Collectors.toMap(
                             PaymentMethod::getId, Function.identity(), (existing, replacement) -> existing));
+        }
+        return Collections.emptyMap();
+    }
+
+    private Map<String, Family> batchQueryFamilies(List<Bill> billList) {
+        List<String> familyIds = billList.stream()
+                .map(Bill::getFamilyId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (CollUtil.isNotEmpty(familyIds)) {
+            List<Family> families = familyService.listByIds(familyIds);
+            return families.stream()
+                    .collect(Collectors.toMap(Family::getId, Function.identity(), (existing, replacement) -> existing));
         }
         return Collections.emptyMap();
     }
