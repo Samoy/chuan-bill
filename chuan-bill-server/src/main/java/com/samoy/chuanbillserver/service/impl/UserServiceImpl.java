@@ -4,8 +4,7 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.PhoneUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,7 +20,6 @@ import com.samoy.chuanbillserver.vo.TokenVO;
 import com.samoy.chuanbillserver.vo.UserVO;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -107,13 +105,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 // 用户不存在，创建新用户
                 user = new User();
                 user.setOpenid(openid);
-                user.setNickname("微信用户" + UUID.randomUUID().toString().substring(0, 8));
+                user.setNickname("微信用户" + RandomUtil.randomString(6));
                 save(user);
             }
 
             return genTokenVO(user);
         } catch (Exception e) {
-            throw new BusinessException(ResultEnum.LOGIN_ERROR, "微信登录失败: " + e.getMessage());
+            throw new BusinessException(ResultEnum.LOGIN_ERROR, "微信登录失败");
         }
     }
 

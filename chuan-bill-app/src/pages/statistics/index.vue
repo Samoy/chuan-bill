@@ -104,7 +104,7 @@ watch(() => user.isLoggedIn, () => {
             支出
           </text>
           <text class="text-lg text-red-400 font-600">
-            ¥{{ statisticsStore.overview?.expense ?? '0.00' }}
+            ¥{{ statisticsStore.overview?.expense || '0.00' }}
           </text>
         </view>
         <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
@@ -113,7 +113,7 @@ watch(() => user.isLoggedIn, () => {
             收入
           </text>
           <text class="text-lg text-green-500 font-600">
-            ¥{{ statisticsStore.overview?.income ?? '0.00' }}
+            ¥{{ statisticsStore.overview?.income || '0.00' }}
           </text>
         </view>
         <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
@@ -122,7 +122,7 @@ watch(() => user.isLoggedIn, () => {
             结余
           </text>
           <text class="text-lg text-primary font-600">
-            ¥{{ statisticsStore.overview?.balance ?? '0.00' }}
+            ¥{{ statisticsStore.overview?.balance || '0.00' }}
           </text>
         </view>
       </view>

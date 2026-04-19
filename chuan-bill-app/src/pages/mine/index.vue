@@ -34,6 +34,8 @@ function goToLogin() {
   user.showLoginPopup = true
 }
 
+const router = useRouter()
+
 // 退出登录
 function logout() {
   userStore.logout()
@@ -88,7 +90,7 @@ onShow(() => {
       </view>
 
       <!-- 本地数据提示 -->
-      <view v-if="billStore" class="mx-3 rounded-2xl bg-orange-50 p-4 dark:bg-orange-900/20">
+      <view v-if="billStore.localBillList.length" class="mx-3 rounded-2xl bg-orange-50 p-4 dark:bg-orange-900/20">
         <view class="flex items-center gap-3">
           <view class="h-10 w-10 flex items-center justify-center rounded-full bg-orange-100 dark:bg-orange-800">
             <view class="i-lucide:database h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -148,12 +150,12 @@ onShow(() => {
             </text>
           </view>
           <!-- 消息通知入口 -->
-          <view class="relative" @click="navigateTo('/subPages/message/list')">
+          <view class="relative" @click="router.push('/pages/message/index')">
             <view class="h-10 w-10 flex items-center justify-center rounded-full bg-white/20">
               <view class="i-lucide:bell h-5 w-5" />
             </view>
             <view v-if="messageStore.hasUnread" class="absolute right-0 top-0 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              {{ messageStore.unreadCount.total > 9 ? '9+' : messageStore.unreadCount.total }}
+              {{ (messageStore.unreadCount?.total || 0) > 9 ? '9+' : messageStore.unreadCount?.total }}
             </view>
           </view>
         </view>

@@ -58,8 +58,8 @@ dashscope:
 
 wx:
   miniapp:
-    appid: ${WX_MINIAPP_APPID:}
-    secret: ${WX_MINIAPP_SECRET:}
+    appid: ${WX_MINIAPP_APPID}
+    secret: ${WX_MINIAPP_SECRET}
 
 
 r2:

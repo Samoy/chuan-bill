@@ -8,6 +8,7 @@ definePage({
 
 const familyStore = useFamilyStore()
 const toast = useGlobalToast()
+const router = useRouter()
 
 const formData = ref({
   name: '',
@@ -28,7 +29,7 @@ async function handleCreate() {
     })
     if (result) {
       toast.success('家庭创建成功')
-      uni.navigateBack()
+      router.back()
     }
   }
   finally {

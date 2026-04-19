@@ -236,10 +236,10 @@ async function handleJoin() {
           </view>
         </view>
         <text class="mb-1 block text-base font-500">
-          还没有家庭
+          您还没有加入任何家庭
         </text>
-        <text class="block text-sm text-gray-500">
-          创建一个家庭或加入已有家庭
+        <text class="block text-xs text-gray-500">
+          通过上方按钮创建或加入已有家庭
         </text>
       </view>
     </template>

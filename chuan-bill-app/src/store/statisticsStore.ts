@@ -31,7 +31,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
   async function fetchOverview(month: string) {
     overviewLoading.value = true
     try {
-      overview.value = await billStore.getMonthlyBillStats(month) ?? null
+      overview.value = await billStore.getMonthlyBillStats(month) || null
     }
     finally {
       overviewLoading.value = false
@@ -48,11 +48,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
         const res = await Apis.statistics.getCategoryStats({ params: { month, type } })
         if (res.success && res.data) {
           categoryData.value = res.data.map(item => ({
-            categoryId: item.categoryId ?? '',
-            categoryName: item.categoryName ?? '',
-            categoryIcon: item.categoryIcon ?? '',
-            amount: Number(item.amount ?? 0),
-            percentage: Number(item.percentage ?? 0),
+            categoryId: item.categoryId || '',
+            categoryName: item.categoryName || '',
+            categoryIcon: item.categoryIcon || '',
+            amount: Number(item.amount || 0),
+            percentage: Number(item.percentage || 0),
           }))
           return
         }
@@ -71,17 +71,17 @@ export const useStatisticsStore = defineStore('statistics', () => {
       // 按分类分组求和
       const categoryMap = new Map<string, { categoryId: string, categoryName: string, categoryIcon: string, amount: number }>()
       for (const bill of filtered) {
-        const catId = bill.category?.id ?? ''
+        const catId = bill.category?.id || ''
         const existing = categoryMap.get(catId)
-        const amount = Number(bill.amount ?? 0)
+        const amount = Number(bill.amount || 0)
         if (existing) {
           existing.amount = add(existing.amount, amount) as number
         }
         else {
           categoryMap.set(catId, {
             categoryId: catId,
-            categoryName: bill.category?.name ?? '未知',
-            categoryIcon: bill.category?.icon ?? '',
+            categoryName: bill.category?.name || '未知',
+            categoryIcon: bill.category?.icon || '',
             amount,
           })
         }
@@ -123,8 +123,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
             if (item.date) {
               const dayIndex = dayjs(item.date).date() - 1
               if (dayIndex >= 0 && dayIndex < daysInMonth) {
-                expenses[dayIndex] = Number(item.expense ?? 0)
-                incomes[dayIndex] = Number(item.income ?? 0)
+                expenses[dayIndex] = Number(item.expense || 0)
+                incomes[dayIndex] = Number(item.income || 0)
               }
             }
           }
@@ -138,7 +138,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
         for (const bill of filtered) {
           const dayIndex = dayjs(bill.time).date() - 1
           if (dayIndex >= 0 && dayIndex < daysInMonth) {
-            const amount = Number(bill.amount ?? 0)
+            const amount = Number(bill.amount || 0)
             if (bill.type === 'expense') {
               expenses[dayIndex] = add(expenses[dayIndex], amount) as number
             }
@@ -168,9 +168,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
     try {
       const res = await Apis.ai.analysis({ params: { month, regenerate } })
       if (res.success && res.data) {
-        aiSuggestion.value = res.data.content ?? ''
-        aiCached.value = res.data.cached ?? false
-        aiRemainingCount.value = res.data.remainingCount ?? -1
+        aiSuggestion.value = res.data.content || ''
+        aiCached.value = res.data.cached || false
+        aiRemainingCount.value = res.data.remainingCount || -1
       }
       else {
         aiSuggestion.value = ''
@@ -195,9 +195,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
     try {
       const res = await Apis.ai.analysis({ params: { month }, meta: { silent: true } } as any)
       if (res.success && res.data) {
-        aiSuggestion.value = res.data.content ?? ''
-        aiCached.value = res.data.cached ?? false
-        aiRemainingCount.value = res.data.remainingCount ?? -1
+        aiSuggestion.value = res.data.content || ''
+        aiCached.value = res.data.cached || false
+        aiRemainingCount.value = res.data.remainingCount || -1
       }
       else {
         aiSuggestion.value = ''

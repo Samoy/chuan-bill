@@ -223,8 +223,8 @@ async function handleWechatLogin() {
   try {
     const loginRes = await uni.login({ provider: 'weixin' })
     if (loginRes.code) {
-      const response = await alovaInstance.Post<any>('/auth/loginByWechat', { code: loginRes.code }).send()
-      if (response.code === 200 && response.data) {
+      const response = await Apis.auth.loginByWechat({ data: { code: loginRes.code } })
+      if (response.success && response.data) {
         await handleLoginSuccess(response.data as TokenVO)
       }
       else {
@@ -269,7 +269,7 @@ export default {
 <template>
   <wd-popup
     v-model="userStore.showLoginPopup"
-    :z-index="9999"
+    :z-index="999"
     position="bottom"
     :close-on-click-modal="true"
     lock-scroll

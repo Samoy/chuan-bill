@@ -1389,12 +1389,7 @@ declare global {
        */
       getMessageList<
         Config extends Alova2MethodConfig<ResultIPageMessageVO> & {
-          params: {
-            /**
-             * 消息列表查询参数
-             */
-            dto: MessageListDTO;
-          };
+          params: MessageListDTO;
         }
       >(
         config: Config

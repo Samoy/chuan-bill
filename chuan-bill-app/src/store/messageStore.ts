@@ -1,19 +1,4 @@
-// 消息相关类型定义（alova-gen 生成后会由 globals.d.ts 提供）
-interface MessageVO {
-  id: string
-  title: string
-  content: string
-  type: string
-  status: number
-  relatedId: string
-  relatedType: string
-  createTime: string
-}
-
-interface UnreadCountVO {
-  total: number
-  familyCount: number
-}
+import type { MessageListDTO, MessageVO, UnreadCountVO } from '@/api/globals'
 
 export const useMessageStore = defineStore('message', () => {
   const user = useUserStore()
@@ -23,7 +8,7 @@ export const useMessageStore = defineStore('message', () => {
   // 消息列表
   const messageList = ref<MessageVO[]>([])
   // 是否有未读消息
-  const hasUnread = computed(() => unreadCount.value.total > 0)
+  const hasUnread = computed(() => (unreadCount.value?.total || 0) > 0)
   // 加载状态
   const messageListLoading = ref(false)
 
@@ -47,18 +32,18 @@ export const useMessageStore = defineStore('message', () => {
   /**
    * 获取消息列表
    */
-  async function fetchMessageList(params: { page: number, pageSize: number, type?: string, status?: number }) {
+  async function fetchMessageList(params: MessageListDTO) {
     if (!user.isLoggedIn)
       return
     messageListLoading.value = true
     try {
-      const res = await Apis.message.getPageList({ params })
+      const res = await Apis.message.getMessageList({ params: { ...params } })
       if (res.success && res.data) {
         if (params.page === 1) {
-          messageList.value = res.data.records ?? []
+          messageList.value = res.data.records || []
         }
         else {
-          messageList.value.push(...(res.data.records ?? []))
+          messageList.value.push(...(res.data.records || []))
         }
         return res.data
       }
@@ -72,7 +57,7 @@ export const useMessageStore = defineStore('message', () => {
    * 标记消息已读
    */
   async function markAsRead(id: string) {
-    const res = await Apis.message.markRead({ params: { id } })
+    const res = await Apis.message.markAsRead({ params: { id } })
     if (res.success) {
       // 更新本地消息状态
       const msg = messageList.value.find(m => m.id === id)
@@ -80,11 +65,11 @@ export const useMessageStore = defineStore('message', () => {
         msg.status = 1
       }
       // 减少未读数
-      if (unreadCount.value.total > 0) {
-        unreadCount.value.total--
+      if ((unreadCount.value?.total || 0) > 0) {
+        unreadCount.value.total = (unreadCount.value?.total || 0) - 1
       }
-      if (msg?.type === 'family' && unreadCount.value.familyCount > 0) {
-        unreadCount.value.familyCount--
+      if (msg?.type === 'family' && (unreadCount.value?.familyCount || 0) > 0) {
+        unreadCount.value.familyCount = (unreadCount.value?.familyCount || 0) - 1
       }
       return true
     }
@@ -95,7 +80,7 @@ export const useMessageStore = defineStore('message', () => {
    * 全部标记已读
    */
   async function markAllAsRead() {
-    const res = await Apis.message.markAllRead()
+    const res = await Apis.message.markAllAsRead()
     if (res.success) {
       messageList.value.forEach(m => m.status = 1)
       unreadCount.value = { total: 0, familyCount: 0 }

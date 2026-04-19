@@ -18,7 +18,7 @@ export const useFamilyStore = defineStore('family', () => {
   const applyListLoading = ref(false)
 
   // 当前选中的家庭ID
-  const currentFamilyId = computed(() => currentFamily.value?.id ?? '')
+  const currentFamilyId = computed(() => currentFamily.value?.id || '')
 
   // 是否有家庭
   const hasFamily = computed(() => familyList.value.length > 0)
@@ -101,7 +101,7 @@ export const useFamilyStore = defineStore('family', () => {
     if (res.success) {
       familyList.value = familyList.value.filter(f => f.id !== familyId)
       if (currentFamily.value?.id === familyId) {
-        currentFamily.value = familyList.value[0] ?? null
+        currentFamily.value = familyList.value[0] || null
       }
       memberList.value = memberList.value.filter(m => m.familyId !== familyId)
       return true
@@ -125,7 +125,7 @@ export const useFamilyStore = defineStore('family', () => {
     if (res.success) {
       familyList.value = familyList.value.filter(f => f.id !== familyId)
       if (currentFamily.value?.id === familyId) {
-        currentFamily.value = familyList.value[0] ?? null
+        currentFamily.value = familyList.value[0] || null
       }
       memberList.value = memberList.value.filter(m => m.familyId !== familyId)
       return true

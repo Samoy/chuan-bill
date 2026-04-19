@@ -10,6 +10,7 @@ const familyStore = useFamilyStore()
 const toast = useGlobalToast()
 const message = useGlobalMessage()
 const userStore = useUserStore()
+const router = useRouter()
 
 const familyId = ref('')
 const showRemoveConfirm = ref(false)
@@ -37,7 +38,7 @@ onShow(async () => {
 const currentFamily = computed(() => familyStore.currentFamily)
 const members = computed(() => familyStore.memberList)
 const pendingApplies = computed(() => familyStore.pendingApplies)
-const isOwner = computed(() => currentFamily.value?.isOwner ?? false)
+const isOwner = computed(() => currentFamily.value?.isOwner || false)
 
 // 复制邀请码
 function copyInviteCode() {
@@ -83,7 +84,7 @@ function handleLeave() {
       if (success) {
         resolve(true)
         toast.success('已退出家庭')
-        uni.navigateBack()
+        router.back()
       }
     },
   })
@@ -99,7 +100,7 @@ function handleDelete() {
       if (success) {
         resolve(true)
         toast.success('家庭已删除')
-        uni.navigateBack()
+        router.back()
       }
     },
   })

@@ -26,6 +26,7 @@ export const useGlobalLoading = defineStore('global-loading', {
         cover: true,
         position: 'middle',
         show: true,
+        zIndex: 99999,
       }, typeof option === 'string' ? { msg: option } : option) as ToastOptions
     },
     // 关闭Toast

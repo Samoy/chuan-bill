@@ -21,7 +21,7 @@ function createLoadingManager() {
     start(method: Method) {
       loading = useGlobalLoading()
       const shouldShow = !method.config.meta?.silent
-      const delay = method.config.meta?.loadingDelay ?? 300
+      const delay = method.config.meta?.loadingDelay || 300
       const text = method.config.meta?.loadingText || '请稍候...'
       if (!shouldShow) {
         return null
