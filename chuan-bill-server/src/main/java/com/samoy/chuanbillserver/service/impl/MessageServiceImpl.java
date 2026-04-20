@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.dao.MessageMapper;
 import com.samoy.chuanbillserver.dto.MessageListDTO;
 import com.samoy.chuanbillserver.entity.Message;
-import com.samoy.chuanbillserver.expection.BusinessException;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IMessageService;
 import com.samoy.chuanbillserver.vo.MessageVO;

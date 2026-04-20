@@ -16,7 +16,7 @@ import com.samoy.chuanbillserver.entity.Family;
 import com.samoy.chuanbillserver.entity.FamilyJoinApply;
 import com.samoy.chuanbillserver.entity.FamilyMember;
 import com.samoy.chuanbillserver.entity.User;
-import com.samoy.chuanbillserver.expection.BusinessException;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IFamilyJoinApplyService;
 import com.samoy.chuanbillserver.service.IFamilyMemberService;

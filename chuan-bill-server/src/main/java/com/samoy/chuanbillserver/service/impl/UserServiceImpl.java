@@ -12,7 +12,7 @@ import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.dao.UserMapper;
 import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.entity.User;
-import com.samoy.chuanbillserver.expection.BusinessException;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;

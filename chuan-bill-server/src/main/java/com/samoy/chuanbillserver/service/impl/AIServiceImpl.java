@@ -13,7 +13,7 @@ import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.entity.AiSuggestion;
 import com.samoy.chuanbillserver.entity.User;
-import com.samoy.chuanbillserver.expection.BusinessException;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IAIService;
 import com.samoy.chuanbillserver.service.IAiSuggestionService;

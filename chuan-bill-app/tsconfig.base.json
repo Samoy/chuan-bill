@@ -2,7 +2,6 @@
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
     "resolveJsonModule": true,
     "strict": true,
     "skipLibCheck": true

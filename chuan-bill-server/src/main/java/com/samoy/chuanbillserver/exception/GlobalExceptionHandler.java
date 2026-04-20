@@ -1,4 +1,4 @@
-package com.samoy.chuanbillserver.expection;
+package com.samoy.chuanbillserver.exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import com.samoy.chuanbillserver.result.Result;

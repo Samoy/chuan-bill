@@ -1,7 +1,7 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import com.samoy.chuanbillserver.constant.SystemConstants;
-import com.samoy.chuanbillserver.expection.BusinessException;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;
 import jakarta.annotation.Resource;

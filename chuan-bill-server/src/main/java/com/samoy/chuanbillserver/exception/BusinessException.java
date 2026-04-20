@@ -1,4 +1,4 @@
-package com.samoy.chuanbillserver.expection;
+package com.samoy.chuanbillserver.exception;
 
 import com.samoy.chuanbillserver.result.ResultEnum;
 import lombok.Getter;
