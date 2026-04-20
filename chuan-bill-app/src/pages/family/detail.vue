@@ -153,6 +153,46 @@ async function handleRefreshInviteCode() {
         </text>
       </view>
 
+      <!-- 功能入口 -->
+      <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
+        <view class="grid grid-cols-2 gap-4">
+          <!-- 家庭账单 -->
+          <view
+            class="flex items-center gap-3"
+            @click="router.push(`/pages/family/bills?familyId=${familyId}`)"
+          >
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:receipt h-5 w-5 text-primary" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                家庭账单
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                查看共享账单
+              </text>
+            </view>
+          </view>
+          <!-- 家庭统计 -->
+          <view
+            class="flex items-center gap-3"
+            @click="toast.info('功能开发中')"
+          >
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
+              <view class="i-lucide:bar-chart-3 h-5 w-5 text-green-600" />
+            </view>
+            <view>
+              <text class="block text-sm font-500">
+                家庭统计
+              </text>
+              <text class="mt-0.5 block text-xs text-gray-500">
+                收支统计分析
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+
       <!-- 邀请码区域（仅户主可见） -->
       <view v-if="isOwner" class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view class="flex items-center justify-between">

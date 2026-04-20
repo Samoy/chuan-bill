@@ -1,14 +1,20 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.CreateFamilyDTO;
 import com.samoy.chuanbillserver.dto.HandleJoinApplyDTO;
 import com.samoy.chuanbillserver.dto.JoinFamilyDTO;
 import com.samoy.chuanbillserver.dto.RemoveMemberDTO;
 import com.samoy.chuanbillserver.dto.TransferOwnerDTO;
 import com.samoy.chuanbillserver.dto.UpdateFamilyDTO;
+import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.Result;
+import com.samoy.chuanbillserver.result.ResultEnum;
+import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.IFamilyService;
+import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.FamilyJoinApplyVO;
 import com.samoy.chuanbillserver.vo.FamilyMemberVO;
 import com.samoy.chuanbillserver.vo.FamilyVO;
@@ -33,6 +39,9 @@ public class FamilyController {
 
     @Resource
     private IFamilyService familyService;
+
+    @Resource
+    private IBillService billService;
 
     @PostMapping("/create")
     @Operation(summary = "创建家庭", description = "创建一个新的家庭")
@@ -129,5 +138,20 @@ public class FamilyController {
             @Parameter(description = "家庭ID", required = true) @RequestParam String familyId) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(familyService.refreshInviteCode(userId, familyId));
+    }
+
+    @GetMapping("/bills")
+    @Operation(summary = "获取家庭账单列表", description = "分页获取家庭共享账单列表，仅家庭成员可查看")
+    public Result<IPage<BillVO>> getFamilyBills(
+            @Parameter(description = "家庭ID", required = true) @RequestParam String familyId,
+            @Validated @ModelAttribute BillListDTO billListDTO) {
+        String userId = StpUtil.getLoginIdAsString();
+        // 检查用户是否是家庭成员
+        if (!familyService.isMember(userId, familyId)) {
+            throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+        }
+        // 设置家庭ID并查询
+        billListDTO.setFamilyId(familyId);
+        return Result.success(billService.getBillListByPage(userId, billListDTO));
     }
 }

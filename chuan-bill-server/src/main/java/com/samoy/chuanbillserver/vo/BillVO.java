@@ -43,4 +43,13 @@ public class BillVO {
 
     @Schema(description = "家庭名称", example = "小川的家")
     private String familyName;
+
+    @Schema(description = "记账人用户ID", example = "user123")
+    private String userId;
+
+    @Schema(description = "记账人昵称", example = "小川")
+    private String userNickname;
+
+    @Schema(description = "记账人头像", example = "https://example.com/avatar.jpg")
+    private String userAvatar;
 }

@@ -1,4 +1,4 @@
-import type { FamilyJoinApplyVO, FamilyMemberVO, FamilyVO } from '@/api/globals'
+import type { BillListDTO, BillVO, FamilyJoinApplyVO, FamilyMemberVO, FamilyVO, IPageBillVO } from '@/api/globals'
 
 // 家庭相关类型定义（alova-gen 生成后会由 globals.d.ts 提供）
 export const useFamilyStore = defineStore('family', () => {
@@ -16,6 +16,12 @@ export const useFamilyStore = defineStore('family', () => {
   const familyListLoading = ref(false)
   const memberListLoading = ref(false)
   const applyListLoading = ref(false)
+
+  // 家庭账单相关
+  const familyBills = ref<BillVO[]>([])
+  const familyBillsLoading = ref(false)
+  const familyBillsPage = ref(1)
+  const familyBillsFinished = ref(false)
 
   // 当前选中的家庭ID
   const currentFamilyId = computed(() => currentFamily.value?.id || '')
@@ -228,6 +234,37 @@ export const useFamilyStore = defineStore('family', () => {
   }
 
   /**
+   * 获取家庭账单列表
+   */
+  async function fetchFamilyBills(
+    familyId: string,
+    page: number = 1,
+    size: number = 10,
+    params: Partial<BillListDTO> = {},
+  ): Promise<IPageBillVO | null> {
+    if (!user.isLoggedIn)
+      return null
+    familyBillsLoading.value = true
+    try {
+      const res = await Apis.family.getFamilyBills({
+        params: {
+          familyId,
+          page,
+          size,
+          ...params,
+        },
+      })
+      if (res.success && res.data) {
+        return res.data
+      }
+      return null
+    }
+    finally {
+      familyBillsLoading.value = false
+    }
+  }
+
+  /**
    * 切换当前家庭
    */
   function switchFamily(familyId: string) {
@@ -245,9 +282,13 @@ export const useFamilyStore = defineStore('family', () => {
     currentFamily.value = null
     memberList.value = []
     pendingApplies.value = []
+    familyBills.value = []
     familyListLoading.value = false
     memberListLoading.value = false
     applyListLoading.value = false
+    familyBillsLoading.value = false
+    familyBillsPage.value = 1
+    familyBillsFinished.value = false
   }
 
   return {
@@ -255,9 +296,13 @@ export const useFamilyStore = defineStore('family', () => {
     currentFamily,
     memberList,
     pendingApplies,
+    familyBills,
     familyListLoading,
     memberListLoading,
     applyListLoading,
+    familyBillsLoading,
+    familyBillsPage,
+    familyBillsFinished,
     currentFamilyId,
     hasFamily,
     fetchFamilyList,
@@ -273,6 +318,7 @@ export const useFamilyStore = defineStore('family', () => {
     fetchPendingApplies,
     handleJoinApply,
     refreshInviteCode,
+    fetchFamilyBills,
     switchFamily,
     reset,
   }

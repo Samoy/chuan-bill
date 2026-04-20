@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn spotless:check -q)",
+      "Bash(mvn:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm lint:fix)",
+      "Bash(pnpm type-check:*)"
+    ]
+  }
+}

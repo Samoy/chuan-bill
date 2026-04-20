@@ -65,7 +65,23 @@ export default <Config>{
         }
         // You can transform the API descriptor here if needed
         // For example, add custom headers, modify parameters, etc.
-
+        const parameters = apiDescriptor.parameters
+        const dtoParam = parameters?.find(item => item.name.endsWith('DTO'))
+        if (dtoParam) {
+          // eslint-disable-next-line ts/ban-ts-comment
+          // @ts-ignore
+          const properties = dtoParam.schema.properties
+          const dtoParamters = Object.keys(properties).map((key) => {
+            return {
+              name: key,
+              in: 'query',
+              schema: {
+                ...properties[key],
+              },
+            }
+          })
+          apiDescriptor.parameters = [...(apiDescriptor.parameters || []), ...dtoParamters]
+        }
         return apiDescriptor
       },
     },

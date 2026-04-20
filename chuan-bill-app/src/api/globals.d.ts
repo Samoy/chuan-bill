@@ -832,8 +832,8 @@ export interface MessageVO {
 }
 export interface IPageMessageVO {
   size?: number;
-  total?: number;
   records?: MessageVO[];
+  total?: number;
   current?: number;
   /**
    * @deprecated
@@ -970,11 +970,23 @@ export interface BillVO {
    * 家庭名称
    */
   familyName?: string;
+  /**
+   * 记账人用户ID
+   */
+  userId?: string;
+  /**
+   * 记账人昵称
+   */
+  userNickname?: string;
+  /**
+   * 记账人头像
+   */
+  userAvatar?: string;
 }
 export interface IPageBillVO {
   size?: number;
-  total?: number;
   records?: BillVO[];
+  total?: number;
   current?: number;
   /**
    * @deprecated
@@ -1356,7 +1368,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1378,6 +1389,7 @@ declare global {
        *       // 创建时间
        *       createTime?: string
        *     }>
+       *     total?: number
        *     current?: number
        *     // [deprecated]
        *     pages?: number
@@ -2167,6 +2179,156 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultFamilyVO, 'family.getFamilyDetail', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取家庭账单列表
+       *
+       * **path:** /family/bills
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   familyId: string
+       *   // 账单列表查询参数
+       *   billListDTO: {
+       *     // 开始日期
+       *     startDate?: string
+       *     // 结束日期
+       *     endDate?: string
+       *     // 分类 ID
+       *     categoryId?: string
+       *     // 账单类型：income-收入，expense-支出，空字符串：全部
+       *     type?: string
+       *     // 支付方式 ID
+       *     paymentMethodId?: string
+       *     // 最小金额
+       *     minAmount?: number
+       *     // 最大金额
+       *     maxAmount?: number
+       *     // 关键字模糊搜索，支持名称和备注
+       *     keyword?: string
+       *     // 页码
+       *     page: number
+       *     // 每页数量
+       *     size: number
+       *     // 家庭 ID，传入则查询家庭账单，不传则查询个人账单
+       *     familyId?: string
+       *   }
+       *   startDate?: string
+       *   endDate?: string
+       *   categoryId?: string
+       *   type?: string
+       *   paymentMethodId?: string
+       *   minAmount?: number
+       *   maxAmount?: number
+       *   keyword?: string
+       *   page?: number
+       *   size?: number
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: {
+       *     size?: number
+       *     // [items] start
+       *     // 账单信息
+       *     // [items] end
+       *     records?: Array<{
+       *       // 账单 ID
+       *       id?: string
+       *       // 账单名称
+       *       name?: string
+       *       // 分类信息
+       *       category?: {
+       *         // 分类 ID
+       *         id?: string
+       *         // 分类名称
+       *         name?: string
+       *         // 图标 URL
+       *         icon?: string
+       *         // 分类类型：income-收入，expense-支出
+       *         type?: string
+       *         // 排序
+       *         sortOrder?: number
+       *         // 是否默认
+       *         isDefault?: boolean
+       *         // 用户 ID
+       *         userId?: string
+       *       }
+       *       // 支付方式信息
+       *       paymentMethod?: {
+       *         // 支付方式 ID
+       *         id?: string
+       *         // 支付方式名称
+       *         name?: string
+       *         // 图标 URL
+       *         icon?: string
+       *         // 排序
+       *         sortOrder?: number
+       *         // 是否默认
+       *         isDefault?: boolean
+       *         // 用户 ID
+       *         userId?: string
+       *       }
+       *       // 账单类型：income-收入，expense-支出
+       *       type?: string
+       *       // 账单金额
+       *       amount?: number
+       *       // 账单时间
+       *       time?: string
+       *       // 账单备注
+       *       remark?: string
+       *       // 账单来源：manual-手动，ocr-图片识别，voice-语音
+       *       source?: string
+       *       // 家庭 ID
+       *       familyId?: string
+       *       // 家庭名称
+       *       familyName?: string
+       *       // 记账人用户ID
+       *       userId?: string
+       *       // 记账人昵称
+       *       userNickname?: string
+       *       // 记账人头像
+       *       userAvatar?: string
+       *     }>
+       *     total?: number
+       *     current?: number
+       *     // [deprecated]
+       *     pages?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getFamilyBills<
+        Config extends Alova2MethodConfig<ResultIPageBillVO> & {
+          params: {
+            familyId: string;
+            startDate?: string;
+            endDate?: string;
+            categoryId?: string;
+            type?: string;
+            paymentMethodId?: string;
+            minAmount?: number;
+            maxAmount?: number;
+            keyword?: string;
+            page?: number;
+            size?: number;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultIPageBillVO, 'family.getFamilyBills', Config>;
     };
     bill: {
       /**
@@ -2452,6 +2614,17 @@ declare global {
        *     // 家庭 ID，传入则查询家庭账单，不传则查询个人账单
        *     familyId?: string
        *   }
+       *   startDate?: string
+       *   endDate?: string
+       *   categoryId?: string
+       *   type?: string
+       *   paymentMethodId?: string
+       *   minAmount?: number
+       *   maxAmount?: number
+       *   keyword?: string
+       *   page?: number
+       *   size?: number
+       *   familyId?: string
        * }
        * ```
        *
@@ -2464,7 +2637,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2519,7 +2691,14 @@ declare global {
        *       familyId?: string
        *       // 家庭名称
        *       familyName?: string
+       *       // 记账人用户ID
+       *       userId?: string
+       *       // 记账人昵称
+       *       userNickname?: string
+       *       // 记账人头像
+       *       userAvatar?: string
        *     }>
+       *     total?: number
        *     current?: number
        *     // [deprecated]
        *     pages?: number
@@ -2555,6 +2734,8 @@ declare global {
        *     // 家庭ID，用于查询家庭账单统计信息
        *     familyId?: string
        *   }
+       *   month?: string
+       *   familyId?: string
        * }
        * ```
        *
@@ -2664,6 +2845,12 @@ declare global {
        *     familyId?: string
        *     // 家庭名称
        *     familyName?: string
+       *     // 记账人用户ID
+       *     userId?: string
+       *     // 记账人昵称
+       *     userNickname?: string
+       *     // 记账人头像
+       *     userAvatar?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -3195,6 +3382,12 @@ declare global {
        *     familyId?: string
        *     // 家庭名称
        *     familyName?: string
+       *     // 记账人用户ID
+       *     userId?: string
+       *     // 记账人昵称
+       *     userNickname?: string
+       *     // 记账人头像
+       *     userAvatar?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -3286,6 +3479,12 @@ declare global {
        *     familyId?: string
        *     // 家庭名称
        *     familyName?: string
+       *     // 记账人用户ID
+       *     userId?: string
+       *     // 记账人昵称
+       *     userNickname?: string
+       *     // 记账人头像
+       *     userAvatar?: string
        *   }
        *   timestamp?: number
        *   success?: boolean

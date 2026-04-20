@@ -223,6 +223,14 @@ async function handleJoin() {
                 {{ family.memberCount }} 位成员
               </text>
             </view>
+            <!-- 编辑按钮（仅户主可见） -->
+            <view
+              v-if="family.isOwner"
+              class="mr-2 h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-200 dark:bg-gray-700 dark:active:bg-gray-600"
+              @click.stop="router.push(`/pages/family/edit?familyId=${family.id}`)"
+            >
+              <view class="i-lucide:settings h-4 w-4 text-gray-500" />
+            </view>
             <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
           </view>
         </view>

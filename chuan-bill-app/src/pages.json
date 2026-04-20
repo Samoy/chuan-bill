@@ -91,7 +91,27 @@
       "style": {
         "navigationBarTitleText": "统计"
       }
+    },
+    // #ifdef H5
+    {
+      "path": "pages/family/bills",
+      "type": "page",
+      "name": "family-bills",
+      "style": {
+        "navigationBarTitleText": "家庭账单"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/family/edit",
+      "type": "page",
+      "name": "family-edit",
+      "style": {
+        "navigationBarTitleText": "编辑家庭"
+      }
     }
+    // #endif
   ],
   "subPackages": [],
   "tabBar": {

@@ -17,12 +17,10 @@ import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.entity.Category;
 import com.samoy.chuanbillserver.entity.Family;
 import com.samoy.chuanbillserver.entity.PaymentMethod;
+import com.samoy.chuanbillserver.entity.User;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
-import com.samoy.chuanbillserver.service.IBillService;
-import com.samoy.chuanbillserver.service.ICategoryService;
-import com.samoy.chuanbillserver.service.IFamilyService;
-import com.samoy.chuanbillserver.service.IPaymentMethodService;
+import com.samoy.chuanbillserver.service.*;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
@@ -57,6 +55,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     @Resource
     private IFamilyService familyService;
+
+    @Resource
+    private IUserService userService;
 
     @Override
     public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
@@ -292,7 +293,8 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             Bill bill,
             Map<String, Category> categoryMap,
             Map<String, PaymentMethod> paymentMethodMap,
-            Map<String, Family> familyMap) {
+            Map<String, Family> familyMap,
+            Map<String, User> userMap) {
         BillVO billVO = new BillVO();
         billVO.setId(bill.getId());
         billVO.setFamilyId(bill.getFamilyId());
@@ -318,6 +320,14 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             billVO.setFamilyName(family.getName());
         }
 
+        // 填充记账人信息
+        User user = userMap.get(bill.getUserId());
+        if (user != null) {
+            billVO.setUserId(user.getId());
+            billVO.setUserNickname(user.getNickname());
+            billVO.setUserAvatar(user.getAvatar());
+        }
+
         return billVO;
     }
 
@@ -325,8 +335,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         Map<String, Category> categoryMap = batchQueryCategories(billList);
         Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billList);
         Map<String, Family> familyMap = batchQueryFamilies(billList);
+        Map<String, User> userMap = batchQueryUsers(billList);
         return billList.stream()
-                .map(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap))
+                .map(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap, userMap))
                 .toList();
     }
 
@@ -334,7 +345,8 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         Map<String, Category> categoryMap = batchQueryCategories(billPage.getRecords());
         Map<String, PaymentMethod> paymentMethodMap = batchQueryPaymentMethods(billPage.getRecords());
         Map<String, Family> familyMap = batchQueryFamilies(billPage.getRecords());
-        return billPage.convert(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap));
+        Map<String, User> userMap = batchQueryUsers(billPage.getRecords());
+        return billPage.convert(bill -> getBillVO(bill, categoryMap, paymentMethodMap, familyMap, userMap));
     }
 
     private Map<String, Category> batchQueryCategories(List<Bill> billList) {
@@ -377,6 +389,20 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             List<Family> families = familyService.listByIds(familyIds);
             return families.stream()
                     .collect(Collectors.toMap(Family::getId, Function.identity(), (existing, replacement) -> existing));
+        }
+        return Collections.emptyMap();
+    }
+
+    private Map<String, User> batchQueryUsers(List<Bill> billList) {
+        List<String> userIds = billList.stream()
+                .map(Bill::getUserId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (CollUtil.isNotEmpty(userIds)) {
+            List<User> users = userService.listByIds(userIds);
+            return users.stream()
+                    .collect(Collectors.toMap(User::getId, Function.identity(), (existing, replacement) -> existing));
         }
         return Collections.emptyMap();
     }

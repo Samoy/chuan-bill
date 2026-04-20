@@ -53,6 +53,7 @@ export default {
   'family.getMyFamilies': ['GET', '/family/my-families'],
   'family.getMembers': ['GET', '/family/members'],
   'family.getFamilyDetail': ['GET', '/family/detail'],
+  'family.getFamilyBills': ['GET', '/family/bills'],
   'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
   'bill.getPageBillList': ['GET', '/bill/page-list'],
   'bill.getMonthlyStats': ['GET', '/bill/monthly-stats'],
