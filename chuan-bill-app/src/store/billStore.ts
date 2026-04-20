@@ -76,7 +76,7 @@ export const useBillStore = defineStore('bill', () => {
    */
   function addLocalBill(bill: AddBillDTO) {
     const paymentMethod = paymentMethodList.value.find(item => item.id === bill.paymentMethodId)
-    const category = categoryListMap.value[bill.type].find(item => item.id === bill.categoryId)
+    const category = categoryListMap.value[bill.type as keyof typeof categoryListMap.value].find(item => item.id === bill.categoryId)
     localBillList.value.push({
       ...bill,
       amount: Number(bill.amount || 0).toFixed(2),
@@ -95,7 +95,7 @@ export const useBillStore = defineStore('bill', () => {
     const index = localBillList.value.findIndex(item => item.id === bill.id)
     if (index !== -1) {
       const paymentMethod = paymentMethodList.value.find(item => item.id === bill.paymentMethodId)
-      const category = categoryListMap.value[bill.type].find(item => item.id === bill.categoryId)
+      const category = categoryListMap.value[bill.type as keyof typeof categoryListMap.value].find(item => item.id === bill.categoryId)
       const newBill = {
         ...localBillList.value[index],
         ...bill,
@@ -137,12 +137,11 @@ export const useBillStore = defineStore('bill', () => {
     try {
       // 映射 LocalBill 为 AddBillDTO 格式
       const bills = localBillList.value.map((bill) => {
-        // name：优先用 remark，否则用 categoryName，兜底 "快速记账"
         const name = bill.name!
 
         return {
           name,
-          categoryId: bill.category?.id,
+          categoryId: bill.category?.id || '',
           type: bill.type!,
           amount: bill.amount!,
           time: bill.time!,

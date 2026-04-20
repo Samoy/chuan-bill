@@ -147,8 +147,7 @@ export interface BillListDTO {
   /**
    * 账单类型：income-收入，expense-支出，空字符串：全部
    */
-  type?: 'income' | 'expense' | '';
-
+  type?: string;
   /**
    * 支付方式 ID
    */
@@ -156,11 +155,11 @@ export interface BillListDTO {
   /**
    * 最小金额
    */
-  minAmount?: number;
+  minAmount?: string;
   /**
    * 最大金额
    */
-  maxAmount?: number;
+  maxAmount?: string;
   /**
    * 关键字模糊搜索，支持名称和备注
    */
@@ -316,7 +315,7 @@ export interface UpdateBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: 'income' | 'expense';
+  type?: string;
   /**
    * 账单时间
    */
@@ -342,7 +341,7 @@ export interface AddBillDTO {
   /**
    * 分类 ID
    */
-  categoryId?: string;
+  categoryId: string;
   /**
    * 支付方式 ID
    */
@@ -350,7 +349,7 @@ export interface AddBillDTO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type: 'income' | 'expense';
+  type: string;
   /**
    * 账单金额
    */
@@ -370,7 +369,7 @@ export interface AddBillDTO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: 'manual' | 'ocr' | 'voice';
+  source?: string;
 }
 export interface BatchCreateBillDTO {
   /**
@@ -831,14 +830,14 @@ export interface MessageVO {
   createTime?: string;
 }
 export interface IPageMessageVO {
-  size?: number;
   records?: MessageVO[];
   total?: number;
-  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
+  current?: number;
+  size?: number;
 }
 export interface ResultIPageMessageVO {
   code?: number;
@@ -945,7 +944,7 @@ export interface BillVO {
   /**
    * 账单类型：income-收入，expense-支出
    */
-  type?: 'income' | 'expense';
+  type?: string;
   /**
    * 账单金额
    */
@@ -961,7 +960,7 @@ export interface BillVO {
   /**
    * 账单来源：manual-手动，ocr-图片识别，voice-语音
    */
-  source?: 'manual' | 'ocr' | 'voice';
+  source?: string;
   /**
    * 家庭 ID
    */
@@ -984,14 +983,14 @@ export interface BillVO {
   userAvatar?: string;
 }
 export interface IPageBillVO {
-  size?: number;
   records?: BillVO[];
   total?: number;
-  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
+  current?: number;
+  size?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -1346,7 +1345,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 消息列表查询参数
-       *   dto: {
+       *   dto?: {
        *     // 消息类型：system-系统消息，family-家庭消息，bill-账单消息，budget-预算消息
        *     type?: string
        *     // 消息状态：0-未读，1-已读
@@ -1356,6 +1355,10 @@ declare global {
        *     // 每页数量
        *     size: number
        *   }
+       *   type?: string
+       *   status?: number
+       *   page?: number
+       *   size?: number
        * }
        * ```
        *
@@ -1367,7 +1370,6 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
-       *     size?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1390,9 +1392,10 @@ declare global {
        *       createTime?: string
        *     }>
        *     total?: number
-       *     current?: number
        *     // [deprecated]
        *     pages?: number
+       *     current?: number
+       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -1401,7 +1404,16 @@ declare global {
        */
       getMessageList<
         Config extends Alova2MethodConfig<ResultIPageMessageVO> & {
-          params: MessageListDTO;
+          params: {
+            /**
+             * 消息列表查询参数
+             */
+            dto?: MessageListDTO;
+            type?: string;
+            status?: number;
+            page?: number;
+            size?: number;
+          };
         }
       >(
         config: Config
@@ -2193,7 +2205,7 @@ declare global {
        * type QueryParameters = {
        *   familyId: string
        *   // 账单列表查询参数
-       *   billListDTO: {
+       *   billListDTO?: {
        *     // 开始日期
        *     startDate?: string
        *     // 结束日期
@@ -2238,7 +2250,6 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
-       *     size?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2301,9 +2312,10 @@ declare global {
        *       userAvatar?: string
        *     }>
        *     total?: number
-       *     current?: number
        *     // [deprecated]
        *     pages?: number
+       *     current?: number
+       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2314,6 +2326,10 @@ declare global {
         Config extends Alova2MethodConfig<ResultIPageBillVO> & {
           params: {
             familyId: string;
+            /**
+             * 账单列表查询参数
+             */
+            billListDTO?: BillListDTO;
             startDate?: string;
             endDate?: string;
             categoryId?: string;
@@ -2590,7 +2606,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 账单列表查询参数
-       *   billListDTO: {
+       *   billListDTO?: {
        *     // 开始日期
        *     startDate?: string
        *     // 结束日期
@@ -2636,7 +2652,6 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
-       *     size?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2699,9 +2714,10 @@ declare global {
        *       userAvatar?: string
        *     }>
        *     total?: number
-       *     current?: number
        *     // [deprecated]
        *     pages?: number
+       *     current?: number
+       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2710,7 +2726,23 @@ declare global {
        */
       getPageBillList<
         Config extends Alova2MethodConfig<ResultIPageBillVO> & {
-          params: BillListDTO;
+          params: {
+            /**
+             * 账单列表查询参数
+             */
+            billListDTO?: BillListDTO;
+            startDate?: string;
+            endDate?: string;
+            categoryId?: string;
+            type?: string;
+            paymentMethodId?: string;
+            minAmount?: string;
+            maxAmount?: string;
+            keyword?: string;
+            page?: number;
+            size?: number;
+            familyId?: string;
+          };
         }
       >(
         config: Config
@@ -2728,7 +2760,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 账单月度统计参数
-       *   billMonthlyStatsDTO: {
+       *   billMonthlyStatsDTO?: {
        *     // 月份，格式为YYYY-MM
        *     month: string
        *     // 家庭ID，用于查询家庭账单统计信息
@@ -2764,7 +2796,14 @@ declare global {
        */
       getMonthlyStats<
         Config extends Alova2MethodConfig<ResultBillMonthlyStatsVO> & {
-          params: BillMonthlyStatsDTO;
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            billMonthlyStatsDTO?: BillMonthlyStatsDTO;
+            month?: string;
+            familyId?: string;
+          };
         }
       >(
         config: Config
@@ -3151,12 +3190,14 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 账单月度统计参数
-       *   dto: {
+       *   dto?: {
        *     // 月份，格式为YYYY-MM
        *     month: string
        *     // 家庭ID，用于查询家庭账单统计信息
        *     familyId?: string
        *   }
+       *   month?: string
+       *   familyId?: string
        * }
        * ```
        *
@@ -3189,7 +3230,9 @@ declare global {
             /**
              * 账单月度统计参数
              */
-            dto: BillMonthlyStatsDTO;
+            dto?: BillMonthlyStatsDTO;
+            month?: string;
+            familyId?: string;
           };
         }
       >(
@@ -3208,12 +3251,14 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 账单月度统计参数
-       *   dto: {
+       *   dto?: {
        *     // 月份，格式为YYYY-MM
        *     month: string
        *     // 家庭ID，用于查询家庭账单统计信息
        *     familyId?: string
        *   }
+       *   month?: string
+       *   familyId?: string
        * }
        * ```
        *
@@ -3242,7 +3287,14 @@ declare global {
        */
       getDailyTrend<
         Config extends Alova2MethodConfig<ResultListDailyTrendVO> & {
-          params: BillMonthlyStatsDTO;
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            dto?: BillMonthlyStatsDTO;
+            month?: string;
+            familyId?: string;
+          };
         }
       >(
         config: Config
@@ -3260,7 +3312,7 @@ declare global {
        * ```ts
        * type QueryParameters = {
        *   // 分类统计参数
-       *   dto: {
+       *   dto?: {
        *     // 月份，格式为YYYY-MM
        *     month: string
        *     // 账单类型：income-收入，expense-支出
@@ -3268,6 +3320,9 @@ declare global {
        *     // 家庭ID，用于查询家庭账单统计信息
        *     familyId?: string
        *   }
+       *   month?: string
+       *   type?: string
+       *   familyId?: string
        * }
        * ```
        *
@@ -3300,7 +3355,15 @@ declare global {
        */
       getCategoryStats<
         Config extends Alova2MethodConfig<ResultListCategoryStatisticsVO> & {
-          params: StatisticsCategoryDTO;
+          params: {
+            /**
+             * 分类统计参数
+             */
+            dto?: StatisticsCategoryDTO;
+            month?: string;
+            type?: string;
+            familyId?: string;
+          };
         }
       >(
         config: Config

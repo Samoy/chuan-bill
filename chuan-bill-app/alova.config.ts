@@ -1,4 +1,6 @@
+/* eslint-disable ts/ban-ts-comment */
 /* eslint-disable no-irregular-whitespace */
+// @ts-nocheck
 
 import type { Config } from '@alova/wormhole'
 
@@ -63,24 +65,27 @@ export default <Config>{
         if (apiDescriptor.deprecated) {
           return undefined // Skip this API
         }
-        // You can transform the API descriptor here if needed
-        // For example, add custom headers, modify parameters, etc.
         const parameters = apiDescriptor.parameters
-        const dtoParam = parameters?.find(item => item.name.endsWith('DTO'))
+
+        // 修改ModelAttribute声明中的DTO 参数为 query 参数
+        const dtoParam = parameters?.find(item => item.name.match(/dto$/i))
+        const dtoParamIndex = parameters?.findIndex(item => item.name.endsWith('DTO'))
+        if (dtoParam && dtoParamIndex !== undefined) {
+          dtoParam.required = false
+        }
         if (dtoParam) {
-          // eslint-disable-next-line ts/ban-ts-comment
           // @ts-ignore
           const properties = dtoParam.schema.properties
           const dtoParamters = Object.keys(properties).map((key) => {
+            const schema = properties[key]
             return {
               name: key,
               in: 'query',
-              schema: {
-                ...properties[key],
-              },
+              schema,
             }
           })
-          apiDescriptor.parameters = [...(apiDescriptor.parameters || []), ...dtoParamters]
+          const newParameters = [...(apiDescriptor.parameters || []), ...dtoParamters]
+          apiDescriptor.parameters = newParameters
         }
         return apiDescriptor
       },
