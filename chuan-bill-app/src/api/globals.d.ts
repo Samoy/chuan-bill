@@ -131,6 +131,16 @@ export interface MessageListDTO {
    */
   size: number;
 }
+export interface FamilyMemberStatsDTO {
+  /**
+   * 月份，格式为YYYY-MM
+   */
+  month: string;
+  /**
+   * 家庭ID
+   */
+  familyId: string;
+}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -830,19 +840,84 @@ export interface MessageVO {
   createTime?: string;
 }
 export interface IPageMessageVO {
+  size?: number;
   records?: MessageVO[];
   total?: number;
+  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  current?: number;
-  size?: number;
 }
 export interface ResultIPageMessageVO {
   code?: number;
   message?: string;
   data?: IPageMessageVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface FamilyMemberStatsVO {
+  /**
+   * 用户ID
+   */
+  userId?: string;
+  /**
+   * 用户昵称
+   */
+  nickname?: string;
+  /**
+   * 用户头像
+   */
+  avatar?: string;
+  /**
+   * 支出金额
+   */
+  expense?: string;
+  /**
+   * 收入金额
+   */
+  income?: string;
+  /**
+   * 支出占比(%)
+   */
+  expensePercentage?: number;
+  /**
+   * 收入占比(%)
+   */
+  incomePercentage?: number;
+  /**
+   * 是否是户主
+   */
+  isOwner?: boolean;
+}
+export interface ResultListFamilyMemberStatsVO {
+  code?: number;
+  message?: string;
+  data?: FamilyMemberStatsVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface FamilyAiSuggestionVO {
+  /**
+   * 建议内容
+   */
+  content?: string;
+  /**
+   * 是否来自缓存
+   */
+  cached?: boolean;
+  /**
+   * 今日剩余次数
+   */
+  remainingCount?: number;
+}
+export interface ResultFamilyAiSuggestionVO {
+  code?: number;
+  message?: string;
+  /**
+   * 家庭AI建议
+   */
+  data?: FamilyAiSuggestionVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -983,14 +1058,14 @@ export interface BillVO {
   userAvatar?: string;
 }
 export interface IPageBillVO {
+  size?: number;
   records?: BillVO[];
   total?: number;
+  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  current?: number;
-  size?: number;
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -1370,6 +1445,7 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
+       *     size?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1392,10 +1468,9 @@ declare global {
        *       createTime?: string
        *     }>
        *     total?: number
+       *     current?: number
        *     // [deprecated]
        *     pages?: number
-       *     current?: number
-       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2250,6 +2325,7 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
+       *     size?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2312,10 +2388,9 @@ declare global {
        *       userAvatar?: string
        *     }>
        *     total?: number
+       *     current?: number
        *     // [deprecated]
        *     pages?: number
-       *     current?: number
-       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2335,8 +2410,8 @@ declare global {
             categoryId?: string;
             type?: string;
             paymentMethodId?: string;
-            minAmount?: number;
-            maxAmount?: number;
+            minAmount?: string;
+            maxAmount?: string;
             keyword?: string;
             page?: number;
             size?: number;
@@ -2652,6 +2727,7 @@ declare global {
        *   code?: number
        *   message?: string
        *   data?: {
+       *     size?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2714,10 +2790,9 @@ declare global {
        *       userAvatar?: string
        *     }>
        *     total?: number
+       *     current?: number
        *     // [deprecated]
        *     pages?: number
-       *     current?: number
-       *     size?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2783,9 +2858,9 @@ declare global {
        *     // 月份，格式为YYYY-MM
        *     month?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *     // 结余金额
        *     balance?: number
        *   }
@@ -3213,9 +3288,9 @@ declare global {
        *     // 月份，格式为YYYY-MM
        *     month?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *     // 结余金额
        *     balance?: number
        *   }
@@ -3276,9 +3351,9 @@ declare global {
        *     // 日期，格式为YYYY-MM-DD
        *     date?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *   }>
        *   timestamp?: number
        *   success?: boolean
@@ -3368,6 +3443,130 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultListCategoryStatisticsVO, 'statistics.getCategoryStats', Config>;
+    };
+    familyStatistics: {
+      /**
+       * ---
+       *
+       * [GET] 获取家庭成员收支统计
+       *
+       * **path:** /family/statistics/members
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭成员统计请求
+       *   dto?: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID
+       *     familyId: string
+       *   }
+       *   month?: string
+       *   familyId?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 家庭成员统计数据
+       *   // [items] end
+       *   data?: Array<{
+       *     // 用户ID
+       *     userId?: string
+       *     // 用户昵称
+       *     nickname?: string
+       *     // 用户头像
+       *     avatar?: string
+       *     // 支出金额
+       *     expense?: string
+       *     // 收入金额
+       *     income?: string
+       *     // 支出占比(%)
+       *     expensePercentage?: number
+       *     // 收入占比(%)
+       *     incomePercentage?: number
+       *     // 是否是户主
+       *     isOwner?: boolean
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMemberStats<
+        Config extends Alova2MethodConfig<ResultListFamilyMemberStatsVO> & {
+          params: {
+            month?: string;
+            familyId?: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListFamilyMemberStatsVO, 'familyStatistics.getMemberStats', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取家庭AI建议
+       *
+       * **path:** /family/statistics/ai-suggestion
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 家庭成员统计请求
+       *   dto?: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID
+       *     familyId: string
+       *   }
+       *   month?: string
+       *   familyId?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 家庭AI建议
+       *   data?: {
+       *     // 建议内容
+       *     content?: string
+       *     // 是否来自缓存
+       *     cached?: boolean
+       *     // 今日剩余次数
+       *     remainingCount?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getAiSuggestion<
+        Config extends Alova2MethodConfig<ResultFamilyAiSuggestionVO> & {
+          params: {
+            month?: string;
+            familyId?: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultFamilyAiSuggestionVO, 'familyStatistics.getAiSuggestion', Config>;
     };
     ai: {
       /**

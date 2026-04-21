@@ -62,6 +62,7 @@ public enum ResultEnum {
     FAMILY_APPLY_ALREADY_HANDLED(4009, "该申请已被处理"),
     FAMILY_TRANSFER_TARGET_NOT_MEMBER(4010, "目标用户不是该家庭成员"),
     FAMILY_CANNOT_REMOVE_OWNER(4011, "不能移除户主"),
+    FAMILY_CREATE_LIMIT_REACHED(4012, "每个家庭最多只能创建5个家庭"),
 
     // 消息相关错误码 4050+
     MESSAGE_NOT_FOUND(4051, "消息不存在"),

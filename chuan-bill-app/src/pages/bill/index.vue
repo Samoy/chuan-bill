@@ -62,10 +62,10 @@ async function getBillList() {
           filtered = filtered && item.type === type
         }
         if (minAmount) {
-          filtered = filtered && Number(item.amount) >= minAmount
+          filtered = filtered && Number(item.amount) >= Number(minAmount)
         }
         if (maxAmount) {
-          filtered = filtered && Number(item.amount) >= maxAmount
+          filtered = filtered && Number(item.amount) >= Number(maxAmount)
         }
         if (categoryId) {
           filtered = filtered && item.category!.id === categoryId

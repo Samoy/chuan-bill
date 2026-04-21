@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { MessageVO } from '@/api/globals'
+
 definePage({
   name: 'message-list',
   style: {
@@ -17,7 +19,7 @@ async function loadMessages(page = 1) {
   try {
     const result = await messageStore.fetchMessageList({
       page,
-      pageSize,
+      size: pageSize,
     })
     if (result) {
       currentPage.value = page
@@ -61,9 +63,9 @@ async function markAllRead() {
 }
 
 // 点击消息标记已读
-async function handleMessageClick(msg: { id: string, status: number }) {
+async function handleMessageClick(msg: MessageVO) {
   if (msg.status === 0) {
-    await messageStore.markAsRead(msg.id)
+    await messageStore.markAsRead(msg.id!)
   }
 }
 </script>

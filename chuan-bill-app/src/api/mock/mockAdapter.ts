@@ -1,3 +1,4 @@
+import type { MockWrapper } from '@alova/mock'
 /*
  * @Author: weisheng
  * @Date: 2025-04-17 16:21:36
@@ -10,19 +11,8 @@
 import { uniappMockResponse, uniappRequestAdapter } from '@alova/adapter-uniapp'
 import { createAlovaMockAdapter } from '@alova/mock'
 
-// 导入所有mock模块
-import commonMocks from './modules/common'
-import petMocks from './modules/pet'
-import storeMocks from './modules/store'
-import userMocks from './modules/user'
-
 // 合并所有mock定义
-const allMocks = [
-  commonMocks,
-  petMocks,
-  storeMocks,
-  userMocks,
-]
+const allMocks: MockWrapper[] = []
 
 // 创建mock适配器
 const mockAdapter = createAlovaMockAdapter(allMocks, {

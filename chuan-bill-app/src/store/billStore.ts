@@ -59,11 +59,11 @@ export const useBillStore = defineStore('bill', () => {
     }
   }
 
-  function getCategoryList(type?: 'expense' | 'income' | '') {
+  function getCategoryList(type?: string) {
     if (!type) {
       return Object.values(categoryListMap.value).flat()
     }
-    return categoryListMap.value[type]
+    return categoryListMap.value[type as keyof typeof categoryListMap.value]
   }
 
   function getPaymentMethodList() {

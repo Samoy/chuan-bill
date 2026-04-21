@@ -39,7 +39,7 @@ onLoad(async () => {
 })
 
 watch(() => formData.value.type, () => {
-  formData.value.categoryId = undefined
+  formData.value.categoryId = ''
   formData.value.paymentMethodId = undefined
 })
 

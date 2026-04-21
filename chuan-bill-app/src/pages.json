@@ -110,6 +110,16 @@
       "style": {
         "navigationBarTitleText": "编辑家庭"
       }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/family/statistics",
+      "type": "page",
+      "name": "family-statistics",
+      "style": {
+        "navigationBarTitleText": "家庭统计"
+      }
     }
     // #endif
   ],

@@ -26,6 +26,7 @@
     "src/**/*.vue"
   ],
   "exclude": [
-    "src/uni_modules/**/*"
+    "src/uni_modules/**/*",
+    "node_modules/**/*"
   ]
 }

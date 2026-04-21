@@ -176,7 +176,7 @@ async function handleRefreshInviteCode() {
           <!-- 家庭统计 -->
           <view
             class="flex items-center gap-3"
-            @click="toast.info('功能开发中')"
+            @click="router.push(`/pages/family/statistics?familyId=${familyId}`)"
           >
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
               <view class="i-lucide:bar-chart-3 h-5 w-5 text-green-600" />

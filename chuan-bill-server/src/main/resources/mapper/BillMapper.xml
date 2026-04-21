@@ -52,4 +52,23 @@
       GROUP BY DATE_FORMAT(time, '%Y-%m-%d')
       ORDER BY DATE_FORMAT(time, '%Y-%m-%d')
     </select>
+
+    <select id="selectMemberStats" resultType="com.samoy.chuanbillserver.vo.FamilyMemberStatsVO">
+        SELECT
+            b.user_id AS userId,
+            u.nickname AS nickname,
+            u.avatar AS avatar,
+            SUM(IF(b.type = 'expense', b.amount, 0)) AS expense,
+            SUM(IF(b.type = 'income', b.amount, 0)) AS income,
+            IFNULL(fm.is_owner, 0) AS isOwner
+        FROM t_bill b
+        LEFT JOIN t_user u ON b.user_id = u.id
+        LEFT JOIN t_family_member fm ON b.user_id = fm.user_id AND fm.family_id = #{familyId}
+        WHERE b.family_id = #{familyId}
+            AND b.time &gt;= #{startTime}
+            AND b.time &lt;= #{endTime}
+            AND b.deleted = 0
+        GROUP BY b.user_id, u.nickname, u.avatar, fm.is_owner
+        ORDER BY expense DESC
+    </select>
 </mapper>

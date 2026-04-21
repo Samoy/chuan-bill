@@ -49,6 +49,8 @@ export default {
   'statistics.getCategoryStats': ['GET', '/statistics/category'],
   'message.getUnreadCount': ['GET', '/message/unread-count'],
   'message.getMessageList': ['GET', '/message/page-list'],
+  'familyStatistics.getMemberStats': ['GET', '/family/statistics/members'],
+  'familyStatistics.getAiSuggestion': ['GET', '/family/statistics/ai-suggestion'],
   'family.getPendingApplies': ['GET', '/family/pending-applies'],
   'family.getMyFamilies': ['GET', '/family/my-families'],
   'family.getMembers': ['GET', '/family/members'],

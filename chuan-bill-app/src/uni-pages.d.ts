@@ -11,6 +11,7 @@ type _LocationUrl =
   "/pages/family/detail" |
   "/pages/family/edit" |
   "/pages/family/index" |
+  "/pages/family/statistics" |
   "/pages/message/index" |
   "/pages/mine/index" |
   "/pages/privacy/index" |

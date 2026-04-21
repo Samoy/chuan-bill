@@ -59,9 +59,19 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, Family> impleme
 
     private static final int INVITE_CODE_LENGTH = 6;
 
+    private static final int MAX_CREATED_FAMILIES = 5;
+
     @Override
     @Transactional
     public FamilyVO createFamily(String userId, CreateFamilyDTO dto) {
+        // 检查用户创建的家庭数量是否已达上限
+        long createdCount = familyMemberService.count(new LambdaQueryWrapper<FamilyMember>()
+                .eq(FamilyMember::getUserId, userId)
+                .eq(FamilyMember::getIsOwner, true));
+        if (createdCount >= MAX_CREATED_FAMILIES) {
+            throw new BusinessException(ResultEnum.FAMILY_CREATE_LIMIT_REACHED);
+        }
+
         Family family = new Family();
         family.setName(dto.getName());
         family.setAvatar(dto.getAvatar());
