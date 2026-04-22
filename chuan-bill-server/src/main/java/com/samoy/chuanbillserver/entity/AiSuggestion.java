@@ -15,7 +15,7 @@ import lombok.ToString;
  * </p>
  *
  * @author Samoy
- * @since 2026-04-18
+ * @since 2026-04-22
  */
 @Getter
 @Setter
@@ -42,6 +42,18 @@ public class AiSuggestion implements Serializable {
      */
     @TableField("month")
     private String month;
+
+    /**
+     * 分析类型：1-个人，2-家庭
+     */
+    @TableField("analysis_type")
+    private Integer analysisType;
+
+    /**
+     * 目标ID：个人为user_id，家庭为family_id
+     */
+    @TableField("target_id")
+    private String targetId;
 
     /**
      * AI分析内容

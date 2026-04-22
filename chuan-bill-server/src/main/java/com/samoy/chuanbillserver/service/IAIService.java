@@ -24,10 +24,11 @@ public interface IAIService {
 
     /**
      * 通过月份进行账单分析
-     *
+     * @param analysisType 分析类型
      * @param month 月份
+     * @param familyId 家庭id
      * @param regenerate 是否重新生成
      * @return 分析结果
      */
-    AiAnalysisVO analysis(String month, boolean regenerate);
+    AiAnalysisVO analysis(Integer analysisType, String month, String familyId, boolean regenerate);
 }

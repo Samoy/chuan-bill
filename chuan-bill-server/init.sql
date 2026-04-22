@@ -235,19 +235,23 @@ CREATE TABLE
 -- ===============================
 -- AI分析建议表(t_ai_suggestion)
 -- ===============================
-CREATE TABLE
-  IF NOT EXISTS `t_ai_suggestion` (
-    `id` VARCHAR(64) PRIMARY KEY NOT NULL COMMENT '主键ID',
-    `user_id` VARCHAR(64) NOT NULL COMMENT '用户ID',
-    `month` VARCHAR(7) NOT NULL COMMENT '月份，格式YYYY-MM',
-    `content` TEXT NOT NULL COMMENT 'AI分析内容',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted` TINYINT (1) NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
-    -- 索引优化说明：
-    -- 1. idx_user_month: 查询用户某月的AI建议，唯一索引（用户每月只有一条建议）
-    UNIQUE KEY `idx_user_month` (`user_id`, `month`)
-  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI分析建议表';
+CREATE TABLE IF NOT EXISTS `t_ai_suggestion`
+(
+  `id`            VARCHAR(64) PRIMARY KEY NOT NULL COMMENT '主键ID',
+  `user_id`       VARCHAR(64)             NOT NULL COMMENT '生成者ID；个人建议为用户ID，家庭建议为户主ID',
+  `month`         VARCHAR(7)              NOT NULL COMMENT '月份，格式YYYY-MM',
+  `analysis_type` TINYINT                 NOT NULL COMMENT '分析类型：1-个人，2-家庭',
+  `target_id`     VARCHAR(64)             NOT NULL COMMENT '目标ID：个人为user_id，家庭为family_id',
+  `content`       TEXT                    NOT NULL COMMENT 'AI分析内容',
+  `create_time`   DATETIME                NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time`   DATETIME                NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted`       TINYINT(1)              NOT NULL DEFAULT 0 COMMENT '是否删除，0未删除，1已删除',
+
+  UNIQUE KEY `uk_user_month_target` (`user_id`, `month`, `analysis_type`, `target_id`),
+  KEY `idx_user_month` (`user_id`, `month`),
+  KEY `idx_target_month` (`analysis_type`, `target_id`, `month`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='AI分析建议表';
 
 -- ===============================
 -- AI使用次数统计表(t_ai_usage)

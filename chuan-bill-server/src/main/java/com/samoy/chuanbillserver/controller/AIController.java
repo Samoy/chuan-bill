@@ -36,8 +36,10 @@ public class AIController {
     @GetMapping("/analysis")
     @Operation(summary = "分析", description = "分析账单信息，优先返回缓存结果，regenerate=true时重新生成")
     public Result<AiAnalysisVO> analysis(
+            Integer analysisType,
             @Validated @Pattern(regexp = "^\\d{4}-\\d{2}$") String month,
+            @RequestParam(required = false) String familyId,
             @RequestParam(defaultValue = "false") boolean regenerate) {
-        return Result.success(aiService.analysis(month, regenerate));
+        return Result.success(aiService.analysis(analysisType, month, familyId, regenerate));
     }
 }

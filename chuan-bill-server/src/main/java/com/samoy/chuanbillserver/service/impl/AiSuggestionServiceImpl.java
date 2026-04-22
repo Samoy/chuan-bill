@@ -19,26 +19,43 @@ import org.springframework.stereotype.Service;
 public class AiSuggestionServiceImpl extends ServiceImpl<AiSuggestionMapper, AiSuggestion>
         implements IAiSuggestionService {
 
+    private static final int USER_ANALYSIS_TYPE = 1;
+    public static final int FAMILY_ANALYSIS_TYPE = 2;
+
     @Override
-    public AiSuggestion getByUserIdAndMonth(String userId, String month) {
-        return getOne(new LambdaQueryWrapper<AiSuggestion>()
-                .eq(AiSuggestion::getUserId, userId)
+    public AiSuggestion getByUserIdAndMonth(Integer analysisType, String userId, String familyId, String month) {
+        LambdaQueryWrapper<AiSuggestion> wrapper = new LambdaQueryWrapper<>();
+        if (analysisType == USER_ANALYSIS_TYPE) {
+            // 说明是个人账单分析
+            wrapper.eq(AiSuggestion::getTargetId, userId);
+        }
+        if (analysisType == FAMILY_ANALYSIS_TYPE) {
+            // 说明是家庭账单分析
+            wrapper.eq(AiSuggestion::getTargetId, familyId);
+        }
+        return getOne(wrapper.eq(AiSuggestion::getUserId, userId)
+                .eq(AiSuggestion::getAnalysisType, analysisType)
                 .eq(AiSuggestion::getMonth, month));
     }
 
     @Override
-    public void saveOrUpdateSuggestion(String userId, String month, String content) {
-        AiSuggestion existing = getByUserIdAndMonth(userId, month);
+    public void saveOrUpdateSuggestion(Integer analysis, String userId, String familyId, String month, String content) {
+        AiSuggestion existing = getByUserIdAndMonth(analysis, userId, familyId, month);
         if (existing != null) {
             existing.setContent(content);
-            existing.setDeleted(false);
             updateById(existing);
         } else {
             AiSuggestion suggestion = new AiSuggestion();
             suggestion.setUserId(userId);
             suggestion.setMonth(month);
+            suggestion.setAnalysisType(analysis);
+            if (analysis == USER_ANALYSIS_TYPE) {
+                suggestion.setTargetId(userId);
+            }
+            if (analysis == FAMILY_ANALYSIS_TYPE) {
+                suggestion.setTargetId(familyId);
+            }
             suggestion.setContent(content);
-            suggestion.setDeleted(false);
             save(suggestion);
         }
     }

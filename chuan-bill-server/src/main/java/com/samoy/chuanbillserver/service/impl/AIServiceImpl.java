@@ -103,14 +103,14 @@ public class AIServiceImpl implements IAIService {
     }
 
     @Override
-    public AiAnalysisVO analysis(String month, boolean regenerate) {
+    public AiAnalysisVO analysis(Integer analysisType, String month, String familyId, boolean regenerate) {
         String userId = StpUtil.getLoginIdAsString();
         User user = userService.getById(userId);
         boolean isVip = Boolean.TRUE.equals(user.getIsVip());
 
         // 非重新生成时，优先返回缓存
         if (!regenerate) {
-            AiSuggestion suggestion = aiSuggestionService.getByUserIdAndMonth(userId, month);
+            AiSuggestion suggestion = aiSuggestionService.getByUserIdAndMonth(analysisType, userId, familyId, month);
             if (suggestion != null) {
                 AiAnalysisVO vo = new AiAnalysisVO();
                 vo.setContent(suggestion.getContent());
@@ -131,7 +131,7 @@ public class AIServiceImpl implements IAIService {
         String analysisText = generateAnalysis(userId, month);
 
         // 持久化建议
-        aiSuggestionService.saveOrUpdateSuggestion(userId, month, analysisText);
+        aiSuggestionService.saveOrUpdateSuggestion(analysisType, userId, familyId, month, analysisText);
 
         // 递增每日使用次数（VIP也需要记录，但不受限制）
         aiUsageService.incrementUsage(userId);
@@ -147,7 +147,7 @@ public class AIServiceImpl implements IAIService {
      * 调用DashScope生成账单分析
      *
      * @param userId 用户ID
-     * @param month 月份
+     * @param month  月份
      * @return 分析文本
      */
     private String generateAnalysis(String userId, String month) {
