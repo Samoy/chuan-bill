@@ -179,3 +179,6 @@ export const LOCAL_PAY_CATEGORY_LIST = [
     isDefault: true,
   },
 ]
+
+export const AI_SUGGESTION_TYPE_USER = 1
+export const AI_SUGGESTION_TYPE_FAMILY = 2

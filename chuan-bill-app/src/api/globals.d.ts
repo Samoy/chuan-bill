@@ -3775,7 +3775,9 @@ declare global {
        * **Query Parameters**
        * ```ts
        * type QueryParameters = {
+       *   analysisType: number
        *   month: string
+       *   familyId?: string
        *   regenerate?: boolean
        * }
        * ```
@@ -3804,7 +3806,9 @@ declare global {
       analysis<
         Config extends Alova2MethodConfig<ResultAiAnalysisVO> & {
           params: {
+            analysisType: number;
             month: string;
+            familyId?: string;
             regenerate?: boolean;
           };
         }

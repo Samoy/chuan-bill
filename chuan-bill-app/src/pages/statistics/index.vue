@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import CategoryChart from './components/CategoryChart.vue'
 import DailyTrendChart from './components/DailyTrendChart.vue'
@@ -57,13 +58,13 @@ function onMonthSelect({ value }: { value: string }) {
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
-  statisticsStore.fetchAiSuggestionCached(month)
+  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_USER, month)
 }, { immediate: true })
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_USER, currentMonth.value)
 })
 </script>
 

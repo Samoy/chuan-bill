@@ -1,4 +1,5 @@
 import type { BillMonthlyStatsVO } from '@/api/globals'
+import type { AI_SUGGESTION_TYPE_FAMILY, AI_SUGGESTION_TYPE_USER } from '@/common/constant'
 import dayjs from 'dayjs'
 import { add, divide, multiply } from 'mathjs'
 
@@ -9,6 +10,8 @@ interface CategoryStatItem {
   amount: number
   percentage: number
 }
+
+type AnalysisType = typeof AI_SUGGESTION_TYPE_USER | typeof AI_SUGGESTION_TYPE_FAMILY
 
 export const useStatisticsStore = defineStore('statistics', () => {
   const user = useUserStore()
@@ -158,15 +161,17 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
   /**
    * 获取AI消费建议（登录后可用）
+   * @param analysisType 分析类型：1-个人，2-家庭
    * @param month 月份
+   * @param familyId 家庭id
    * @param regenerate 是否重新生成
    */
-  async function fetchAiSuggestion(month: string, regenerate = false) {
+  async function fetchAiSuggestion(analysisType: AnalysisType, month: string, familyId?: string, regenerate = false) {
     if (!user.isLoggedIn)
       return
     aiLoading.value = true
     try {
-      const res = await Apis.ai.analysis({ params: { month, regenerate } })
+      const res = await Apis.ai.analysis({ params: { month, analysisType, familyId, regenerate } })
       if (res.success && res.data) {
         aiSuggestion.value = res.data.content || ''
         aiCached.value = res.data.cached || false
@@ -189,11 +194,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
   /**
    * 获取缓存的AI建议（不触发AI生成，无缓存时返回空）
    */
-  async function fetchAiSuggestionCached(month: string) {
+  async function fetchAiSuggestionCached(analysisType: AnalysisType, month: string, familyId?: string) {
     if (!user.isLoggedIn)
       return
     try {
-      const res = await Apis.ai.analysis({ params: { month }, meta: { silent: true } } as any)
+      const res = await Apis.ai.analysis({ params: { analysisType, month, familyId }, meta: { silent: true } } as any)
       if (res.success && res.data) {
         aiSuggestion.value = res.data.content || ''
         aiCached.value = res.data.cached || false
