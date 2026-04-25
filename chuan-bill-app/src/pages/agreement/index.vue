@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePage({
   name: 'agreement',
+  layout: 'default',
   style: {
     navigationBarTitleText: '用户协议',
   },

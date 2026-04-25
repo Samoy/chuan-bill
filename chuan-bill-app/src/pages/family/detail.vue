@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePage({
   name: 'family-detail',
+  layout: 'default',
   style: {
     navigationBarTitleText: '家庭详情',
   },
@@ -128,8 +129,8 @@ async function handleRefreshInviteCode() {
       <!-- 家庭信息卡片 -->
       <view class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
         <view class="flex items-center gap-3">
-          <view class="h-14 w-14 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-            <image v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-14 w-14 rounded-2xl" mode="aspectFill" />
+          <view class="flex items-center justify-center rounded-2xl bg-white/20 p-2 backdrop-blur-sm">
+            <wd-img v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-12 w-12 rounded-2xl" mode="aspectFill" />
             <view v-else class="i-lucide:home h-7 w-7" />
           </view>
           <view class="flex-1">

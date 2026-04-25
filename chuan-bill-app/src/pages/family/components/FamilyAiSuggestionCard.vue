@@ -25,8 +25,9 @@ const hasReachedLimit = computed(() => {
 async function fetchAiSuggestion() {
   loading.value = true
   try {
-    const res = await Apis.familyStatistics.getAiSuggestion({
+    const res = await Apis.ai.analysis({
       params: {
+        analysisType: 2, // 2代表家庭账单分析
         familyId: props.familyId,
         month: props.month,
       },

@@ -7,6 +7,7 @@ import MemberRanking from './components/MemberRanking.vue'
 
 definePage({
   name: 'family-statistics',
+  layout: 'default',
   style: {
     navigationBarTitleText: '家庭统计',
   },
@@ -86,7 +87,7 @@ async function fetchStatistics() {
     return
   loading.value = true
   try {
-    const res = await Apis.familyStatistics.getMemberStats({
+    const res = await Apis.statistics.getMembersStats({
       params: {
         familyId: familyId.value,
         month: currentMonth.value,

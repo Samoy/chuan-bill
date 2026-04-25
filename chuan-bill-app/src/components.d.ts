@@ -23,6 +23,8 @@ declare module 'vue' {
     WdFab: typeof import('wot-design-uni/components/wd-fab/wd-fab.vue')['default']
     WdForm: typeof import('wot-design-uni/components/wd-form/wd-form.vue')['default']
     WdIcon: typeof import('wot-design-uni/components/wd-icon/wd-icon.vue')['default']
+    WdImage: typeof import('wot-design-uni/components/wd-image/wd-image.vue')['default']
+    WdImg: typeof import('wot-design-uni/components/wd-img/wd-img.vue')['default']
     WdInput: typeof import('wot-design-uni/components/wd-input/wd-input.vue')['default']
     WdKeyboard: typeof import('wot-design-uni/components/wd-keyboard/wd-keyboard.vue')['default']
     WdLoading: typeof import('wot-design-uni/components/wd-loading/wd-loading.vue')['default']

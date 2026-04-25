@@ -1,0 +1,253 @@
+<script setup lang="ts">
+import type { BillListDTO, BillVO } from '@/api/globals'
+import dayjs from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import BillDetailModal from '@/pages/bill/components/BillDetailModal.vue'
+import BillItem from '@/pages/bill/components/BillItem.vue'
+import BillSection from '@/pages/bill/components/BillSection.vue'
+import FilterModal from '@/pages/bill/components/FilterModal.vue'
+
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
+
+definePage({
+  name: 'bill',
+  layout: 'default',
+  style: {
+    navigationBarTitleText: '家庭账单',
+    enablePullDownRefresh: true,
+    onReachBottomDistance: 50,
+  },
+})
+
+// 鉴权检查
+const user = useUserStore()
+const billStore = useBillStore()
+const message = useGlobalMessage()
+
+const searchValue = ref('')
+const filterParams = ref<Optional<BillListDTO>>()
+const isFiltered = ref()
+const showFilterModal = ref(false)
+const showQuickBillModal = ref(false)
+const showBillDetailModal = ref(false)
+const currentBill = ref<BillVO>()
+const isEditBill = ref(false)
+const quickBillSource = ref<'manual' | 'ocr' | 'voice'>('manual')
+
+// 账单列表数据
+const billList = ref<BillVO[]>([])
+const page = ref(1)
+const loadingMoreStatus = ref<'loading' | 'finished' | 'error'>()
+
+// 获取账单列表
+async function getBillList() {
+  const queryParams = {
+    keyword: searchValue.value,
+    ...filterParams.value,
+  }
+
+  if (!user.isLoggedIn) {
+    // 未登录时使用本地数据
+    loadingMoreStatus.value = 'finished'
+    billList.value = billStore.localBillList.filter(
+      (item) => {
+        const { keyword, minAmount, maxAmount, categoryId, paymentMethodId, startDate, endDate, type } = queryParams
+        let filtered: boolean | undefined = true
+        if (keyword) {
+          filtered = filtered && (item.name?.includes(keyword) || item.remark?.includes(keyword))
+        }
+        if (type) {
+          filtered = filtered && item.type === type
+        }
+        if (minAmount) {
+          filtered = filtered && Number(item.amount) >= Number(minAmount)
+        }
+        if (maxAmount) {
+          filtered = filtered && Number(item.amount) >= Number(maxAmount)
+        }
+        if (categoryId) {
+          filtered = filtered && item.category!.id === categoryId
+        }
+        if (paymentMethodId) {
+          filtered = filtered && item.category!.id === paymentMethodId
+        }
+        if (startDate) {
+          filtered = filtered && dayjs(item.time).isSameOrAfter(dayjs(startDate).startOf('D'))
+        }
+        if (endDate) {
+          filtered = filtered && dayjs(item.time).isSameOrBefore(dayjs(endDate).endOf('D'))
+        }
+        return filtered
+      },
+    )
+    return
+  }
+
+  const res = await Apis.bill.getPageBillList({
+    params: {
+      page: page.value,
+      size: 10,
+      ...queryParams,
+    },
+  })
+  if (res.success) {
+    billList.value = page.value === 1 ? (res.data?.records || []) : [...billList.value || [], ...res.data?.records || []]
+    if (page.value * 10 >= (res.data?.total || 0)) {
+      loadingMoreStatus.value = 'finished'
+    }
+    else {
+      loadingMoreStatus.value = 'loading'
+    }
+  }
+  else {
+    loadingMoreStatus.value = 'error'
+  }
+}
+
+function refresh() {
+  page.value = 1
+  return getBillList()
+}
+
+function loadMore() {
+  if (!user.isLoggedIn)
+    return
+  page.value++
+  getBillList()
+}
+
+function submitFilter(result: Optional<BillListDTO>, filtered?: boolean) {
+  filterParams.value = result
+  isFiltered.value = filtered
+  showFilterModal.value = false
+  refresh()
+}
+
+function onClickBill(bill: BillVO) {
+  currentBill.value = bill
+  showBillDetailModal.value = true
+}
+
+// 添加账单 - 打开快速记账弹框
+function addBill() {
+  // 判断账目条数是否大于1000条，如果大于，则需要登录
+  if (billStore.localBillList.length >= 1000) {
+    message.confirm({ title: '提示', msg: '账目条数已达到上限，登录后解锁更多记账条数', confirmButtonText: '去登录', cancelButtonText: '暂不登录', success: (res) => {
+      if (res.action === 'confirm') {
+        goToLogin()
+      }
+    } })
+    return
+  }
+  currentBill.value = undefined
+  quickBillSource.value = 'manual'
+  isEditBill.value = false
+  showQuickBillModal.value = true
+}
+
+function editBill(bill: BillVO) {
+  isEditBill.value = true
+  currentBill.value = bill
+  showBillDetailModal.value = false
+  showQuickBillModal.value = true
+}
+
+function isSameMonth(currentTime?: string, comparedTime?: string) {
+  if (!currentTime || !comparedTime) {
+    return false
+  }
+  return dayjs(currentTime).isSame(dayjs(comparedTime), 'month')
+}
+
+// 跳转到登录页
+function goToLogin() {
+  user.showLoginPopup = true
+}
+
+onLoad(() => {
+  refresh()
+})
+
+onPullDownRefresh(async () => {
+  await refresh()
+  uni.stopPullDownRefresh()
+})
+
+onReachBottom(() => {
+  loadMore()
+})
+
+// 监听登录状态变化
+watch(() => user.isLoggedIn, (newVal) => {
+  if (newVal) {
+    // 登录后刷新数据
+    refresh()
+  }
+})
+</script>
+
+<template>
+  <view class="box-border flex flex-col gap-3 py-3">
+    <!-- 搜索区域 -->
+    <wd-sticky>
+      <view class="box-border w-100vw border-b border-[var(--wot-border-color)] px-3">
+        <view class="flex items-center gap-2">
+          <wd-search
+            v-model="searchValue" placeholder="账单名称或备注" hide-cancel
+            custom-class="flex-1 rounded-xl border border-solid border-[var(--wot-color-border)] dark:border-gray-600"
+            @search="refresh"
+            @clear="refresh"
+          />
+          <view
+            class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
+            :class="isFiltered && 'text-primary'"
+            @click="showFilterModal = true"
+          >
+            <view v-if="isFiltered" class="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
+            <view class="i-lucide:filter" />
+          </view>
+        </view>
+      </view>
+    </wd-sticky>
+
+    <!-- 分页列表区域 - 已登录 -->
+    <view v-if="billList.length" class="mb-9 box-border flex flex-col gap-3 px-3 pb-3">
+      <template v-for="(bill, index) in billList" :key="bill.id">
+        <BillSection v-if="!isSameMonth(bill.time, billList?.[index - 1]?.time)" :key="bill.amount" :month="dayjs(bill.time!).format('YYYY-MM')" custom-class="mt-3" />
+        <BillItem :bill="bill" @click="onClickBill(bill)" />
+      </template>
+      <wd-loadmore :state="loadingMoreStatus" finished-text="没有更多数据了" custom-class="h-8!" @reload="refresh" />
+    </view>
+
+    <view v-else class="mt-10vh flex flex-col items-center justify-center gap-5">
+      <wd-status-tip tip="您还没有任何账单数据，快来记一笔吧！">
+        <template #image>
+          <image mode="aspectFit" class="h-30 w-80" src="https://cdn.chuanbill.samoy.site/default/nodata.svg" />
+        </template>
+      </wd-status-tip>
+      <wd-button type="primary" @click="addBill">
+        开始记账
+      </wd-button>
+    </view>
+
+    <!-- 账单详情弹框 -->
+    <BillDetailModal v-if="currentBill" v-model="showBillDetailModal" :bill="currentBill!" @delete="refresh" @update="editBill" />
+    <!-- 筛选弹框 -->
+    <FilterModal v-model="showFilterModal" @submit="submitFilter" />
+  </view>
+</template>
+
+<style lang="scss" scoped>
+:deep(.wot-theme-dark .wd-search__cover) {
+  background-color: transparent;
+}
+
+:deep(.wot-theme-dark .wd-search__block) {
+  background-color: transparent;
+}
+:deep(.wd-loadmore .wd-divider){
+  @apply m-0!
+}
+</style>

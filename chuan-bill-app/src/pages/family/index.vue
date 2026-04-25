@@ -153,7 +153,7 @@ async function handleJoin() {
     <template v-else>
       <!-- 顶部操作栏 -->
       <view class="mx-3 flex gap-3">
-        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="router.push('/pages/family/create')">
+        <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="router.push('/pages/family/edit')">
           <view class="flex items-center gap-3">
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:plus h-5 w-5 text-primary" />
@@ -192,20 +192,20 @@ async function handleJoin() {
 
       <template v-else-if="familyStore.hasFamily">
         <view class="mx-3">
-          <text class="mb-2 block px-1 text-sm text-gray-500 font-500">
+          <text class="mt-2 block px-1 text-sm text-gray-500 font-500">
             我的家庭
           </text>
         </view>
         <view
           v-for="family in familyStore.familyList"
           :key="family.id"
-          class="mx-3 mb-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]"
           @click="router.push(`/pages/family/detail?familyId=${family.id}`)"
         >
           <view class="flex items-center gap-3">
             <!-- 家庭头像 -->
-            <view class="h-12 w-12 flex items-center justify-center rounded-xl bg-primary/10">
-              <image v-if="family.avatar" :src="family.avatar" class="h-12 w-12 rounded-xl" mode="aspectFill" />
+            <view class="flex items-center justify-center rounded-xl bg-primary/10 p-1">
+              <wd-img v-if="family.avatar" :src="family.avatar" class="h-12 w-12 rounded-xl" mode="aspectFill" />
               <view v-else class="i-lucide:home h-6 w-6 text-primary" />
             </view>
             <view class="flex-1">
@@ -226,12 +226,32 @@ async function handleJoin() {
             <!-- 编辑按钮（仅户主可见） -->
             <view
               v-if="family.isOwner"
-              class="mr-2 h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-200 dark:bg-gray-700 dark:active:bg-gray-600"
+              class="h-8 w-8 flex items-center justify-center rounded-full bg-primary/10"
               @click.stop="router.push(`/pages/family/edit?familyId=${family.id}`)"
             >
-              <view class="i-lucide:settings h-4 w-4 text-gray-500" />
+              <view class="i-lucide:edit h-3 w-3 text-primary" />
             </view>
-            <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+          </view>
+          <!-- 快捷操作 -->
+          <view class="mt-3 flex gap-2">
+            <view
+              class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary/5 py-2 text-primary transition-all active:scale-95"
+              @click.stop="router.push(`/pages/family/bill?familyId=${family.id}`)"
+            >
+              <view class="i-lucide:clipboard-list h-4 w-4" />
+              <view class="text-xs font-500">
+                账单列表
+              </view>
+            </view>
+            <view
+              class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-50 py-2 text-green-500 transition-all active:scale-95"
+              @click.stop="router.push(`/pages/family/statistics?familyId=${family.id}`)"
+            >
+              <view class="i-lucide:bar-chart-3 h-4 w-4" />
+              <view class="text-xs font-500">
+                家庭统计
+              </view>
+            </view>
           </view>
         </view>
       </template>

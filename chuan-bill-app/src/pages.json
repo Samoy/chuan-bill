@@ -26,7 +26,6 @@
       }
     },
     // #endif
-    // #ifdef H5
     {
       "path": "pages/bill/index",
       "type": "home",
@@ -38,29 +37,42 @@
         "onReachBottomDistance": 50
       }
     },
-    // #endif
     {
       "path": "pages/agreement/index",
       "type": "page",
       "name": "agreement",
+      "layout": "default",
       "style": {
         "navigationBarTitleText": "用户协议"
       }
     },
     {
-      "path": "pages/family/create",
+      "path": "pages/family/bill",
       "type": "page",
-      "name": "family-create",
+      "name": "bill",
+      "layout": "default",
       "style": {
-        "navigationBarTitleText": "创建家庭"
+        "navigationBarTitleText": "家庭账单",
+        "enablePullDownRefresh": true,
+        "onReachBottomDistance": 50
       }
     },
     {
       "path": "pages/family/detail",
       "type": "page",
       "name": "family-detail",
+      "layout": "default",
       "style": {
         "navigationBarTitleText": "家庭详情"
+      }
+    },
+    {
+      "path": "pages/family/edit",
+      "type": "page",
+      "name": "family-edit",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "编辑家庭"
       }
     },
     {
@@ -70,6 +82,15 @@
       "layout": "tabbar",
       "style": {
         "navigationBarTitleText": "家庭"
+      }
+    },
+    {
+      "path": "pages/family/statistics",
+      "type": "page",
+      "name": "family-statistics",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "家庭统计"
       }
     },
     {
@@ -93,6 +114,7 @@
       "path": "pages/privacy/index",
       "type": "page",
       "name": "privacy",
+      "layout": "default",
       "style": {
         "navigationBarTitleText": "隐私政策"
       }
@@ -105,37 +127,7 @@
       "style": {
         "navigationBarTitleText": "统计"
       }
-    },
-    // #ifdef H5
-    {
-      "path": "pages/family/bills",
-      "type": "page",
-      "name": "family-bills",
-      "style": {
-        "navigationBarTitleText": "家庭账单"
-      }
-    },
-    // #endif
-    // #ifdef H5
-    {
-      "path": "pages/family/edit",
-      "type": "page",
-      "name": "family-edit",
-      "style": {
-        "navigationBarTitleText": "编辑家庭"
-      }
-    },
-    // #endif
-    // #ifdef H5
-    {
-      "path": "pages/family/statistics",
-      "type": "page",
-      "name": "family-statistics",
-      "style": {
-        "navigationBarTitleText": "家庭统计"
-      }
     }
-    // #endif
   ],
   "subPackages": [],
   "tabBar": {

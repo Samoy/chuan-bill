@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePage({
   name: 'privacy',
+  layout: 'default',
   style: {
     navigationBarTitleText: '隐私政策',
   },
