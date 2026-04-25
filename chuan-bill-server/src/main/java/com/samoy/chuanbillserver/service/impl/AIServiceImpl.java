@@ -111,13 +111,13 @@ public class AIServiceImpl implements IAIService {
         // 非重新生成时，优先返回缓存
         if (!regenerate) {
             AiSuggestion suggestion = aiSuggestionService.getByUserIdAndMonth(analysisType, userId, familyId, month);
+            AiAnalysisVO vo = new AiAnalysisVO();
             if (suggestion != null) {
-                AiAnalysisVO vo = new AiAnalysisVO();
                 vo.setContent(suggestion.getContent());
-                vo.setCached(true);
-                vo.setRemainingCount(aiUsageService.getRemainingCount(userId, isVip));
                 return vo;
             }
+            vo.setCached(true);
+            vo.setRemainingCount(aiUsageService.getRemainingCount(userId, isVip));
             return null;
         }
 

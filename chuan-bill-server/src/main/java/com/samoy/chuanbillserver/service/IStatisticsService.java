@@ -5,6 +5,7 @@ import com.samoy.chuanbillserver.dto.StatisticsCategoryDTO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.CategoryStatisticsVO;
 import com.samoy.chuanbillserver.vo.DailyTrendVO;
+import com.samoy.chuanbillserver.vo.FamilyMemberStatsVO;
 import java.util.List;
 
 /**
@@ -43,4 +44,12 @@ public interface IStatisticsService {
      * @return 每日收支趋势列表
      */
     List<DailyTrendVO> getDailyTrend(String userId, BillMonthlyStatsDTO dto);
+
+    /**
+     * 获取家庭成员账单统计
+     * @param userId 用户id
+     * @param dto 请求参数
+     * @return 家庭成员账单统计列表
+     */
+    List<FamilyMemberStatsVO> getMembersStats(String userId, BillMonthlyStatsDTO dto);
 }

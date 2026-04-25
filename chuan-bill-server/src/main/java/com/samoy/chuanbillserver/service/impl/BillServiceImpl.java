@@ -61,6 +61,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     @Override
     public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
+        if (billListDTO.getFamilyId() != null && !familyService.isMember(userId, billListDTO.getFamilyId())) {
+            throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+        }
         LambdaQueryWrapper<Bill> wrapper = buildQueryWrapper(userId, billListDTO);
         List<Bill> billList = baseMapper.selectList(wrapper);
         return convertToBillVOList(billList);
@@ -68,6 +71,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     @Override
     public IPage<BillVO> getBillListByPage(String userId, BillListDTO billListDTO) {
+        // 如果是家庭账单，则需要查询是否是家庭成员
+        if (billListDTO.getFamilyId() != null && !familyService.isMember(userId, billListDTO.getFamilyId())) {
+            throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+        }
         LambdaQueryWrapper<Bill> wrapper = buildQueryWrapper(userId, billListDTO);
         IPage<Bill> billPage = this.page(new Page<>(billListDTO.getPage(), billListDTO.getSize()), wrapper);
 
@@ -87,6 +94,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         bill.setRemark(addBillDTO.getRemark());
         bill.setSource(addBillDTO.getSource());
         if (addBillDTO.getFamilyId() != null) {
+            if (!familyService.isMember(userId, addBillDTO.getFamilyId())) {
+                throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+            }
             bill.setFamilyId(addBillDTO.getFamilyId());
         }
         return this.save(bill);

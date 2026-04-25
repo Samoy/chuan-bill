@@ -8,6 +8,7 @@ import com.samoy.chuanbillserver.service.IStatisticsService;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.CategoryStatisticsVO;
 import com.samoy.chuanbillserver.vo.DailyTrendVO;
+import com.samoy.chuanbillserver.vo.FamilyMemberStatsVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -53,5 +54,12 @@ public class StatisticsController {
     public Result<List<DailyTrendVO>> getDailyTrend(@Validated @ModelAttribute BillMonthlyStatsDTO dto) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(statisticsService.getDailyTrend(userId, dto));
+    }
+
+    @GetMapping("/members-bill")
+    @Operation(summary = "获取成员账单统计", description = "获取指定月份的成员收支统计")
+    public Result<List<FamilyMemberStatsVO>> getMembersStats(@Validated @ModelAttribute BillMonthlyStatsDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(statisticsService.getMembersStats(userId, dto));
     }
 }

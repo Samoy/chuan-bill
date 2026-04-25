@@ -3,11 +3,15 @@ package com.samoy.chuanbillserver.service.impl;
 import com.samoy.chuanbillserver.dao.BillMapper;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.StatisticsCategoryDTO;
+import com.samoy.chuanbillserver.exception.BusinessException;
+import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IBillService;
+import com.samoy.chuanbillserver.service.IFamilyService;
 import com.samoy.chuanbillserver.service.IStatisticsService;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.CategoryStatisticsVO;
 import com.samoy.chuanbillserver.vo.DailyTrendVO;
+import com.samoy.chuanbillserver.vo.FamilyMemberStatsVO;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,13 +42,20 @@ public class StatisticsServiceImpl implements IStatisticsService {
     @Resource
     private IBillService billService;
 
+    @Resource
+    private IFamilyService familyService;
+
     @Override
     public BillMonthlyStatsVO getOverview(String userId, BillMonthlyStatsDTO dto) {
+        // 如果是查询家庭，需要判断是否是家庭成员
+        testFamilyMember(userId, dto.getFamilyId());
         return billService.getMonthlyStats(userId, dto);
     }
 
     @Override
     public List<CategoryStatisticsVO> getCategoryStats(String userId, StatisticsCategoryDTO dto) {
+        // 如果是查询家庭，需要判断是否是家庭成员
+        testFamilyMember(userId, dto.getFamilyId());
         YearMonth yearMonth = YearMonth.parse(dto.getMonth(), DateTimeFormatter.ofPattern("yyyy-MM"));
         LocalDateTime startTime = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
@@ -78,6 +89,8 @@ public class StatisticsServiceImpl implements IStatisticsService {
 
     @Override
     public List<DailyTrendVO> getDailyTrend(String userId, BillMonthlyStatsDTO dto) {
+        // 如果是查询家庭，需要判断是否是家庭成员
+        testFamilyMember(userId, dto.getFamilyId());
         YearMonth yearMonth = YearMonth.parse(dto.getMonth(), DateTimeFormatter.ofPattern("yyyy-MM"));
         LocalDateTime startTime = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
@@ -110,5 +123,54 @@ public class StatisticsServiceImpl implements IStatisticsService {
         }
 
         return result;
+    }
+
+    @Override
+    public List<FamilyMemberStatsVO> getMembersStats(String userId, BillMonthlyStatsDTO dto) {
+        // 1. 如果是查询家庭，需要判断是否是家庭成员
+        testFamilyMember(userId, dto.getFamilyId());
+
+        // 2. 计算时间范围
+        YearMonth yearMonth = YearMonth.parse(dto.getMonth(), DateTimeFormatter.ofPattern("yyyy-MM"));
+        LocalDateTime startTime = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        // 3. 查询成员统计
+        List<FamilyMemberStatsVO> list = billMapper.selectMemberStats(dto.getFamilyId(), startTime, endTime);
+        if (list == null || list.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 4. 计算总支出和总输入
+        BigDecimal totalExpense =
+                list.stream().map(FamilyMemberStatsVO::getExpense).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalIncome =
+                list.stream().map(FamilyMemberStatsVO::getIncome).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 5. 计算百分比
+        for (FamilyMemberStatsVO item : list) {
+            item.setExpensePercentage(calculatePercentage(item.getExpense(), totalExpense));
+            item.setIncomePercentage(calculatePercentage(item.getIncome(), totalIncome));
+            // 处理isOwner为null的情况
+            if (item.getIsOwner() == null) {
+                item.setIsOwner(false);
+            }
+        }
+        return list;
+    }
+
+    private void testFamilyMember(String userId, String familyId) {
+        if (familyId != null && !familyService.isMember(userId, familyId)) {
+            throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+        }
+    }
+
+    private BigDecimal calculatePercentage(BigDecimal amount, BigDecimal totalAmount) {
+        if (totalAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return new BigDecimal("0.00");
+        }
+        return amount.divide(totalAmount, 4, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal("100"))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }
