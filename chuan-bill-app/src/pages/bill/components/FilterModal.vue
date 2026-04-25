@@ -162,7 +162,7 @@ watch(() => formData.value, (newVal) => {
             <text class="i-lucide:home text-primary" />
             <text>所属家庭</text>
           </view>
-          <wd-radio-group v-model="formData.familyId" shape="button" custom-class="grid grid-cols-3 gap-2 mt-1">
+          <wd-radio-group v-model="formData.familyId" shape="button" custom-class="flex flex-wrap gap-2 mt-1">
             <wd-radio v-for="item in familyList" :key="item.id" :value="item.id!" custom-class="normal-radio">
               {{ item.name }}
             </wd-radio>

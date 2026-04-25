@@ -3,6 +3,11 @@ import type { AddBillDTO, BillListDTO, BillVO, UpdateBillDTO } from '@/api/globa
 import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import BillDetailModal from './components/BillDetailModal.vue'
+import BillItem from './components/BillItem.vue'
+import BillSection from './components/BillSection.vue'
+import FilterModal from './components/FilterModal.vue'
+import QuickBillModal from './components/QuickBillModal.vue'
 
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
@@ -12,7 +17,7 @@ definePage({
   layout: 'tabbar',
   type: 'home',
   style: {
-    navigationBarTitleText: '账单',
+    navigationBarTitleText: '我的账单',
     enablePullDownRefresh: true,
     onReachBottomDistance: 50,
   },

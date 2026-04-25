@@ -1,6 +1,6 @@
 ---
 name: alova-api-fix
-description: Fix Alova API generated type definitions for Chuan Bill project. Use when working with src/api/globals.d.ts after running pnpm alova-gen to: (1) Convert amount/money fields from number to string type, (2) Handle DTO field transformations where duplicate fields need to be removed, (3) Post-process OpenAPI generated types to match backend @JsonFormat(shape = JsonFormat.Shape.STRING) annotations.
+description: Fix Alova API generated type definitions for Chuan Bill project. Use when working with src/api/globals.d.ts after running pnpm alova-gen to fix (1) amount/money fields from number to string type to match backend @JsonFormat annotation, (2) DTO field duplications in params where @ModelAttribute expands DTO to flat query parameters. Must be used immediately after pnpm alova-gen generates new API definitions.
 ---
 
 # Alova API Fix
@@ -9,11 +9,33 @@ description: Fix Alova API generated type definitions for Chuan Bill project. Us
 
 ## 背景问题
 
+### 问题 1: 金额字段类型错误
 后端使用 `@JsonFormat(shape = JsonFormat.Shape.STRING)` 将金额字段序列化为字符串，但 alova-gen 工具无法识别此注解，导致生成的 TypeScript 类型中金额字段为 `number` 而非正确的 `string`。
 
-此外，后端使用 `@ModelAttribute` 注解将 DTO 字段展开为 query 参数，alova-gen 无法识别此模式，会产生重复字段。
+**涉及字段**: `amount`, `minAmount`, `maxAmount`, `balance`, `income`, `expense`, `budget`, `price`, `money`, `totalAmount`, `totalIncome`, `totalExpense`
 
-## 修复流程
+### 问题 2: DTO 参数重复
+后端使用 `@ModelAttribute` 注解将 DTO 字段展开为 query 参数。虽然 `alova.config.ts` 中的 `handleApi` 函数已配置为展开 DTO 字段，但生成的代码仍然保留了原始的 DTO 对象字段，导致 params 中同时存在 DTO 对象和展开的扁平字段。
+
+**示例**:
+```typescript
+// 修复前（有问题）
+params: {
+  billListDTO?: BillListDTO;  // ❌ 需要删除
+  startDate?: string;         // ✅ 已展开，保留
+  endDate?: string;           // ✅ 已展开，保留
+  // ... 其他展开字段
+}
+
+// 修复后（正确）
+params: {
+  startDate?: string;         // ✅ 保留
+  endDate?: string;           // ✅ 保留
+  // ... 其他展开字段（没有 DTO 对象）
+}
+```
+
+## 自动修复流程（推荐）
 
 ### 步骤 1: 生成接口定义
 
@@ -22,13 +44,38 @@ cd chuan-bill-app
 pnpm alova-gen
 ```
 
-### 步骤 2: 修复金额字段类型
+### 步骤 2: 运行自动修复脚本
 
-将 `src/api/globals.d.ts` 中以下字段从 `number` 改为 `string`：
+```bash
+# 使用整合脚本自动修复所有问题
+python .claude/skills/alova-api-fix/scripts/fix_alova_api.py src/api/globals.d.ts
+```
+
+脚本会自动：
+1. 提取所有 DTO 接口定义
+2. 将所有金额字段从 `number` 改为 `string`
+3. 删除 params 中重复的 DTO 对象字段（仅当字段已展开时才删除）
+4. 自动创建带时间戳的备份文件
+
+### 步骤 3: 验证修复结果
+
+```bash
+pnpm type-check
+```
+
+## 手动修复（备选）
+
+如果自动脚本无法解决问题，可以手动修复：
+
+### 手动修复金额字段
+
+全局搜索以下字段，将 `: number` 改为 `: string`：
 
 | 字段名 | 说明 |
 |--------|------|
 | `amount` | 金额 |
+| `minAmount` | 最小金额 |
+| `maxAmount` | 最大金额 |
 | `balance` | 余额 |
 | `income` | 收入 |
 | `expense` | 支出 |
@@ -39,74 +86,59 @@ pnpm alova-gen
 | `totalIncome` | 总收入 |
 | `totalExpense` | 总支出 |
 
-**操作方式**：
-- 全局搜索这些字段名
-- 将 `: number` 或 `: number | undefined` 改为 `: string` 或 `: string | undefined`
-- 注意保留可选标记 `?` 和联合类型中的 `undefined`
+**匹配模式**: `{field}?: number` → `{field}?: string`
 
-### 步骤 3: 处理 DTO 字段重复（仅针对 Query 参数）
+### 手动修复 DTO 参数
 
-**重要区分**：
-- **Query 参数**（`params`）：后端使用 `@ModelAttribute` 展开 DTO，需要删除 DTO 对象、保留展开的扁平字段
-- **Body 参数**（`data`）：DTO 作为 JSON 对象传递，**保留 DTO 对象字段**
+在 `params` 对象中查找 DTO 字段（如 `xxxDTO?: XxxDTO`），如果该 DTO 的字段已经被平铺展开，则删除 DTO 对象字段。
 
-**判断方法**：
-查看接口定义中 DTO 字段出现的位置：
-- 在 `params` 中 → 需要展开处理
-- 在 `data` 中 → 保留原样
-
-**自动修复**（推荐）：
-
-```bash
-# 使用脚本自动删除 params 中的 DTO 字段
-python .claude/skills/alova-api-fix/scripts/fix_dto_params.py src/api/globals.d.ts
-```
-
-脚本会：
-1. 自动识别所有 `export interface XXXDTO` 定义
-2. 在 `params` 上下文中查找对应的 DTO 字段
-3. 安全删除 DTO 对象字段，保留已展开的扁平字段
-4. 自动创建备份文件
-
-**手动处理示例**：
-```typescript
-// 删除这个 DTO 对象字段（params 中）
-billQueryDto?: {
-  startDate?: string
-  endDate?: string
-  categoryId?: number
-}
-
-// 保留这些已展开的字段（如果存在）
-startDate?: string
-endDate?: string
-categoryId?: number
-```
-
-**Body 参数保留示例**：
-```typescript
-// 保留这个 DTO 对象字段（data 中）
-body: {
-  billDto: {
-    amount: string
-    categoryId: number
-    description?: string
-  }
-}
-```
-
-## 快速检查清单
+## 修复检查清单
 
 修复完成后，确认：
 
+- [ ] 运行 `python .claude/skills/alova-api-fix/scripts/fix_alova_api.py` 成功
 - [ ] 所有金额相关字段为 `string` 类型
 - [ ] Query 参数中的 DTO 对象已删除，保留展开的扁平字段
-- [ ] Body 参数中的 DTO 对象已保留
-- [ ] 文件无 TypeScript 语法错误
-- [ ] 项目能正常通过 `pnpm type-check`
+- [ ] Body 参数中的 DTO 对象已保留（不受影响）
+- [ ] 运行 `pnpm type-check` 无错误
+
+## 配置文件说明
+
+### alova.config.ts
+
+项目中的 `alova.config.ts` 已配置 `handleApi` 函数来处理 `@ModelAttribute` 展开：
+
+```typescript
+handleApi: (apiDescriptor) => {
+  const parameters = apiDescriptor.parameters
+
+  // 查找 DTO 参数
+  const dtoParam = parameters?.find(item => item.name.match(/dto$/i))
+
+  if (dtoParam) {
+    // 提取 DTO 的 properties
+    const properties = dtoParam.schema.properties
+    const dtoParameters = Object.keys(properties).map((key) => {
+      const schema = properties[key]
+      return {
+        name: key,
+        in: 'query',
+        schema,
+      }
+    })
+
+    // 将展开的字段添加到 parameters
+    apiDescriptor.parameters = [...parameters, ...dtoParameters]
+  }
+
+  return apiDescriptor
+}
+```
+
+此配置确保 DTO 字段被展开为独立的 query 参数，但仍需要修复脚本来删除原始的 DTO 对象字段。
 
 ## 参考
 
 - 后端金额格式化：`@JsonFormat(shape = JsonFormat.Shape.STRING)`
 - 后端 DTO 展开：`@ModelAttribute` 注解
-- 原文件备份：生成前自动备份到 `src/api/globals.d.ts.bak`
+- 备份文件：生成前自动备份到 `src/api/globals.d.ts.bak.{timestamp}`

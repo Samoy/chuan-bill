@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BillVO } from '@/api/globals'
+import BillDetail from './BillDetail.vue'
 
 defineOptions({
   name: 'BillDetailModal',

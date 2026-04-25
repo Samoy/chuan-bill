@@ -10,6 +10,8 @@ from pathlib import Path
 
 # 需要转换为 string 的字段名（支持驼峰命名）
 AMOUNT_FIELDS = [
+    'minAmount',  # 最小金额
+    'maxAmount',  # 最大金额
     'amount',       # 金额
     'balance',      # 余额
     'income',       # 收入

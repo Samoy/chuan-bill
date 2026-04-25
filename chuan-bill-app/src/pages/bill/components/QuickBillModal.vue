@@ -3,6 +3,7 @@ import type { AddBillDTO, BillVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
 import ManualEdit from './ManualEdit.vue'
 import OcrEdit from './OcrEdit.vue'
+import VoiceEdit from './VoiceEdit.vue'
 
 defineOptions({
   name: 'QuickBillModal',

@@ -131,16 +131,6 @@ export interface MessageListDTO {
    */
   size: number;
 }
-export interface FamilyMemberStatsDTO {
-  /**
-   * 月份，格式为YYYY-MM
-   */
-  month: string;
-  /**
-   * 家庭ID
-   */
-  familyId: string;
-}
 export interface BillListDTO {
   /**
    * 开始日期
@@ -755,6 +745,47 @@ export interface ResultBillMonthlyStatsVO {
   timestamp?: number;
   success?: boolean;
 }
+export interface FamilyMemberStatsVO {
+  /**
+   * 用户ID
+   */
+  userId?: string;
+  /**
+   * 用户昵称
+   */
+  nickname?: string;
+  /**
+   * 用户头像
+   */
+  avatar?: string;
+  /**
+   * 支出金额
+   */
+  expense?: string;
+  /**
+   * 收入金额
+   */
+  income?: string;
+  /**
+   * 支出占比(%)
+   */
+  expensePercentage?: number;
+  /**
+   * 收入占比(%)
+   */
+  incomePercentage?: number;
+  /**
+   * 是否是户主
+   */
+  isOwner?: boolean;
+}
+export interface ResultListFamilyMemberStatsVO {
+  code?: number;
+  message?: string;
+  data?: FamilyMemberStatsVO[];
+  timestamp?: number;
+  success?: boolean;
+}
 export interface DailyTrendVO {
   /**
    * 日期，格式为YYYY-MM-DD
@@ -763,11 +794,11 @@ export interface DailyTrendVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
 }
 export interface ResultListDailyTrendVO {
   code?: number;
@@ -792,7 +823,7 @@ export interface CategoryStatisticsVO {
   /**
    * 金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 占比百分比
    */
@@ -841,8 +872,8 @@ export interface MessageVO {
 }
 export interface IPageMessageVO {
   size?: number;
-  records?: MessageVO[];
   total?: number;
+  records?: MessageVO[];
   current?: number;
   /**
    * @deprecated
@@ -853,71 +884,6 @@ export interface ResultIPageMessageVO {
   code?: number;
   message?: string;
   data?: IPageMessageVO;
-  timestamp?: number;
-  success?: boolean;
-}
-export interface FamilyMemberStatsVO {
-  /**
-   * 用户ID
-   */
-  userId?: string;
-  /**
-   * 用户昵称
-   */
-  nickname?: string;
-  /**
-   * 用户头像
-   */
-  avatar?: string;
-  /**
-   * 支出金额
-   */
-  expense?: string;
-  /**
-   * 收入金额
-   */
-  income?: string;
-  /**
-   * 支出占比(%)
-   */
-  expensePercentage?: number;
-  /**
-   * 收入占比(%)
-   */
-  incomePercentage?: number;
-  /**
-   * 是否是户主
-   */
-  isOwner?: boolean;
-}
-export interface ResultListFamilyMemberStatsVO {
-  code?: number;
-  message?: string;
-  data?: FamilyMemberStatsVO[];
-  timestamp?: number;
-  success?: boolean;
-}
-export interface FamilyAiSuggestionVO {
-  /**
-   * 建议内容
-   */
-  content?: string;
-  /**
-   * 是否来自缓存
-   */
-  cached?: boolean;
-  /**
-   * 今日剩余次数
-   */
-  remainingCount?: number;
-}
-export interface ResultFamilyAiSuggestionVO {
-  code?: number;
-  message?: string;
-  /**
-   * 家庭AI建议
-   */
-  data?: FamilyAiSuggestionVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -1059,8 +1025,8 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
-  records?: BillVO[];
   total?: number;
+  records?: BillVO[];
   current?: number;
   /**
    * @deprecated
@@ -1446,6 +1412,7 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
+       *     total?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1467,7 +1434,6 @@ declare global {
        *       // 创建时间
        *       createTime?: string
        *     }>
-       *     total?: number
        *     current?: number
        *     // [deprecated]
        *     pages?: number
@@ -2266,160 +2232,6 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultFamilyVO, 'family.getFamilyDetail', Config>;
-      /**
-       * ---
-       *
-       * [GET] 获取家庭账单列表
-       *
-       * **path:** /family/bills
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   familyId: string
-       *   // 账单列表查询参数
-       *   billListDTO?: {
-       *     // 开始日期
-       *     startDate?: string
-       *     // 结束日期
-       *     endDate?: string
-       *     // 分类 ID
-       *     categoryId?: string
-       *     // 账单类型：income-收入，expense-支出，空字符串：全部
-       *     type?: string
-       *     // 支付方式 ID
-       *     paymentMethodId?: string
-       *     // 最小金额
-       *     minAmount?: number
-       *     // 最大金额
-       *     maxAmount?: number
-       *     // 关键字模糊搜索，支持名称和备注
-       *     keyword?: string
-       *     // 页码
-       *     page: number
-       *     // 每页数量
-       *     size: number
-       *     // 家庭 ID，传入则查询家庭账单，不传则查询个人账单
-       *     familyId?: string
-       *   }
-       *   startDate?: string
-       *   endDate?: string
-       *   categoryId?: string
-       *   type?: string
-       *   paymentMethodId?: string
-       *   minAmount?: number
-       *   maxAmount?: number
-       *   keyword?: string
-       *   page?: number
-       *   size?: number
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: {
-       *     size?: number
-       *     // [items] start
-       *     // 账单信息
-       *     // [items] end
-       *     records?: Array<{
-       *       // 账单 ID
-       *       id?: string
-       *       // 账单名称
-       *       name?: string
-       *       // 分类信息
-       *       category?: {
-       *         // 分类 ID
-       *         id?: string
-       *         // 分类名称
-       *         name?: string
-       *         // 图标 URL
-       *         icon?: string
-       *         // 分类类型：income-收入，expense-支出
-       *         type?: string
-       *         // 排序
-       *         sortOrder?: number
-       *         // 是否默认
-       *         isDefault?: boolean
-       *         // 用户 ID
-       *         userId?: string
-       *       }
-       *       // 支付方式信息
-       *       paymentMethod?: {
-       *         // 支付方式 ID
-       *         id?: string
-       *         // 支付方式名称
-       *         name?: string
-       *         // 图标 URL
-       *         icon?: string
-       *         // 排序
-       *         sortOrder?: number
-       *         // 是否默认
-       *         isDefault?: boolean
-       *         // 用户 ID
-       *         userId?: string
-       *       }
-       *       // 账单类型：income-收入，expense-支出
-       *       type?: string
-       *       // 账单金额
-       *       amount?: number
-       *       // 账单时间
-       *       time?: string
-       *       // 账单备注
-       *       remark?: string
-       *       // 账单来源：manual-手动，ocr-图片识别，voice-语音
-       *       source?: string
-       *       // 家庭 ID
-       *       familyId?: string
-       *       // 家庭名称
-       *       familyName?: string
-       *       // 记账人用户ID
-       *       userId?: string
-       *       // 记账人昵称
-       *       userNickname?: string
-       *       // 记账人头像
-       *       userAvatar?: string
-       *     }>
-       *     total?: number
-       *     current?: number
-       *     // [deprecated]
-       *     pages?: number
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getFamilyBills<
-        Config extends Alova2MethodConfig<ResultIPageBillVO> & {
-          params: {
-            familyId: string;
-            /**
-             * 账单列表查询参数
-             */
-            billListDTO?: BillListDTO;
-            startDate?: string;
-            endDate?: string;
-            categoryId?: string;
-            type?: string;
-            paymentMethodId?: string;
-            minAmount?: string;
-            maxAmount?: string;
-            keyword?: string;
-            page?: number;
-            size?: number;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultIPageBillVO, 'family.getFamilyBills', Config>;
     };
     bill: {
       /**
@@ -2447,7 +2259,7 @@ declare global {
        *   // 账单时间
        *   time?: string
        *   // 账单金额
-       *   amount?: number
+       *   amount?: string
        *   // 账单备注
        *   remark?: string
        *   // 家庭 ID，为空则属于个人账单
@@ -2543,7 +2355,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type: string
        *     // 账单金额
-       *     amount: number
+       *     amount: string
        *     // 账单时间
        *     time: string
        *     // 账单备注
@@ -2597,7 +2409,7 @@ declare global {
        *   // 账单类型：income-收入，expense-支出
        *   type: string
        *   // 账单金额
-       *   amount: number
+       *   amount: string
        *   // 账单时间
        *   time: string
        *   // 账单备注
@@ -2693,9 +2505,9 @@ declare global {
        *     // 支付方式 ID
        *     paymentMethodId?: string
        *     // 最小金额
-       *     minAmount?: number
+       *     minAmount?: string
        *     // 最大金额
-       *     maxAmount?: number
+       *     maxAmount?: string
        *     // 关键字模糊搜索，支持名称和备注
        *     keyword?: string
        *     // 页码
@@ -2710,8 +2522,8 @@ declare global {
        *   categoryId?: string
        *   type?: string
        *   paymentMethodId?: string
-       *   minAmount?: number
-       *   maxAmount?: number
+       *   minAmount?: string
+       *   maxAmount?: string
        *   keyword?: string
        *   page?: number
        *   size?: number
@@ -2728,6 +2540,7 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
+       *     total?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2771,7 +2584,7 @@ declare global {
        *       // 账单类型：income-收入，expense-支出
        *       type?: string
        *       // 账单金额
-       *       amount?: number
+       *       amount?: string
        *       // 账单时间
        *       time?: string
        *       // 账单备注
@@ -2789,7 +2602,6 @@ declare global {
        *       // 记账人头像
        *       userAvatar?: string
        *     }>
-       *     total?: number
        *     current?: number
        *     // [deprecated]
        *     pages?: number
@@ -2805,7 +2617,7 @@ declare global {
             /**
              * 账单列表查询参数
              */
-            billListDTO?: BillListDTO;
+            
             startDate?: string;
             endDate?: string;
             categoryId?: string;
@@ -2862,7 +2674,7 @@ declare global {
        *     // 收入金额
        *     income?: string
        *     // 结余金额
-       *     balance?: number
+       *     balance?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2875,7 +2687,7 @@ declare global {
             /**
              * 账单月度统计参数
              */
-            billMonthlyStatsDTO?: BillMonthlyStatsDTO;
+            
             month?: string;
             familyId?: string;
           };
@@ -2948,7 +2760,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注
@@ -3292,7 +3104,7 @@ declare global {
        *     // 收入金额
        *     income?: string
        *     // 结余金额
-       *     balance?: number
+       *     balance?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -3313,6 +3125,77 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultBillMonthlyStatsVO, 'statistics.getOverview', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取成员账单统计
+       *
+       * **path:** /statistics/members-bill
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 账单月度统计参数
+       *   dto?: {
+       *     // 月份，格式为YYYY-MM
+       *     month: string
+       *     // 家庭ID，用于查询家庭账单统计信息
+       *     familyId?: string
+       *   }
+       *   month?: string
+       *   familyId?: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // [items] start
+       *   // 家庭成员统计数据
+       *   // [items] end
+       *   data?: Array<{
+       *     // 用户ID
+       *     userId?: string
+       *     // 用户昵称
+       *     nickname?: string
+       *     // 用户头像
+       *     avatar?: string
+       *     // 支出金额
+       *     expense?: string
+       *     // 收入金额
+       *     income?: string
+       *     // 支出占比(%)
+       *     expensePercentage?: number
+       *     // 收入占比(%)
+       *     incomePercentage?: number
+       *     // 是否是户主
+       *     isOwner?: boolean
+       *   }>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getMembersStats<
+        Config extends Alova2MethodConfig<ResultListFamilyMemberStatsVO> & {
+          params: {
+            /**
+             * 账单月度统计参数
+             */
+            dto?: BillMonthlyStatsDTO;
+            month?: string;
+            familyId?: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultListFamilyMemberStatsVO, 'statistics.getMembersStats', Config>;
       /**
        * ---
        *
@@ -3419,7 +3302,7 @@ declare global {
        *     // 分类图标
        *     categoryIcon?: string
        *     // 金额
-       *     amount?: number
+       *     amount?: string
        *     // 占比百分比
        *     percentage?: number
        *   }>
@@ -3443,130 +3326,6 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultListCategoryStatisticsVO, 'statistics.getCategoryStats', Config>;
-    };
-    familyStatistics: {
-      /**
-       * ---
-       *
-       * [GET] 获取家庭成员收支统计
-       *
-       * **path:** /family/statistics/members
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 家庭成员统计请求
-       *   dto?: {
-       *     // 月份，格式为YYYY-MM
-       *     month: string
-       *     // 家庭ID
-       *     familyId: string
-       *   }
-       *   month?: string
-       *   familyId?: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // [items] start
-       *   // 家庭成员统计数据
-       *   // [items] end
-       *   data?: Array<{
-       *     // 用户ID
-       *     userId?: string
-       *     // 用户昵称
-       *     nickname?: string
-       *     // 用户头像
-       *     avatar?: string
-       *     // 支出金额
-       *     expense?: string
-       *     // 收入金额
-       *     income?: string
-       *     // 支出占比(%)
-       *     expensePercentage?: number
-       *     // 收入占比(%)
-       *     incomePercentage?: number
-       *     // 是否是户主
-       *     isOwner?: boolean
-       *   }>
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getMemberStats<
-        Config extends Alova2MethodConfig<ResultListFamilyMemberStatsVO> & {
-          params: {
-            month?: string;
-            familyId?: string;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultListFamilyMemberStatsVO, 'familyStatistics.getMemberStats', Config>;
-      /**
-       * ---
-       *
-       * [GET] 获取家庭AI建议
-       *
-       * **path:** /family/statistics/ai-suggestion
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 家庭成员统计请求
-       *   dto?: {
-       *     // 月份，格式为YYYY-MM
-       *     month: string
-       *     // 家庭ID
-       *     familyId: string
-       *   }
-       *   month?: string
-       *   familyId?: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   // 家庭AI建议
-       *   data?: {
-       *     // 建议内容
-       *     content?: string
-       *     // 是否来自缓存
-       *     cached?: boolean
-       *     // 今日剩余次数
-       *     remainingCount?: number
-       *   }
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getAiSuggestion<
-        Config extends Alova2MethodConfig<ResultFamilyAiSuggestionVO> & {
-          params: {
-            month?: string;
-            familyId?: string;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultFamilyAiSuggestionVO, 'familyStatistics.getAiSuggestion', Config>;
     };
     ai: {
       /**
@@ -3633,7 +3392,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注
@@ -3730,7 +3489,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注

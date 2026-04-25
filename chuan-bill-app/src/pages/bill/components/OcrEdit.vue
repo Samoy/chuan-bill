@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { UploadFile, UploadSuccessEvent } from 'wot-design-uni/components/wd-upload/types'
 import type { BillVO, ResultTempFileVO, TempFileVO } from '@/api/globals'
+import BillCard from './BillCard.vue'
 
 defineOptions({
   name: 'OcrEdit',
@@ -175,7 +176,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/temp/upload`
           <!-- 成功图标 -->
           <wd-icon name="check-circle" size="20px" color="green" />
         </view>
-        <bill-card :bill="taskResult" custom-class="w-full flex" />
+        <BillCard :bill="taskResult" custom-class="w-full flex" />
         <view class="box-border w-full flex gap-3">
           <wd-button plain custom-class="flex-1" @click="reset">
             重新识别
