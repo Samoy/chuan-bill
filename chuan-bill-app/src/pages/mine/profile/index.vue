@@ -136,6 +136,18 @@ async function handleSave() {
 
     <!-- 表单区域 -->
     <view class="rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <!-- 手机号 -->
+      <view class="mb-4 flex items-center justify-between py-2">
+        <text class="text-sm text-gray-600">
+          手机号
+        </text>
+        <view class="flex items-center gap-1">
+          <text class="text-sm text-gray-400">
+            {{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
+          </text>
+          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+        </view>
+      </view>
       <!-- 昵称 -->
       <view class="mb-4">
         <text class="mb-2 block text-sm text-gray-600">
@@ -152,7 +164,7 @@ async function handleSave() {
       </view>
 
       <!-- 性别 -->
-      <view class="mb-4">
+      <view>
         <text class="mb-2 block text-sm text-gray-600">
           性别
         </text>
@@ -166,19 +178,6 @@ async function handleSave() {
             {{ item.label }}
           </wd-radio>
         </wd-radio-group>
-      </view>
-
-      <!-- 手机号 -->
-      <view class="flex items-center justify-between py-2">
-        <text class="text-sm text-gray-600">
-          手机号
-        </text>
-        <view class="flex items-center gap-1">
-          <text class="text-sm text-gray-400">
-            {{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
-          </text>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-        </view>
       </view>
     </view>
 

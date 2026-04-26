@@ -30,6 +30,11 @@ const menuList = [
     action: () => user.requireAuth(() => router.push('/pages/mine/profile/index')),
   },
   {
+    icon: 'i-lucide:bell',
+    title: '消息中心',
+    action: () => user.requireAuth(() => router.push('/pages/mine/profile/index')),
+  },
+  {
     icon: 'i-lucide:settings',
     title: '设置',
     action: () => router.push('/pages/mine/settings/index'),
@@ -38,11 +43,6 @@ const menuList = [
     icon: 'i-lucide:help-circle',
     title: '帮助与反馈',
     action: () => router.push('/pages/mine/help/index'),
-  },
-  {
-    icon: 'i-lucide:info',
-    title: '关于',
-    action: () => router.push('/pages/mine/about/index'),
   },
 ]
 
@@ -169,15 +169,6 @@ onShow(() => {
             <text class="mt-1 block text-sm text-white/80">
               {{ userStore.phone || '未绑定手机号' }}
             </text>
-          </view>
-          <!-- 消息通知入口 -->
-          <view class="relative" @click="router.push('/pages/message/index')">
-            <view class="h-10 w-10 flex items-center justify-center rounded-full bg-white/20">
-              <view class="i-lucide:bell h-5 w-5" />
-            </view>
-            <view v-if="messageStore.hasUnread" class="absolute right-0 top-0 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              {{ (messageStore.unreadCount?.total || 0) > 9 ? '9+' : messageStore.unreadCount?.total }}
-            </view>
           </view>
         </view>
       </view>
