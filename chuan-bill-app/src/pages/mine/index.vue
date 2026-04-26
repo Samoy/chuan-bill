@@ -12,6 +12,7 @@ const user = useUserStore()
 const userStore = useUserStore()
 const billStore = useBillStore()
 const messageStore = useMessageStore()
+const router = useRouter()
 
 // 登录价值特性
 const loginFeatures = [
@@ -23,18 +24,32 @@ const loginFeatures = [
 
 // 菜单列表（已登录状态）
 const menuList = [
-  { icon: 'i-lucide:user', title: '个人信息', action: () => {} },
-  { icon: 'i-lucide:settings', title: '设置', action: () => {} },
-  { icon: 'i-lucide:help-circle', title: '帮助与反馈', action: () => {} },
-  { icon: 'i-lucide:info', title: '关于', action: () => {} },
+  {
+    icon: 'i-lucide:user',
+    title: '个人信息',
+    action: () => user.requireAuth(() => router.push('/pages/mine/profile/index')),
+  },
+  {
+    icon: 'i-lucide:settings',
+    title: '设置',
+    action: () => router.push('/pages/mine/settings/index'),
+  },
+  {
+    icon: 'i-lucide:help-circle',
+    title: '帮助与反馈',
+    action: () => router.push('/pages/mine/help/index'),
+  },
+  {
+    icon: 'i-lucide:info',
+    title: '关于',
+    action: () => router.push('/pages/mine/about/index'),
+  },
 ]
 
 // 跳转到登录
 function goToLogin() {
   user.showLoginPopup = true
 }
-
-const router = useRouter()
 
 // 退出登录
 function logout() {
@@ -109,22 +124,28 @@ onShow(() => {
         </view>
       </view>
 
-      <!-- 关于 -->
+      <!-- 帮助与关于 -->
       <view class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
-        <view class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
-          <view class="flex items-center gap-3">
-            <view class="i-lucide:info h-5 w-5 text-gray-500" />
-            <text class="text-sm">
-              关于小川记账
-            </text>
-          </view>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-        </view>
-        <view class="flex items-center justify-between p-4">
+        <view
+          class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700"
+          @click="router.push('/pages/mine/help/index')"
+        >
           <view class="flex items-center gap-3">
             <view class="i-lucide:help-circle h-5 w-5 text-gray-500" />
             <text class="text-sm">
               帮助与反馈
+            </text>
+          </view>
+          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+        </view>
+        <view
+          class="flex items-center justify-between p-4"
+          @click="router.push('/pages/mine/about/index')"
+        >
+          <view class="flex items-center gap-3">
+            <view class="i-lucide:info h-5 w-5 text-gray-500" />
+            <text class="text-sm">
+              关于小川记账
             </text>
           </view>
           <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
