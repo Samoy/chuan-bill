@@ -11,6 +11,10 @@ defineOptions({
   },
 })
 
+const props = defineProps<{
+  familyId?: string
+}>()
+
 const emit = defineEmits<{
   submit: [result: Optional<BillListDTO>, isFiltered?: boolean]
 }>()
@@ -157,7 +161,7 @@ watch(() => formData.value, (newVal) => {
           </wd-radio-group>
         </view>
         <!-- 家庭筛选（仅已登录且有家庭时显示） -->
-        <view v-if="user.isLoggedIn && familyList.length > 0" class="flex flex-col gap-1">
+        <view v-if="user.isLoggedIn && familyList.length > 0 && !props.familyId" class="flex flex-col gap-1">
           <view class="flex items-center gap-2 font-500">
             <text class="i-lucide:home text-primary" />
             <text>所属家庭</text>
@@ -174,7 +178,7 @@ watch(() => formData.value, (newVal) => {
         <wd-button plain type="primary" custom-class="flex-1" @click="resetFormData">
           重置
         </wd-button>
-        <wd-button type="primary" custom-class="flex-1" @click="emit('submit', formData, isFiltered)">
+        <wd-button type="primary" custom-class="flex-1" @click="emit('submit', { ...formData, familyId: props.familyId }, isFiltered)">
           确定
         </wd-button>
       </view>

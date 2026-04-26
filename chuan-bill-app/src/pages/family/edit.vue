@@ -143,7 +143,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/upload`
         <text class="mb-2 block text-sm text-gray-600">
           家庭名称
         </text>
-        <wd-input v-model="formData.name" placeholder="请输入家庭名称" :maxlength="20" no-border custom-class="mt-2" />
+        <wd-input v-model="formData.name" placeholder="请输入家庭名称" :maxlength="15" no-border custom-class="mt-2" />
         <wd-divider custom-class="!mt-2 !px-0" />
       </view>
 

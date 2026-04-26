@@ -10,7 +10,8 @@ defineOptions({
   },
 })
 
-const { bill } = defineProps<{
+const { bill, type = 'user' } = defineProps<{
+  type?: 'user' | 'family'
   bill: BillVO
 }>()
 
@@ -53,21 +54,25 @@ function deleteBill() {
   })
 }
 
-const isOwnerBill = computed(() => {
-  return bill.userId === userStore.userId
+const isFamilyBill = computed(() => {
+  return type === 'family'
+})
+
+const showBtn = computed(() => {
+  return bill.userId === userStore.userId && !isFamilyBill.value
 })
 </script>
 
 <template>
   <wd-popup v-model="show" :z-index="100" safe-area-inset-bottom position="bottom" closable custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" lock-scroll>
-    <view class="relative" :class="isOwnerBill ? 'pb-12' : ''">
+    <view class="relative" :class="showBtn ? 'pb-12' : ''">
       <view class="box-border h-10 w-full flex items-center justify-center text-center text-lg font-500">
         <text>账单详情</text>
       </view>
       <view class="mt-2 box-border px-4">
         <BillDetail :bill="bill" />
       </view>
-      <view v-if="isOwnerBill" class="absolute bottom-0 left-4 right-4 box-border h-8 flex items-center justify-center gap-3">
+      <view v-if="showBtn" class="absolute bottom-0 left-4 right-4 box-border h-8 flex items-center justify-center gap-3">
         <wd-button type="error" custom-class="flex-1" @click="deleteBill">
           删除
         </wd-button>

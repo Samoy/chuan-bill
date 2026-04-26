@@ -236,7 +236,7 @@ async function handleJoin() {
           <view class="mt-3 flex gap-2">
             <view
               class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary/5 py-2 text-primary transition-all active:scale-95"
-              @click.stop="router.push(`/pages/family/bill?familyId=${family.id}`)"
+              @click.stop="router.push(`/pages/family/bill?familyId=${family.id}&familyName=${family.name}`)"
             >
               <view class="i-lucide:clipboard-list h-4 w-4" />
               <view class="text-xs font-500">

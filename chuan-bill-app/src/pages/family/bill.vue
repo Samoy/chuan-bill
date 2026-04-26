@@ -21,20 +21,16 @@ definePage({
   },
 })
 
-// 鉴权检查
 const user = useUserStore()
 const billStore = useBillStore()
-const message = useGlobalMessage()
 
 const searchValue = ref('')
-const filterParams = ref<Optional<BillListDTO>>()
+const filterParams = ref<Optional<BillListDTO>>({})
 const isFiltered = ref()
 const showFilterModal = ref(false)
-const showQuickBillModal = ref(false)
 const showBillDetailModal = ref(false)
 const currentBill = ref<BillVO>()
-const isEditBill = ref(false)
-const quickBillSource = ref<'manual' | 'ocr' | 'voice'>('manual')
+const familyId = ref<string>()
 
 // 账单列表数据
 const billList = ref<BillVO[]>([])
@@ -119,7 +115,7 @@ function loadMore() {
 }
 
 function submitFilter(result: Optional<BillListDTO>, filtered?: boolean) {
-  filterParams.value = result
+  filterParams.value = { familyId: familyId.value, ...result }
   isFiltered.value = filtered
   showFilterModal.value = false
   refresh()
@@ -130,30 +126,6 @@ function onClickBill(bill: BillVO) {
   showBillDetailModal.value = true
 }
 
-// 添加账单 - 打开快速记账弹框
-function addBill() {
-  // 判断账目条数是否大于1000条，如果大于，则需要登录
-  if (billStore.localBillList.length >= 1000) {
-    message.confirm({ title: '提示', msg: '账目条数已达到上限，登录后解锁更多记账条数', confirmButtonText: '去登录', cancelButtonText: '暂不登录', success: (res) => {
-      if (res.action === 'confirm') {
-        goToLogin()
-      }
-    } })
-    return
-  }
-  currentBill.value = undefined
-  quickBillSource.value = 'manual'
-  isEditBill.value = false
-  showQuickBillModal.value = true
-}
-
-function editBill(bill: BillVO) {
-  isEditBill.value = true
-  currentBill.value = bill
-  showBillDetailModal.value = false
-  showQuickBillModal.value = true
-}
-
 function isSameMonth(currentTime?: string, comparedTime?: string) {
   if (!currentTime || !comparedTime) {
     return false
@@ -161,12 +133,14 @@ function isSameMonth(currentTime?: string, comparedTime?: string) {
   return dayjs(currentTime).isSame(dayjs(comparedTime), 'month')
 }
 
-// 跳转到登录页
-function goToLogin() {
-  user.showLoginPopup = true
-}
-
-onLoad(() => {
+onLoad((options) => {
+  if (options?.familyId) {
+    filterParams.value.familyId = options.familyId
+    familyId.value = options.familyId
+  }
+  if (options?.familyName) {
+    uni.setNavigationBarTitle({ title: `${options.familyName}的账单` })
+  }
   refresh()
 })
 
@@ -222,20 +196,17 @@ watch(() => user.isLoggedIn, (newVal) => {
     </view>
 
     <view v-else class="mt-10vh flex flex-col items-center justify-center gap-5">
-      <wd-status-tip tip="您还没有任何账单数据，快来记一笔吧！">
+      <wd-status-tip tip="您的家庭还没有任何账单数据">
         <template #image>
           <image mode="aspectFit" class="h-30 w-80" src="https://cdn.chuanbill.samoy.site/default/nodata.svg" />
         </template>
       </wd-status-tip>
-      <wd-button type="primary" @click="addBill">
-        开始记账
-      </wd-button>
     </view>
 
     <!-- 账单详情弹框 -->
-    <BillDetailModal v-if="currentBill" v-model="showBillDetailModal" :bill="currentBill!" @delete="refresh" @update="editBill" />
+    <BillDetailModal v-if="currentBill" v-model="showBillDetailModal" :bill="currentBill!" type="family" />
     <!-- 筛选弹框 -->
-    <FilterModal v-model="showFilterModal" @submit="submitFilter" />
+    <FilterModal v-model="showFilterModal" :family-id="familyId" @submit="submitFilter" />
   </view>
 </template>
 
