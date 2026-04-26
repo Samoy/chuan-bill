@@ -14,8 +14,5 @@ const colorPrimary = computed(() => {
     <global-loading />
     <global-toast />
     <global-message />
-    <!-- #ifdef MP-WEIXIN -->
-    <privacy-popup />
-    <!-- #endif -->
   </wd-config-provider>
 </template>

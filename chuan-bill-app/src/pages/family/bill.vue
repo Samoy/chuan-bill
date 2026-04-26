@@ -139,7 +139,7 @@ onLoad((options) => {
     familyId.value = options.familyId
   }
   if (options?.familyName) {
-    uni.setNavigationBarTitle({ title: `${options.familyName}的账单` })
+    uni.setNavigationBarTitle({ title: `${decodeURIComponent(options.familyName)}的账单` })
   }
   refresh()
 })

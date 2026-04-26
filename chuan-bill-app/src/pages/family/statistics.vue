@@ -57,7 +57,7 @@ onLoad((options) => {
     familyId.value = options.familyId
   }
   if (options?.familyName) {
-    uni.setNavigationBarTitle({ title: `${options.familyName}账单统计` })
+    uni.setNavigationBarTitle({ title: `${decodeURIComponent(options.familyName)}账单统计` })
   }
   statisticsStore.setAnalysisContext(AI_SUGGESTION_TYPE_FAMILY, familyId.value)
   statisticsStore.fetchAll(currentMonth.value, familyId.value)

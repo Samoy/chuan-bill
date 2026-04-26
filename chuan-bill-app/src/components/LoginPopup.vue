@@ -274,20 +274,15 @@ export default {
     :close-on-click-modal="true"
     lock-scroll
     safe-area-inset-bottom
-    custom-style="border-radius: 24rpx 24rpx 0 0;"
+    custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!"
     @close="handleClose"
   >
-    <view class="px-6 pb-5">
-      <!-- 顶部拖拽条 -->
-      <view class="flex justify-center py-3">
-        <view class="h-1 w-10 rounded-full bg-gray-200" />
-      </view>
-
+    <view class="px-6 py-2">
       <!-- ==================== 微信快速登录视图 ==================== -->
       <view v-if="currentView === 'wechat'" class="flex flex-col">
         <!-- 应用图标 -->
-        <view class="app-icon mx-auto mt-2">
-          <view class="i-mingcute-wallet-4-fill text-3xl text-white" />
+        <view class="app-icon mx-auto">
+          <wd-img src="https://cdn.chuanbill.samoy.site/default/logo.png" custom-class="w-16 h-16" image-mode="aspectFill" />
         </view>
         <!-- 标题 -->
         <text class="mt-5 text-xl text-gray-800 font-bold">
@@ -322,8 +317,8 @@ export default {
       <view v-if="currentView === 'phone'">
         <!-- 应用图标 -->
         <view class="mt-2 flex justify-center">
-          <view class="app-icon">
-            <view class="i-mingcute-wallet-4-fill text-3xl text-white" />
+          <view class="app-icon mx-auto mt-4 bg-blue-200">
+            <wd-img src="https://cdn.chuanbill.samoy.site/default/logo.png" custom-class="w-16 h-16" image-mode="aspectFill" />
           </view>
         </view>
         <!-- 标题 -->
@@ -472,10 +467,8 @@ export default {
 <style lang="scss" scoped>
 /* 应用图标 */
 .app-icon {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  @apply rounded-2xl p-2;
+  background: linear-gradient(135deg, rgb(var(--color-primary) / 0.5), rgb(var(--color-primary) / 1));
   display: flex;
   align-items: center;
   justify-content: center;
