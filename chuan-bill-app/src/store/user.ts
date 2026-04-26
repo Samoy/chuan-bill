@@ -12,6 +12,8 @@ export const useUserStore = defineStore('user', () => {
   const userId = ref('')
   const nickname = ref('')
   const phone = ref('')
+  const avatar = ref('')
+  const gender = ref('0')
   const expireTime = ref(0)
   const showLoginPopup = ref(false)
   const pendingCallback = ref<PendingCallback>(null)
@@ -33,6 +35,8 @@ export const useUserStore = defineStore('user', () => {
     expireTime.value = data.expireTime
     userId.value = data.userId
     nickname.value = data.nickname
+    // 登录后获取完整资料
+    getProfile()
   }
 
   /**
@@ -45,7 +49,51 @@ export const useUserStore = defineStore('user', () => {
     userId.value = ''
     nickname.value = ''
     phone.value = ''
+    avatar.value = ''
+    gender.value = '0'
     expireTime.value = 0
+  }
+
+  /**
+   * 获取用户资料
+   */
+  async function getProfile() {
+    if (!isLoggedIn.value)
+      return
+    try {
+      const res = await Apis.user.getProfile()
+      if (res.success && res.data) {
+        nickname.value = res.data.nickname || ''
+        phone.value = res.data.phone || ''
+        avatar.value = res.data.avatar || ''
+        gender.value = res.data.gender || '0'
+      }
+    }
+    catch {
+      // 静默失败
+    }
+  }
+
+  /**
+   * 更新用户资料
+   */
+  async function updateProfile(data: { nickname?: string, avatar?: string, gender?: string }) {
+    try {
+      const res = await Apis.user.updateProfile({ data })
+      if (res.success) {
+        if (data.nickname !== undefined)
+          nickname.value = data.nickname
+        if (data.avatar !== undefined)
+          avatar.value = data.avatar
+        if (data.gender !== undefined)
+          gender.value = data.gender
+        return true
+      }
+    }
+    catch {
+      // 静默失败
+    }
+    return false
   }
 
   /**
@@ -106,6 +154,8 @@ export const useUserStore = defineStore('user', () => {
     userId,
     nickname,
     phone,
+    avatar,
+    gender,
     expireTime,
     isLoggedIn,
     showLoginPopup,
@@ -115,5 +165,7 @@ export const useUserStore = defineStore('user', () => {
     onLoginCancel,
     login,
     logout,
+    getProfile,
+    updateProfile,
   }
 })
