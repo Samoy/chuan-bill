@@ -1,4 +1,4 @@
-import type { BillVO, FamilyJoinApplyVO, FamilyMemberVO, FamilyVO } from '@/api/globals'
+import type { FamilyJoinApplyVO, FamilyMemberVO, FamilyVO } from '@/api/globals'
 
 export const useFamilyStore = defineStore('family', () => {
   const user = useUserStore()
@@ -15,12 +15,6 @@ export const useFamilyStore = defineStore('family', () => {
   const familyListLoading = ref(false)
   const memberListLoading = ref(false)
   const applyListLoading = ref(false)
-
-  // 家庭账单相关
-  const familyBills = ref<BillVO[]>([])
-  const familyBillsLoading = ref(false)
-  const familyBillsPage = ref(1)
-  const familyBillsFinished = ref(false)
 
   // 当前选中的家庭ID
   const currentFamilyId = computed(() => currentFamily.value?.id || '')
@@ -233,16 +227,6 @@ export const useFamilyStore = defineStore('family', () => {
   }
 
   /**
-   * 切换当前家庭
-   */
-  function switchFamily(familyId: string) {
-    const family = familyList.value.find(f => f.id === familyId)
-    if (family) {
-      currentFamily.value = family
-    }
-  }
-
-  /**
    * 重置状态
    */
   function reset() {
@@ -250,13 +234,9 @@ export const useFamilyStore = defineStore('family', () => {
     currentFamily.value = null
     memberList.value = []
     pendingApplies.value = []
-    familyBills.value = []
     familyListLoading.value = false
     memberListLoading.value = false
     applyListLoading.value = false
-    familyBillsLoading.value = false
-    familyBillsPage.value = 1
-    familyBillsFinished.value = false
   }
 
   return {
@@ -264,13 +244,9 @@ export const useFamilyStore = defineStore('family', () => {
     currentFamily,
     memberList,
     pendingApplies,
-    familyBills,
     familyListLoading,
     memberListLoading,
     applyListLoading,
-    familyBillsLoading,
-    familyBillsPage,
-    familyBillsFinished,
     currentFamilyId,
     hasFamily,
     fetchFamilyList,
@@ -286,7 +262,6 @@ export const useFamilyStore = defineStore('family', () => {
     fetchPendingApplies,
     handleJoinApply,
     refreshInviteCode,
-    switchFamily,
     reset,
   }
 })

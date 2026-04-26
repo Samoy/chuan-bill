@@ -11,7 +11,7 @@ const version = ref<string>('1.0.0')
 
 onLoad(() => {
   // #ifdef APP-PLUS
-  version.value = plus.runtime.version
+  version.value = plus.runtime.version || '1.0.0'
   // #endif
   // #ifdef MP-WEIXIN
   try {
