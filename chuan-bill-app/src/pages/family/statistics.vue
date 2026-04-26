@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { FamilyMemberStatsVO } from '@/api/globals'
 import dayjs from 'dayjs'
-import AiSuggestionCard from './components/FamilyAiSuggestionCard.vue'
-import MemberChart from './components/MemberChart.vue'
-import MemberRanking from './components/MemberRanking.vue'
+import { AI_SUGGESTION_TYPE_FAMILY } from '@/common/constant'
+import AiSuggestionCard from '@/pages/statistics/components/AiSuggestionCard.vue'
+import { setupEcharts } from '../../utils/echarts-setup'
+import CategoryChart from '../statistics/components/CategoryChart.vue'
+import MemberRankingChart from './components/MemberRankingChart.vue'
 
 definePage({
   name: 'family-statistics',
@@ -13,17 +14,13 @@ definePage({
   },
 })
 
-const userStore = useUserStore()
-const toast = useGlobalToast()
+setupEcharts()
+
+const statisticsStore = useStatisticsStore()
 
 const familyId = ref('')
 const currentMonth = ref(dayjs().format('YYYY-MM'))
 const showMonthPicker = ref(false)
-
-// 统计数据
-const memberStats = ref<FamilyMemberStatsVO[]>([])
-const overview = ref({ expense: 0, income: 0, balance: 0 })
-const loading = ref(false)
 
 // 月份选项（最近12个月）
 const monthOptions = computed(() => {
@@ -35,31 +32,6 @@ const monthOptions = computed(() => {
   return options
 })
 
-// 当前用户信息
-const currentUserId = computed(() => userStore.userId)
-const isOwner = computed(() => {
-  return memberStats.value.some(m => m.userId === currentUserId.value && m.isOwner)
-})
-
-onLoad((options) => {
-  if (options?.familyId) {
-    familyId.value = options.familyId
-  }
-})
-
-onShow(() => {
-  if (familyId.value) {
-    fetchStatistics()
-  }
-})
-
-// 监听月份变化
-watch(currentMonth, () => {
-  if (familyId.value) {
-    fetchStatistics()
-  }
-})
-
 // 切换到上一个月
 function prevMonth() {
   currentMonth.value = dayjs(currentMonth.value).subtract(1, 'month').format('YYYY-MM')
@@ -69,7 +41,6 @@ function prevMonth() {
 function nextMonth() {
   const next = dayjs(currentMonth.value).add(1, 'month')
   if (next.isAfter(dayjs(), 'month')) {
-    toast.info('不能选择未来月份')
     return
   }
   currentMonth.value = next.format('YYYY-MM')
@@ -81,34 +52,22 @@ function onMonthSelect({ value }: { value: string }) {
   showMonthPicker.value = false
 }
 
-// 获取统计数据
-async function fetchStatistics() {
-  if (!familyId.value)
-    return
-  loading.value = true
-  try {
-    const res = await Apis.statistics.getMembersStats({
-      params: {
-        familyId: familyId.value,
-        month: currentMonth.value,
-      },
-    })
-    if (res.success && res.data) {
-      memberStats.value = res.data
-      // 计算总览数据
-      const totalExpense = res.data.reduce((sum, item) => sum + (Number(item.expense) || 0), 0)
-      const totalIncome = res.data.reduce((sum, item) => sum + (Number(item.income) || 0), 0)
-      overview.value = {
-        expense: totalExpense,
-        income: totalIncome,
-        balance: totalIncome - totalExpense,
-      }
-    }
+onLoad((options) => {
+  if (options?.familyId) {
+    familyId.value = options.familyId
   }
-  finally {
-    loading.value = false
+  if (options?.familyName) {
+    uni.setNavigationBarTitle({ title: `${options.familyName}账单统计` })
   }
-}
+  statisticsStore.setAnalysisContext(AI_SUGGESTION_TYPE_FAMILY, familyId.value)
+  statisticsStore.fetchAll(currentMonth.value, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_FAMILY, currentMonth.value, familyId.value)
+})
+
+watch(currentMonth, (month) => {
+  statisticsStore.fetchAll(month, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_FAMILY, month, familyId.value)
+})
 </script>
 
 <template>
@@ -145,7 +104,7 @@ async function fetchStatistics() {
 
     <!-- 概览卡片 -->
     <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
-      <view v-if="loading" class="py-4">
+      <view v-if="statisticsStore.overviewLoading" class="py-4">
         <wd-skeleton :row="1" animation="gradient" />
       </view>
       <view v-else class="flex items-center justify-around">
@@ -154,7 +113,7 @@ async function fetchStatistics() {
             支出
           </text>
           <text class="text-lg text-red-400 font-600">
-            ¥{{ overview.expense.toFixed(2) }}
+            ¥{{ statisticsStore.overview?.expense || '0.00' }}
           </text>
         </view>
         <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
@@ -163,7 +122,7 @@ async function fetchStatistics() {
             收入
           </text>
           <text class="text-lg text-green-500 font-600">
-            ¥{{ overview.income.toFixed(2) }}
+            ¥{{ statisticsStore.overview?.income || '0.00' }}
           </text>
         </view>
         <view class="h-8 w-px bg-gray-200 dark:bg-gray-700" />
@@ -172,7 +131,7 @@ async function fetchStatistics() {
             结余
           </text>
           <text class="text-lg text-primary font-600">
-            ¥{{ overview.balance.toFixed(2) }}
+            ¥{{ statisticsStore.overview?.balance || '0.00' }}
           </text>
         </view>
       </view>
@@ -180,20 +139,17 @@ async function fetchStatistics() {
 
     <!-- 成员收支饼图 -->
     <view class="mx-3">
-      <MemberChart :month="currentMonth" :family-id="familyId" :data="memberStats" :loading="loading" />
+      <CategoryChart :month="currentMonth" :family-id="familyId" />
     </view>
 
     <!-- 收支排行榜 -->
     <view class="mx-3">
-      <MemberRanking :data="memberStats" :loading="loading" />
+      <MemberRankingChart :month="currentMonth" :family-id="familyId" />
     </view>
 
     <!-- AI建议（仅户主可见） -->
-    <view v-if="isOwner" class="mx-3">
-      <AiSuggestionCard :month="currentMonth" :family-id="familyId" />
+    <view class="mx-3">
+      <AiSuggestionCard :month="currentMonth" :analysis-type="AI_SUGGESTION_TYPE_FAMILY" :family-id="familyId" />
     </view>
-
-    <!-- 底部间距 -->
-    <view class="h-10" />
   </view>
 </template>

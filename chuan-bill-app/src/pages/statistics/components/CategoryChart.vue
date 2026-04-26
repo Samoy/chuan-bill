@@ -6,6 +6,7 @@ defineOptions({
 
 const props = defineProps<{
   month: string
+  familyId?: string
 }>()
 
 const statisticsStore = useStatisticsStore()
@@ -59,11 +60,11 @@ const pieOption = computed(() => {
 })
 
 watch(activeType, (type) => {
-  statisticsStore.fetchCategoryBreakdown(props.month, type)
+  statisticsStore.fetchCategoryBreakdown(props.month, type, props.familyId)
 })
 
 watch(() => props.month, () => {
-  statisticsStore.fetchCategoryBreakdown(props.month, activeType.value)
+  statisticsStore.fetchCategoryBreakdown(props.month, activeType.value, props.familyId)
 })
 </script>
 

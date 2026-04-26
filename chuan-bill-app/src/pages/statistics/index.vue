@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
+import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import CategoryChart from './components/CategoryChart.vue'
 import DailyTrendChart from './components/DailyTrendChart.vue'
-import { setupEcharts } from './echarts-setup'
 
 definePage({
   name: 'statistics',

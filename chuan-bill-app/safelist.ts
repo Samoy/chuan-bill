@@ -30,4 +30,8 @@ export const safeIconList: string[] = [
   'i-mingcute:gift-line',
   'i-mingcute:card-refund-line',
   'i-icon-park-outline:income',
+  // 排行榜名次图标
+  'i-lucide:crown',
+  'i-lucide:medal',
+  'i-lucide:award',
 ]
