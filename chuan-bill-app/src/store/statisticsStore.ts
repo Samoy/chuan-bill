@@ -1,7 +1,8 @@
 import type { BillMonthlyStatsVO } from '@/api/globals'
-import type { AI_SUGGESTION_TYPE_FAMILY, AI_SUGGESTION_TYPE_USER } from '@/common/constant'
+import type { AI_SUGGESTION_TYPE_FAMILY } from '@/common/constant'
 import dayjs from 'dayjs'
 import { add, divide, multiply } from 'mathjs'
+import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
 
 interface CategoryStatItem {
   categoryId: string
@@ -16,6 +17,8 @@ type AnalysisType = typeof AI_SUGGESTION_TYPE_USER | typeof AI_SUGGESTION_TYPE_F
 export const useStatisticsStore = defineStore('statistics', () => {
   const user = useUserStore()
   const billStore = useBillStore()
+  const currentAnalysisType = ref<AnalysisType>(AI_SUGGESTION_TYPE_USER)
+  const currentFamilyId = ref<string>()
 
   const overview = ref<BillMonthlyStatsVO | null>(null)
   const categoryData = ref<CategoryStatItem[]>([])
@@ -28,13 +31,22 @@ export const useStatisticsStore = defineStore('statistics', () => {
   const trendLoading = ref(false)
   const aiLoading = ref(false)
 
+  function setAnalysisContext(type: AnalysisType, familyId?: string) {
+    if (type !== currentAnalysisType.value || familyId !== currentFamilyId.value) {
+      reset()
+      currentAnalysisType.value = type
+      currentFamilyId.value = familyId
+    }
+  }
+
   /**
    * 获取月度概览
    */
-  async function fetchOverview(month: string) {
+  async function fetchOverview(month: string, familyId?: string) {
     overviewLoading.value = true
     try {
-      overview.value = await billStore.getMonthlyBillStats(month) || null
+      const fid = familyId || currentFamilyId.value
+      overview.value = await billStore.getMonthlyBillStats(month, fid) || null
     }
     finally {
       overviewLoading.value = false
@@ -44,11 +56,12 @@ export const useStatisticsStore = defineStore('statistics', () => {
   /**
    * 获取分类统计
    */
-  async function fetchCategoryBreakdown(month: string, type: 'expense' | 'income') {
+  async function fetchCategoryBreakdown(month: string, type: 'expense' | 'income', familyId?: string) {
     categoryLoading.value = true
     try {
       if (user.isLoggedIn) {
-        const res = await Apis.statistics.getCategoryStats({ params: { month, type } })
+        const fid = familyId || currentFamilyId.value
+        const res = await Apis.statistics.getCategoryStats({ params: { month, type, familyId: fid } })
         if (res.success && res.data) {
           categoryData.value = res.data.map(item => ({
             categoryId: item.categoryId || '',
@@ -111,7 +124,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
   /**
    * 获取每日收支趋势
    */
-  async function fetchDailyTrend(month: string) {
+  async function fetchDailyTrend(month: string, familyId?: string) {
     trendLoading.value = true
     try {
       const daysInMonth = dayjs(month).daysInMonth()
@@ -120,7 +133,8 @@ export const useStatisticsStore = defineStore('statistics', () => {
       const incomes = Array.from({ length: daysInMonth }, () => 0)
 
       if (user.isLoggedIn) {
-        const res = await Apis.statistics.getDailyTrend({ params: { month } })
+        const fid = familyId || currentFamilyId.value
+        const res = await Apis.statistics.getDailyTrend({ params: { month, familyId: fid } })
         if (res.success && res.data) {
           for (const item of res.data) {
             if (item.date) {
@@ -218,10 +232,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
   /**
    * 并行获取所有统计数据
    */
-  async function fetchAll(month: string) {
+  async function fetchAll(month: string, familyId?: string) {
+    const fid = familyId || currentFamilyId.value
     await Promise.all([
       fetchOverview(month),
-      fetchCategoryBreakdown(month, 'expense'),
+      fetchCategoryBreakdown(month, 'expense', fid),
       fetchDailyTrend(month),
     ])
   }
@@ -250,6 +265,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
     categoryLoading,
     trendLoading,
     aiLoading,
+    setAnalysisContext,
     fetchOverview,
     fetchCategoryBreakdown,
     fetchDailyTrend,

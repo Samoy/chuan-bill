@@ -165,9 +165,9 @@ export const useBillStore = defineStore('bill', () => {
     }
   }
 
-  async function getMonthlyBillStats(month: string): Promise<BillMonthlyStatsVO | undefined> {
+  async function getMonthlyBillStats(month: string, familyId?: string): Promise<BillMonthlyStatsVO | undefined> {
     if (user.isLoggedIn) {
-      const res = await Apis.bill.getMonthlyStats({ params: { month } })
+      const res = await Apis.bill.getMonthlyStats({ params: { month, familyId } })
       return res.data
     }
 

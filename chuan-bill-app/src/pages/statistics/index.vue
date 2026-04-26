@@ -55,6 +55,10 @@ function onMonthSelect({ value }: { value: string }) {
   showMonthPicker.value = false
 }
 
+onLoad(() => {
+  statisticsStore.setAnalysisContext(AI_SUGGESTION_TYPE_USER)
+})
+
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)

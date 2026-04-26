@@ -114,11 +114,10 @@ public class AIServiceImpl implements IAIService {
             AiAnalysisVO vo = new AiAnalysisVO();
             if (suggestion != null) {
                 vo.setContent(suggestion.getContent());
-                return vo;
             }
             vo.setCached(true);
             vo.setRemainingCount(aiUsageService.getRemainingCount(userId, isVip));
-            return null;
+            return vo;
         }
 
         // 需要调用AI生成（无缓存或重新生成）
