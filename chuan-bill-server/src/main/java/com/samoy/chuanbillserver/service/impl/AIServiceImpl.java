@@ -8,6 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.dashscope.app.ApplicationResult;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
+import com.google.gson.JsonObject;
 import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
@@ -15,11 +16,7 @@ import com.samoy.chuanbillserver.entity.AiSuggestion;
 import com.samoy.chuanbillserver.entity.User;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
-import com.samoy.chuanbillserver.service.IAIService;
-import com.samoy.chuanbillserver.service.IAiSuggestionService;
-import com.samoy.chuanbillserver.service.IAiUsageService;
-import com.samoy.chuanbillserver.service.IBillService;
-import com.samoy.chuanbillserver.service.IUserService;
+import com.samoy.chuanbillserver.service.*;
 import com.samoy.chuanbillserver.utils.AgentUtil;
 import com.samoy.chuanbillserver.vo.AiAnalysisVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
@@ -49,6 +46,9 @@ public class AIServiceImpl implements IAIService {
 
     @Resource
     private IBillService billService;
+
+    @Resource
+    private IFamilyService familyService;
 
     @Resource
     private IUserService userService;
@@ -127,7 +127,7 @@ public class AIServiceImpl implements IAIService {
         }
 
         // 调用DashScope生成分析
-        String analysisText = generateAnalysis(userId, month);
+        String analysisText = generateAnalysis(analysisType, userId, month, familyId);
 
         // 持久化建议
         aiSuggestionService.saveOrUpdateSuggestion(analysisType, userId, familyId, month, analysisText);
@@ -149,14 +149,20 @@ public class AIServiceImpl implements IAIService {
      * @param month  月份
      * @return 分析文本
      */
-    private String generateAnalysis(String userId, String month) {
-        BillMonthlyStatsVO vo = billService.getMonthlyStats(userId, new BillMonthlyStatsDTO(month, null));
+    private String generateAnalysis(Integer analysisType, String userId, String month, String familyId) {
+        BillMonthlyStatsVO vo = billService.getMonthlyStats(userId, new BillMonthlyStatsDTO(month, familyId));
         BillListDTO billListDTO = new BillListDTO();
         YearMonth yearMonth = YearMonth.parse(month, DateTimeFormatter.ofPattern("yyyy-MM"));
         String startDate = yearMonth.atDay(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String endDate = yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         billListDTO.setStartDate(startDate);
         billListDTO.setEndDate(endDate);
+        if (analysisType == SystemConstants.FAMILY_ANALYSIS_TYPE) {
+            if (!familyService.isOwner(userId, familyId)) {
+                throw new BusinessException(ResultEnum.FAMILY_NOT_OWNER);
+            }
+            billListDTO.setFamilyId(familyId);
+        }
         List<BillVO> billVOList = billService.getBillList(userId, billListDTO);
         StringBuilder sb = new StringBuilder();
         sb.append("请分析以下账单数据：\n");
@@ -166,7 +172,9 @@ public class AIServiceImpl implements IAIService {
         sb.append(String.format("【%s账单明细】%n%s", month, JSONUtil.toJsonPrettyStr(billVOList)));
         log.debug("查询语句：\n{}", sb);
         try {
-            ApplicationResult result = agentUtil.callAgent(analysisAppId, sb.toString());
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("analysisType", analysisType);
+            ApplicationResult result = agentUtil.callAgent(analysisAppId, sb.toString(), jsonObject);
             return result.getOutput().getText();
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new BusinessException(ResultEnum.BILL_ANALYSIS_FAILED);

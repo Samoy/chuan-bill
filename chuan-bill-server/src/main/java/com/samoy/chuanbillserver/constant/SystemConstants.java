@@ -46,4 +46,13 @@ public class SystemConstants {
      * 拒绝家庭成员申请
      */
     public static final int REFUSE_FAMILY_MEMBER_APPLY = 2;
+
+    /**
+     * 用户账单分析
+     */
+    public static final int USER_ANALYSIS_TYPE = 1;
+    /**
+     * 家庭账单分析
+     */
+    public static final int FAMILY_ANALYSIS_TYPE = 2;
 }

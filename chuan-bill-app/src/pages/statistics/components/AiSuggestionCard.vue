@@ -20,12 +20,12 @@ const statisticsStore = useStatisticsStore()
 
 function handleLogin() {
   user.requireAuth(() => {
-    statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month)
+    statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month, props.familyId)
   })
 }
 
 function fetchAnalysis() {
-  statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month, props.familyId, !!statisticsStore.aiSuggestion)
+  statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month, props.familyId, true)
 }
 
 const remainingLabel = computed(() => {
