@@ -7,7 +7,7 @@ definePage({
   },
 })
 
-const version = ref('1.0.0')
+const version = ref<string>('1.0.0')
 
 onLoad(() => {
   // #ifdef APP-PLUS

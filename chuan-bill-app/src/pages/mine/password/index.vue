@@ -176,8 +176,8 @@ async function handleSubmit() {
       <wd-input
         v-model="formData.newPassword"
         placeholder="请输入新密码"
-        type="password"
         :maxlength="20"
+        show-password
         no-border
       />
       <view v-if="formData.newPassword" class="mt-2 flex items-center gap-2">
@@ -195,8 +195,8 @@ async function handleSubmit() {
       <wd-input
         v-model="formData.confirmPassword"
         placeholder="请确认新密码"
-        type="password"
         :maxlength="20"
+        show-password
         no-border
       />
     </view>

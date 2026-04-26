@@ -1,6 +1,5 @@
-import type { BillListDTO, BillVO, FamilyJoinApplyVO, FamilyMemberVO, FamilyVO, IPageBillVO } from '@/api/globals'
+import type { BillVO, FamilyJoinApplyVO, FamilyMemberVO, FamilyVO } from '@/api/globals'
 
-// 家庭相关类型定义（alova-gen 生成后会由 globals.d.ts 提供）
 export const useFamilyStore = defineStore('family', () => {
   const user = useUserStore()
 
@@ -234,37 +233,6 @@ export const useFamilyStore = defineStore('family', () => {
   }
 
   /**
-   * 获取家庭账单列表
-   */
-  async function fetchFamilyBills(
-    familyId: string,
-    page: number = 1,
-    size: number = 10,
-    params: Partial<BillListDTO> = {},
-  ): Promise<IPageBillVO | null> {
-    if (!user.isLoggedIn)
-      return null
-    familyBillsLoading.value = true
-    try {
-      const res = await Apis.family.getFamilyBills({
-        params: {
-          familyId,
-          page,
-          size,
-          ...params,
-        },
-      })
-      if (res.success && res.data) {
-        return res.data
-      }
-      return null
-    }
-    finally {
-      familyBillsLoading.value = false
-    }
-  }
-
-  /**
    * 切换当前家庭
    */
   function switchFamily(familyId: string) {
@@ -318,7 +286,6 @@ export const useFamilyStore = defineStore('family', () => {
     fetchPendingApplies,
     handleJoinApply,
     refreshInviteCode,
-    fetchFamilyBills,
     switchFamily,
     reset,
   }

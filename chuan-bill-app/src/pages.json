@@ -115,7 +115,73 @@
       "style": {
         "navigationBarTitleText": "统计"
       }
+    },
+    // #ifdef H5
+    {
+      "path": "pages/mine/about/index",
+      "type": "page",
+      "name": "about",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "关于"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/help/index",
+      "type": "page",
+      "name": "help-feedback",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "帮助与反馈"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/password/index",
+      "type": "page",
+      "name": "password-edit",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/phone/index",
+      "type": "page",
+      "name": "phone-change",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "更换手机号"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/profile/index",
+      "type": "page",
+      "name": "profile-edit",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "个人信息"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/settings/index",
+      "type": "page",
+      "name": "settings",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
     }
+    // #endif
   ],
   "subPackages": [],
   "tabBar": {
