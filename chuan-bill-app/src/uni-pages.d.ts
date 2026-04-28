@@ -12,15 +12,15 @@ type _LocationUrl =
   "/pages/family/index" |
   "/pages/family/statistics" |
   "/pages/message/index" |
+  "/pages/mine/about" |
+  "/pages/mine/account" |
+  "/pages/mine/help" |
   "/pages/mine/index" |
+  "/pages/mine/password" |
+  "/pages/mine/profile" |
+  "/pages/mine/settings" |
   "/pages/privacy/index" |
-  "/pages/statistics/index" |
-  "/pages/mine/about/index" |
-  "/pages/mine/help/index" |
-  "/pages/mine/password/index" |
-  "/pages/mine/phone/index" |
-  "/pages/mine/profile/index" |
-  "/pages/mine/settings/index";
+  "/pages/statistics/index";
 
 interface NavigateToOptions {
   url: _LocationUrl;

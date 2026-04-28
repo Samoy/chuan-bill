@@ -116,9 +116,8 @@
         "navigationBarTitleText": "统计"
       }
     },
-    // #ifdef H5
     {
-      "path": "pages/mine/about/index",
+      "path": "pages/mine/about",
       "type": "page",
       "name": "about",
       "layout": "default",
@@ -126,32 +125,8 @@
         "navigationBarTitleText": "关于"
       }
     },
-    // #endif
-    // #ifdef H5
     {
-      "path": "pages/mine/help/index",
-      "type": "page",
-      "name": "help-feedback",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "帮助与反馈"
-      }
-    },
-    // #endif
-    // #ifdef H5
-    {
-      "path": "pages/mine/password/index",
-      "type": "page",
-      "name": "password-edit",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "修改密码"
-      }
-    },
-    // #endif
-    // #ifdef H5
-    {
-      "path": "pages/mine/phone/index",
+      "path": "pages/mine/account",
       "type": "page",
       "name": "phone-change",
       "layout": "default",
@@ -159,10 +134,26 @@
         "navigationBarTitleText": "更换手机号"
       }
     },
-    // #endif
-    // #ifdef H5
     {
-      "path": "pages/mine/profile/index",
+      "path": "pages/mine/help",
+      "type": "page",
+      "name": "help-feedback",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "帮助与反馈"
+      }
+    },
+    {
+      "path": "pages/mine/password",
+      "type": "page",
+      "name": "password-edit",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    },
+    {
+      "path": "pages/mine/profile",
       "type": "page",
       "name": "profile-edit",
       "layout": "default",
@@ -170,10 +161,8 @@
         "navigationBarTitleText": "个人信息"
       }
     },
-    // #endif
-    // #ifdef H5
     {
-      "path": "pages/mine/settings/index",
+      "path": "pages/mine/settings",
       "type": "page",
       "name": "settings",
       "layout": "default",
@@ -181,7 +170,6 @@
         "navigationBarTitleText": "设置"
       }
     }
-    // #endif
   ],
   "subPackages": [],
   "tabBar": {

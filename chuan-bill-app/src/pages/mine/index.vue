@@ -27,22 +27,22 @@ const menuList = [
   {
     icon: 'i-lucide:user',
     title: '个人信息',
-    action: () => user.requireAuth(() => router.push('/pages/mine/profile/index')),
+    action: () => user.requireAuth(() => router.push('/pages/mine/profile')),
   },
   {
     icon: 'i-lucide:bell',
     title: '消息中心',
-    action: () => user.requireAuth(() => router.push('/pages/mine/profile/index')),
+    action: () => user.requireAuth(() => router.push('/pages/message/index')),
   },
   {
     icon: 'i-lucide:settings',
     title: '设置',
-    action: () => router.push('/pages/mine/settings/index'),
+    action: () => router.push('/pages/mine/settings'),
   },
   {
     icon: 'i-lucide:help-circle',
     title: '帮助与反馈',
-    action: () => router.push('/pages/mine/help/index'),
+    action: () => router.push('/pages/mine/help'),
   },
 ]
 
