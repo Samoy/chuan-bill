@@ -160,7 +160,8 @@ onShow(() => {
         <view class="flex items-center gap-4">
           <!-- 头像 -->
           <view class="h-16 w-16 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <view class="i-lucide:user h-8 w-8" />
+            <wd-img v-if="userStore.avatar" :src="userStore.avatar" custom-class="w-8 h-8" mode="aspectFill" />
+            <view v-else class="i-lucide:user h-8 w-8" />
           </view>
           <view class="flex-1">
             <text class="block text-lg font-bold">
