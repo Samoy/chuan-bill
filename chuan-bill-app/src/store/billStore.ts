@@ -4,19 +4,34 @@ import { add, subtract } from 'mathjs'
 import { v4 as uuid } from 'uuid'
 import { LOCAL_PAY_CATEGORY_LIST, LOCAL_PAYMENT_METHOD_LIST } from '@/common/constant'
 
+// 扩展 BillVO 类型，添加同步状态
+interface LocalBillVO extends BillVO {
+  syncStatus: 'init' | 'success' | 'failed'
+}
+
 export const useBillStore = defineStore('bill', () => {
   const categoryListMap = ref<{ expense: CategoryVO[], income: CategoryVO[] }>(
     { expense: [], income: [] },
   )
   const paymentMethodList = ref<PaymentMethodVO[]>([])
 
-  const localBillList = ref<BillVO[]>([])
+  const localBillList = ref<LocalBillVO[]>([])
 
   const isInitialzed = ref(false)
 
   const user = useUserStore()
 
   const hasPendingBills = computed(() => localBillList.value.length > 0)
+
+  const pendingSyncCount = computed(() =>
+    localBillList.value.filter(bill => bill.syncStatus === 'init').length,
+  )
+
+  const syncedCount = computed(() =>
+    localBillList.value.filter(bill => bill.syncStatus === 'success').length,
+  )
+
+  const lastSyncTime = ref<string>('')
 
   async function initBillData() {
     if (isInitialzed.value) {
@@ -84,6 +99,7 @@ export const useBillStore = defineStore('bill', () => {
       id: uuid(),
       paymentMethod,
       category,
+      syncStatus: 'init',
     })
   }
 
@@ -128,15 +144,17 @@ export const useBillStore = defineStore('bill', () => {
 
   /**
    * 同步本地账单到服务器
+   * 仅同步 syncStatus 为 'init' 的账单
    */
-  async function syncLocalBillToServer(): Promise<boolean> {
-    if (!hasPendingBills.value) {
-      return true
+  async function syncLocalBillToServer(): Promise<{ success: boolean, successCount: number }> {
+    const pendingBills = localBillList.value.filter(bill => bill.syncStatus === 'init')
+    if (pendingBills.length === 0) {
+      return { success: true, successCount: 0 }
     }
 
     try {
       // 映射 LocalBill 为 AddBillDTO 格式
-      const bills = localBillList.value.map((bill) => {
+      const bills = pendingBills.map((bill) => {
         const name = bill.name!
 
         return {
@@ -152,16 +170,29 @@ export const useBillStore = defineStore('bill', () => {
       const response = await Apis.bill.batchCreate({ data: { bills } })
 
       if (response.code === 200) {
-        clearLocalBills()
-        return true
+        const successCount = response.data || 0
+
+        // 按时间顺序标记成功同步的账单
+        const sortedPendingBills = [...pendingBills].sort((a, b) =>
+          dayjs(a.time).valueOf() - dayjs(b.time).valueOf(),
+        )
+        for (let i = 0; i < successCount && i < sortedPendingBills.length; i++) {
+          const bill = localBillList.value.find(item => item.id === sortedPendingBills[i].id)
+          if (bill) {
+            bill.syncStatus = 'success'
+          }
+        }
+
+        lastSyncTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
+        return { success: true, successCount }
       }
 
       console.error('同步本地账单失败:', response.message)
-      return false
+      return { success: false, successCount: 0 }
     }
     catch (error) {
       console.error('同步本地账单失败:', error)
-      return false
+      return { success: false, successCount: 0 }
     }
   }
 
@@ -190,6 +221,9 @@ export const useBillStore = defineStore('bill', () => {
     getMonthlyBillStats,
     localBillList,
     hasPendingBills,
+    pendingSyncCount,
+    syncedCount,
+    lastSyncTime,
     addLocalBill,
     updateLocalBill,
     deleteLocalBill,
