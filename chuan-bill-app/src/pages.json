@@ -125,6 +125,7 @@
         "navigationBarTitleText": "关于"
       }
     },
+    // #ifdef MP-WEIXIN
     {
       "path": "pages/mine/account",
       "type": "page",
@@ -134,6 +135,7 @@
         "navigationBarTitleText": "更换手机号"
       }
     },
+    // #endif
     {
       "path": "pages/mine/help",
       "type": "page",
@@ -143,6 +145,7 @@
         "navigationBarTitleText": "帮助与反馈"
       }
     },
+    // #ifdef MP-WEIXIN
     {
       "path": "pages/mine/password",
       "type": "page",
@@ -152,6 +155,7 @@
         "navigationBarTitleText": "修改密码"
       }
     },
+    // #endif
     {
       "path": "pages/mine/profile",
       "type": "page",
@@ -169,6 +173,17 @@
       "layout": "default",
       "style": {
         "navigationBarTitleText": "设置"
+      }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/mine/account-security/index",
+      "type": "page",
+      "name": "account-security",
+      "layout": "default",
+      "style": {
+        "navigationBarTitleText": "账号与安全"
       }
     }
     // #endif
