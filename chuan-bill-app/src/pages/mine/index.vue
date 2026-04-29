@@ -7,12 +7,12 @@ definePage({
   },
 })
 
-// 鉴权检查
 const user = useUserStore()
 const userStore = useUserStore()
 const billStore = useBillStore()
 const messageStore = useMessageStore()
 const router = useRouter()
+const themeStore = useManualTheme()
 
 // 登录价值特性
 const loginFeatures = [
@@ -22,27 +22,108 @@ const loginFeatures = [
   { icon: 'i-lucide:smartphone', text: '多设备访问' },
 ]
 
-// 菜单列表（已登录状态）
-const menuList = [
+// 个性化登录提示
+const loginTip = computed(() => {
+  const count = billStore.localBillList.length
+  if (count === 0) {
+    return '登录后享受云端同步、多设备访问等功能'
+  }
+  return `您已记账${count}笔，登录后可同步到云端，永不丢失`
+})
+
+// 弹窗状态
+const showSyncPopup = ref(false)
+const showThemePopup = ref(false)
+const showNotificationPopup = ref(false)
+const showExportPopup = ref(false)
+
+// 菜单分组（已登录状态）
+const menuGroups = [
   {
-    icon: 'i-lucide:user',
-    title: '个人信息',
-    action: () => user.requireAuth(() => router.push('/pages/mine/profile')),
+    title: '账户管理',
+    items: [
+      {
+        icon: 'i-lucide:user',
+        title: '个人信息',
+        action: () => user.requireAuth(() => router.push('/pages/mine/profile')),
+      },
+      {
+        icon: 'i-lucide:shield',
+        title: '账号与安全',
+        action: () => user.requireAuth(() => router.push('/pages/mine/account-security')),
+      },
+      {
+        icon: 'i-lucide:bell',
+        title: '消息中心',
+        action: () => user.requireAuth(() => router.push('/pages/message/index')),
+        badge: computed(() => messageStore.hasUnread ? messageStore.unreadCount.total : 0),
+      },
+    ],
   },
   {
-    icon: 'i-lucide:bell',
-    title: '消息中心',
-    action: () => user.requireAuth(() => router.push('/pages/message/index')),
+    title: '数据管理',
+    items: [
+      {
+        icon: 'i-lucide:refresh-cw',
+        title: '数据同步',
+        action: () => user.requireAuth(() => showSyncPopup.value = true),
+        subtitle: computed(() => {
+          const pendingCount = billStore.localBillList.filter(b => b.syncStatus === 'init').length
+          return pendingCount > 0 ? `${pendingCount}条待同步` : ''
+        }),
+      },
+      {
+        icon: 'i-lucide:download',
+        title: '数据导出',
+        action: () => user.requireAuth(() => showExportPopup.value = true),
+      },
+    ],
   },
   {
-    icon: 'i-lucide:settings',
-    title: '设置',
-    action: () => router.push('/pages/mine/settings'),
+    title: '系统设置',
+    items: [
+      {
+        icon: 'i-lucide:palette',
+        title: '主题切换',
+        action: () => showThemePopup.value = true,
+        subtitle: computed(() => themeStore.currentThemeColor.name),
+      },
+      {
+        icon: 'i-lucide:bell-ring',
+        title: '通知设置',
+        action: () => user.requireAuth(() => showNotificationPopup.value = true),
+      },
+      {
+        icon: 'i-lucide:download-cloud',
+        title: '检查更新',
+        action: () => checkUpdate(),
+      },
+    ],
   },
   {
-    icon: 'i-lucide:help-circle',
-    title: '帮助与反馈',
-    action: () => router.push('/pages/mine/help'),
+    title: '其他',
+    items: [
+      {
+        icon: 'i-lucide:file-text',
+        title: '用户协议',
+        action: () => router.push('/pages/agreement/index'),
+      },
+      {
+        icon: 'i-lucide:lock',
+        title: '隐私政策',
+        action: () => router.push('/pages/privacy/index'),
+      },
+      {
+        icon: 'i-lucide:info',
+        title: '关于应用',
+        action: () => router.push('/pages/mine/about/index'),
+      },
+      {
+        icon: 'i-lucide:help-circle',
+        title: '帮助与反馈',
+        action: () => router.push('/pages/mine/help/index'),
+      },
+    ],
   },
 ]
 
@@ -54,6 +135,12 @@ function goToLogin() {
 // 退出登录
 function logout() {
   userStore.logout()
+}
+
+// 检查更新
+function checkUpdate() {
+  const toast = useGlobalToast()
+  toast.info('已是最新版本')
 }
 
 // 页面显示时获取未读消息数
@@ -80,7 +167,7 @@ onShow(() => {
               点击登录
             </text>
             <text class="mt-1 block text-sm text-gray-500">
-              登录后享受更多功能
+              {{ loginTip }}
             </text>
           </view>
           <view class="i-lucide:chevron-right h-5 w-5 text-gray-400" />
@@ -101,26 +188,6 @@ onShow(() => {
               {{ item.text }}
             </text>
           </view>
-        </view>
-      </view>
-
-      <!-- 本地数据提示 -->
-      <view v-if="billStore.localBillList.length" class="mx-3 rounded-2xl bg-orange-50 p-4 dark:bg-orange-900/20">
-        <view class="flex items-center gap-3">
-          <view class="h-10 w-10 flex items-center justify-center rounded-full bg-orange-100 dark:bg-orange-800">
-            <view class="i-lucide:database h-5 w-5 text-orange-600 dark:text-orange-400" />
-          </view>
-          <view class="flex-1">
-            <text class="block text-sm text-orange-800 font-500 dark:text-orange-200">
-              您有本地账单数据
-            </text>
-            <text class="mt-0.5 block text-xs text-orange-600 dark:text-orange-300">
-              {{ billStore.localBillList.length }} 笔账单待同步到云端
-            </text>
-          </view>
-          <wd-button type="warning" size="small" @click="goToLogin">
-            去同步
-          </wd-button>
         </view>
       </view>
 
@@ -145,7 +212,7 @@ onShow(() => {
           <view class="flex items-center gap-3">
             <view class="i-lucide:info h-5 w-5 text-gray-500" />
             <text class="text-sm">
-              关于小川记账
+              关于应用
             </text>
           </view>
           <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
@@ -174,13 +241,18 @@ onShow(() => {
         </view>
       </view>
 
-      <!-- 菜单列表 -->
-      <view class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <!-- 菜单分组列表 -->
+      <view v-for="(group, groupIndex) in menuGroups" :key="groupIndex" class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+        <!-- 分组标题 -->
+        <view class="px-4 pb-2 pt-3 text-xs text-gray-400 font-medium">
+          {{ group.title }}
+        </view>
+        <!-- 菜单项 -->
         <view
-          v-for="(item, index) in menuList"
-          :key="index"
-          class="flex items-center justify-between p-4"
-          :class="index < menuList.length - 1 && 'border-b border-gray-100 dark:border-gray-700'"
+          v-for="(item, itemIndex) in group.items"
+          :key="itemIndex"
+          class="flex items-center justify-between px-4 py-3"
+          :class="itemIndex < group.items.length - 1 && 'border-b border-gray-100 dark:border-gray-700'"
           @click="item.action"
         >
           <view class="flex items-center gap-3">
@@ -189,7 +261,17 @@ onShow(() => {
               {{ item.title }}
             </text>
           </view>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+          <view class="flex items-center gap-2">
+            <!-- 副标题 -->
+            <text v-if="item.subtitle" class="text-xs text-gray-400">
+              {{ item.subtitle }}
+            </text>
+            <!-- 徽章 -->
+            <view v-if="item.badge && item.badge.value > 0" class="h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
+              {{ item.badge.value > 99 ? '99+' : item.badge.value }}
+            </view>
+            <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
+          </view>
         </view>
       </view>
 
@@ -200,5 +282,11 @@ onShow(() => {
         </wd-button>
       </view>
     </template>
+
+    <!-- 弹窗组件 -->
+    <SyncStatusPopup v-model="showSyncPopup" />
+    <ThemePickerPopup v-model="showThemePopup" />
+    <NotificationSettingsPopup v-model="showNotificationPopup" />
+    <ExportFilterPopup v-model="showExportPopup" />
   </view>
 </template>
