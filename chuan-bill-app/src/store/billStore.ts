@@ -21,7 +21,7 @@ export const useBillStore = defineStore('bill', () => {
 
   const user = useUserStore()
 
-  const hasPendingBills = computed(() => localBillList.value.length > 0)
+  const hasLocalBills = computed(() => localBillList.value.length > 0)
 
   const pendingSyncCount = computed(() =>
     localBillList.value.filter(bill => bill.syncStatus === 'init').length,
@@ -120,6 +120,7 @@ export const useBillStore = defineStore('bill', () => {
       newBill.paymentMethod = paymentMethod
       newBill.category = category
       newBill.time = dayjs(newBill.time).format('YYYY-MM-DD HH:mm')
+      newBill.syncStatus = 'init'
       localBillList.value[index] = newBill
     }
   }
@@ -169,7 +170,7 @@ export const useBillStore = defineStore('bill', () => {
       })
       const response = await Apis.bill.batchCreate({ data: { bills } })
 
-      if (response.code === 200) {
+      if (response.success) {
         const successCount = response.data || 0
 
         // 按时间顺序标记成功同步的账单
@@ -220,7 +221,7 @@ export const useBillStore = defineStore('bill', () => {
   return {
     getMonthlyBillStats,
     localBillList,
-    hasPendingBills,
+    hasLocalBills,
     pendingSyncCount,
     syncedCount,
     lastSyncTime,
