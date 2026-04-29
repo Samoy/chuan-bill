@@ -8,10 +8,10 @@ definePage({
 })
 
 const user = useUserStore()
-const userStore = useUserStore()
 const billStore = useBillStore()
 const messageStore = useMessageStore()
 const router = useRouter()
+const toast = useGlobalToast()
 const themeStore = useManualTheme()
 
 // 登录价值特性
@@ -37,6 +37,14 @@ const showThemePopup = ref(false)
 const showNotificationPopup = ref(false)
 const showExportPopup = ref(false)
 
+// 菜单动态数据
+const unreadBadge = computed(() => messageStore.hasUnread ? messageStore.unreadCount.total : 0)
+const syncSubtitle = computed(() => {
+  const pendingCount = billStore.localBillList.filter(b => b.syncStatus === 'init').length
+  return pendingCount > 0 ? `${pendingCount}条待同步` : ''
+})
+const themeSubtitle = computed(() => themeStore.currentThemeColor.value.name)
+
 // 菜单分组（已登录状态）
 const menuGroups = [
   {
@@ -56,7 +64,7 @@ const menuGroups = [
         icon: 'i-lucide:bell',
         title: '消息中心',
         action: () => user.requireAuth(() => router.push('/pages/message/index')),
-        badge: computed(() => messageStore.hasUnread ? messageStore.unreadCount.total : 0),
+        badge: unreadBadge,
       },
     ],
   },
@@ -67,10 +75,7 @@ const menuGroups = [
         icon: 'i-lucide:refresh-cw',
         title: '数据同步',
         action: () => user.requireAuth(() => showSyncPopup.value = true),
-        subtitle: computed(() => {
-          const pendingCount = billStore.localBillList.filter(b => b.syncStatus === 'init').length
-          return pendingCount > 0 ? `${pendingCount}条待同步` : ''
-        }),
+        subtitle: syncSubtitle,
       },
       {
         icon: 'i-lucide:download',
@@ -86,7 +91,7 @@ const menuGroups = [
         icon: 'i-lucide:palette',
         title: '主题切换',
         action: () => showThemePopup.value = true,
-        subtitle: computed(() => themeStore.currentThemeColor.name),
+        subtitle: themeSubtitle,
       },
       {
         icon: 'i-lucide:bell-ring',
@@ -134,12 +139,11 @@ function goToLogin() {
 
 // 退出登录
 function logout() {
-  userStore.logout()
+  user.logout()
 }
 
 // 检查更新
 function checkUpdate() {
-  const toast = useGlobalToast()
   toast.info('已是最新版本')
 }
 
@@ -227,15 +231,15 @@ onShow(() => {
         <view class="flex items-center gap-4">
           <!-- 头像 -->
           <view class="h-16 w-16 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <wd-img v-if="userStore.avatar" :src="userStore.avatar" custom-class="w-8 h-8" mode="aspectFill" />
+            <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-8 h-8" mode="aspectFill" />
             <view v-else class="i-lucide:user h-8 w-8" />
           </view>
           <view class="flex-1">
             <text class="block text-lg font-bold">
-              {{ userStore.nickname || '用户' }}
+              {{ user.nickname || '用户' }}
             </text>
             <text class="mt-1 block text-sm text-white/80">
-              {{ userStore.phone || '未绑定手机号' }}
+              {{ user.phone || '未绑定手机号' }}
             </text>
           </view>
         </view>
@@ -264,7 +268,7 @@ onShow(() => {
           <view class="flex items-center gap-2">
             <!-- 副标题 -->
             <text v-if="item.subtitle" class="text-xs text-gray-400">
-              {{ item.subtitle }}
+              {{ item.subtitle.value }}
             </text>
             <!-- 徽章 -->
             <view v-if="item.badge && item.badge.value > 0" class="h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
