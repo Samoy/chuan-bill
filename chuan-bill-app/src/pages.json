@@ -161,6 +161,7 @@
         "navigationBarTitleText": "个人信息"
       }
     },
+    // #ifdef MP-WEIXIN
     {
       "path": "pages/mine/settings",
       "type": "page",
@@ -170,6 +171,7 @@
         "navigationBarTitleText": "设置"
       }
     }
+    // #endif
   ],
   "subPackages": [],
   "tabBar": {

@@ -18,7 +18,6 @@ type _LocationUrl =
   "/pages/mine/index" |
   "/pages/mine/password" |
   "/pages/mine/profile" |
-  "/pages/mine/settings" |
   "/pages/privacy/index" |
   "/pages/statistics/index";
 
