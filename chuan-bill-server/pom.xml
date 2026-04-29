@@ -160,6 +160,13 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- 七牛云SDK  -->
+    <dependency>
+      <groupId>com.qiniu</groupId>
+      <artifactId>qiniu-java-sdk</artifactId>
+      <version>7.19.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
