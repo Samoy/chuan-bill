@@ -37,8 +37,17 @@ const showThemePopup = ref(false)
 const showNotificationPopup = ref(false)
 const showExportPopup = ref(false)
 
+// 菜单项类型
+interface MenuItem {
+  icon: string
+  title: string
+  action: () => void
+  badge?: ComputedRef<number>
+  subtitle?: ComputedRef<string>
+}
+
 // 菜单动态数据
-const unreadBadge = computed(() => messageStore.hasUnread ? messageStore.unreadCount.total : 0)
+const unreadBadge = computed(() => messageStore.hasUnread ? (messageStore.unreadCount.total || 0) : 0)
 const syncSubtitle = computed(() => {
   const pendingCount = billStore.localBillList.filter(b => b.syncStatus === 'init').length
   return pendingCount > 0 ? `${pendingCount}条待同步` : ''
@@ -46,7 +55,7 @@ const syncSubtitle = computed(() => {
 const themeSubtitle = computed(() => themeStore.currentThemeColor.value.name)
 
 // 菜单分组（已登录状态）
-const menuGroups = [
+const menuGroups: { title: string, items: MenuItem[] }[] = [
   {
     title: '账户管理',
     items: [
