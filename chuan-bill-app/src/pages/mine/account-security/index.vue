@@ -12,6 +12,12 @@ const toast = useGlobalToast()
 const message = useGlobalMessage()
 const router = useRouter()
 
+onLoad(() => {
+  if (!userStore.isLoggedIn) {
+    userStore.requireAuth(() => {})
+  }
+})
+
 // 密码表单
 const showPasswordForm = ref(false)
 const passwordForm = ref({
@@ -25,6 +31,18 @@ const showPhoneForm = ref(false)
 const phoneForm = ref({
   newPhone: '',
   code: '',
+})
+
+// 弹窗关闭时重置表单
+watch(showPasswordForm, (val) => {
+  if (!val) {
+    passwordForm.value = { code: '', newPassword: '', confirmPassword: '' }
+  }
+})
+watch(showPhoneForm, (val) => {
+  if (!val) {
+    phoneForm.value = { newPhone: '', code: '' }
+  }
 })
 
 // 倒计时
@@ -59,10 +77,19 @@ onUnload(() => {
   }
 })
 
+// 手机号格式校验
+function isValidPhone(phone: string) {
+  return /^1\d{10}$/.test(phone)
+}
+
 // 发送验证码
 async function sendCode(phone: string) {
   if (countdown.value > 0 || sending.value)
     return
+  if (!isValidPhone(phone)) {
+    toast.warning('请输入正确的手机号')
+    return
+  }
 
   sending.value = true
   try {
@@ -342,7 +369,7 @@ function goToDeviceManagement() {
             custom-class="flex-1"
           />
           <wd-button
-            :disabled="countdown > 0 || !phoneForm.newPhone"
+            :disabled="countdown > 0 || !isValidPhone(phoneForm.newPhone)"
             size="small"
             @click="sendCode(phoneForm.newPhone)"
           >
