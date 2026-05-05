@@ -6,13 +6,7 @@ const router = useRouter()
 // ========== 状态管理 ==========
 const userStore = useUserStore()
 const toast = useGlobalToast()
-
-// ========== 视图切换 ==========
-type LoginView = 'wechat' | 'phone'
-const currentView = ref<LoginView>('phone')
-// #ifdef MP-WEIXIN
-currentView.value = 'wechat'
-// #endif
+const loading = useGlobalLoading()
 
 // ========== 登录方式切换 ==========
 const activeTab = ref(0) // 0: 验证码登录, 1: 密码登录
@@ -61,16 +55,6 @@ function validateAgreement(): boolean {
   }
   return true
 }
-
-// ========== 视图切换 ==========
-function switchToPhone() {
-  currentView.value = 'phone'
-}
-// #ifdef MP-WEIXIN
-function switchToWechat() {
-  currentView.value = 'wechat'
-}
-// #endif
 
 // ========== 协议链接（占位） ==========
 function handleOpenAgreement() {
@@ -137,10 +121,6 @@ function resetForm() {
   agreedToTerms.value = false
   clearCountdown()
   countdown.value = 0
-  currentView.value = 'phone'
-  // #ifdef MP-WEIXIN
-  currentView.value = 'wechat'
-  // #endif
 }
 
 // ========== 验证码登录 ==========
@@ -219,8 +199,11 @@ async function handlePasswordLogin() {
 async function handleWechatLogin() {
   if (!validateAgreement())
     return
+  if (isLoading.value)
+    return
   isLoading.value = true
   try {
+    loading.loading('请稍候...')
     const loginRes = await uni.login({ provider: 'weixin' })
     if (loginRes.code) {
       const response = await Apis.auth.loginByWechat({ data: { code: loginRes.code } })
@@ -240,6 +223,7 @@ async function handleWechatLogin() {
     toast.error('微信登录失败')
   }
   finally {
+    loading.close()
     isLoading.value = false
   }
 }
@@ -268,58 +252,17 @@ export default {
 
 <template>
   <wd-popup
-    v-model="userStore.showLoginPopup"
-    :z-index="999"
-    position="bottom"
-    :close-on-click-modal="true"
-    lock-scroll
-    safe-area-inset-bottom
-    custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!"
-    @close="handleClose"
+    v-model="userStore.showLoginPopup" :z-index="999" position="bottom" close-on-click-modal lock-scroll
+    closable safe-area-inset-bottom custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" @close="handleClose"
   >
     <view class="px-6 py-2">
-      <!-- ==================== 微信快速登录视图 ==================== -->
-      <view v-if="currentView === 'wechat'" class="flex flex-col">
-        <!-- 应用图标 -->
-        <view class="app-icon mx-auto">
-          <wd-img src="https://cdn.chuanbill.samoy.site/default/logo.png" custom-class="w-16 h-16" image-mode="aspectFill" />
-        </view>
-        <!-- 标题 -->
-        <text class="mt-5 text-xl text-gray-800 font-bold">
-          欢迎使用小川记账
-        </text>
-        <text class="mb-10 mt-2 text-xs text-gray-400">
-          登录后解锁云端同步、图片识别等更多功能
-        </text>
-        <!-- 微信登录按钮 -->
-        <!-- #ifdef MP-WEIXIN -->
-        <wd-button
-          :disabled="isLoading"
-          custom-class="w-full bg-[#07C160]!"
-          block
-          @click="handleWechatLogin"
-        >
-          <view class="flex items-center gap-1">
-            <view class="i-mingcute-wechat-fill mr-2 text-xl" />
-            <text>微信快速登录</text>
-          </view>
-        </wd-button>
-        <!-- #endif -->
-        <!-- 切换到手机号登录 -->
-        <view v-if="!isLoading" class="mt-1 w-100% text-center">
-          <text class="text-xs text-gray-500" @click="switchToPhone">
-            其他方式登录
-          </text>
-        </view>
-      </view>
-
-      <!-- ==================== 手机号登录视图 ==================== -->
-      <view v-if="currentView === 'phone'">
+      <view>
         <!-- 应用图标 -->
         <view class="mt-2 flex justify-center">
-          <view class="app-icon mx-auto mt-4 bg-blue-200">
-            <wd-img src="https://cdn.chuanbill.samoy.site/default/logo.png" custom-class="w-16 h-16" image-mode="aspectFill" />
-          </view>
+          <wd-img
+            src="https://chuan-bill-cdn.samoy.site/default/logo.png"
+            custom-class="rounded-2xl mt-4 w-16 h-16 overflow-hidden" image-mode="aspectFill"
+          />
         </view>
         <!-- 标题 -->
         <view class="mt-5 text-center">
@@ -334,48 +277,30 @@ export default {
         </view>
 
         <!-- Tab 切换 -->
-        <wd-tabs v-model="activeTab" class="mt-4">
+        <wd-tabs v-model="activeTab" custom-class="mt-8">
           <!-- 验证码登录 -->
           <wd-tab title="验证码登录">
             <view class="pt-5">
-              <wd-input
-                v-model="phone"
-                type="number"
-                placeholder="手机号"
-                :maxlength="11"
-                custom-class="login-input"
-              >
+              <wd-input v-model="phone" type="number" placeholder="手机号" :maxlength="11" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-phone text-gray-400" />
                 </template>
               </wd-input>
-              <wd-input
-                v-model="code"
-                type="number"
-                placeholder="验证码"
-                :maxlength="6"
-                custom-class="login-input"
-              >
+              <wd-input v-model="code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-message-square text-gray-400" />
                 </template>
                 <template #suffix>
                   <text
                     class="whitespace-nowrap text-sm"
-                    :class="isCountingDown || !phone ? 'text-gray-400' : 'text-blue-500'"
-                    @click.stop="handleSendCode"
+                    :class="isCountingDown || !phone ? 'text-gray-400' : 'text-blue-500'" @click.stop="handleSendCode"
                   >
                     {{ isCountingDown ? `${countdown}s` : '获取验证码' }}
                   </text>
                 </template>
               </wd-input>
               <wd-button
-                type="primary"
-                round
-                block
-                :loading="isLoading"
-                :disabled="isLoading"
-                custom-class="mt-2"
+                type="primary" round block :disabled="isLoading" custom-class="mt-2"
                 @click="handlePhoneLogin"
               >
                 登录
@@ -386,34 +311,18 @@ export default {
           <!-- 密码登录 -->
           <wd-tab title="密码登录">
             <view class="pt-5">
-              <wd-input
-                v-model="phone"
-                type="number"
-                placeholder="手机号"
-                :maxlength="11"
-                custom-class="login-input"
-              >
+              <wd-input v-model="phone" type="number" placeholder="手机号" :maxlength="11" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-phone text-gray-400" />
                 </template>
               </wd-input>
-              <wd-input
-                v-model="password"
-                type="safe-password"
-                placeholder="登录密码"
-                custom-class="login-input"
-              >
+              <wd-input v-model="password" type="safe-password" placeholder="登录密码" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-lock text-gray-400" />
                 </template>
               </wd-input>
               <wd-button
-                type="primary"
-                round
-                block
-                :loading="isLoading"
-                :disabled="isLoading"
-                custom-class="mt-2"
+                type="primary" round block :disabled="isLoading" custom-class="mt-2"
                 @click="handlePasswordLogin"
               >
                 登录
@@ -428,28 +337,14 @@ export default {
             未注册手机号验证通过后将自动注册
           </text>
         </view>
-
-        <!-- 切换到微信登录 -->
-        <!-- #ifdef MP-WEIXIN -->
-        <view v-if="!isLoading" class="mx-auto mt-3 w-full text-center">
-          <text class="text-xs text-gray-500" @click="switchToWechat">
-            微信快速登录
-          </text>
-        </view>
-        <!-- #endif -->
+        <wd-divider>或</wd-divider>
+        <view class="i-mingcute:wechat-fill mx-auto mt-4 h-8 w-8 text-[#07C160]" @click="handleWechatLogin" />
       </view>
 
-      <!-- ==================== 协议勾选区域（共享） ==================== -->
+      <!-- ==================== 协议勾选区域 ==================== -->
       <view class="mt-10 flex items-center justify-center text-center">
-        <wd-checkbox
-          v-model="agreedToTerms"
-          shape="square"
-          custom-class="login-checkbox"
-        />
-        <view
-          class="text-xs text-gray-500 leading-5"
-          @click="agreedToTerms = !agreedToTerms"
-        >
+        <wd-checkbox v-model="agreedToTerms" shape="square" custom-class="login-checkbox" />
+        <view class="text-xs text-gray-500 leading-5" @click="agreedToTerms = !agreedToTerms">
           <text>登录即代表您同意</text>
           <text class="text-blue-500" @click.stop="handleOpenAgreement">
             《用户协议》
@@ -465,15 +360,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-/* 应用图标 */
-.app-icon {
-  @apply rounded-2xl p-2;
-  background: linear-gradient(135deg, rgb(var(--color-primary) / 0.5), rgb(var(--color-primary) / 1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* 微信按钮 */
 .wechat-btn {
   display: flex;
