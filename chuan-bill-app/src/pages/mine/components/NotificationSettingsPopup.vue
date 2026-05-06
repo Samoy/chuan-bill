@@ -10,12 +10,12 @@ const toast = useGlobalToast()
 const settings = ref({
   pushEnabled: true,
   billReminderEnabled: true,
-  billReminderTime: '21:00',
+  billReminderTime: '20:00',
   familyNotificationEnabled: true,
 })
 
 const timePickerVisible = ref(false)
-const timeValue = ref([21, 0])
+const timeValue = ref('20:00')
 
 // 加载设置
 onMounted(() => {
@@ -49,6 +49,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
     v-model="modelValue"
     position="bottom"
     closable
+    :z-index="999"
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
   >
@@ -81,13 +82,22 @@ function onTimeConfirm({ value }: { value: number[] }) {
           </text>
         </view>
         <view class="flex items-center gap-2">
-          <text
-            v-if="settings.billReminderEnabled"
-            class="text-xs text-primary"
-            @click="timePickerVisible = true"
+          <!-- 时间选择器 -->
+          <wd-datetime-picker
+            v-model="timeValue"
+            v-model:visible="timePickerVisible"
+            type="time"
+            title="选择提醒时间"
+            @confirm="onTimeConfirm"
           >
-            {{ settings.billReminderTime }}
-          </text>
+            <text
+              v-if="settings.billReminderEnabled"
+              class="text-xs text-primary"
+              @click="timePickerVisible = true"
+            >
+              {{ settings.billReminderTime }}
+            </text>
+          </wd-datetime-picker>
           <wd-switch
             v-model="settings.billReminderEnabled"
             :disabled="!settings.pushEnabled"
@@ -115,14 +125,5 @@ function onTimeConfirm({ value }: { value: number[] }) {
         />
       </view>
     </view>
-
-    <!-- 时间选择器 -->
-    <wd-datetime-picker
-      v-model="timeValue"
-      v-model:visible="timePickerVisible"
-      type="time"
-      title="选择提醒时间"
-      @confirm="onTimeConfirm"
-    />
   </wd-popup>
 </template>

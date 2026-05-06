@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import ExportFilterPopup from './components/ExportFilterPopup.vue'
+import NotificationSettingsPopup from './components/NotificationSettingsPopup.vue'
+import SyncStatusPopup from './components/SyncStatusPopup.vue'
+import ThemePickerPopup from './components/ThemePickerPopup.vue'
+
 definePage({
   name: 'mine',
   layout: 'tabbar',
@@ -12,6 +17,7 @@ const billStore = useBillStore()
 const messageStore = useMessageStore()
 const router = useRouter()
 const toast = useGlobalToast()
+const message = useGlobalMessage()
 const themeStore = useManualTheme()
 
 // 登录价值特性
@@ -67,29 +73,13 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
       {
         icon: 'i-lucide:shield',
         title: '账号与安全',
-        action: () => user.requireAuth(() => router.push('/pages/mine/account-security')),
+        action: () => user.requireAuth(() => router.push('/pages/mine/account')),
       },
       {
         icon: 'i-lucide:bell',
         title: '消息中心',
         action: () => user.requireAuth(() => router.push('/pages/message/index')),
         badge: unreadBadge,
-      },
-    ],
-  },
-  {
-    title: '数据管理',
-    items: [
-      {
-        icon: 'i-lucide:refresh-cw',
-        title: '数据同步',
-        action: () => user.requireAuth(() => showSyncPopup.value = true),
-        subtitle: syncSubtitle,
-      },
-      {
-        icon: 'i-lucide:download',
-        title: '数据导出',
-        action: () => user.requireAuth(() => showExportPopup.value = true),
       },
     ],
   },
@@ -107,10 +97,21 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
         title: '通知设置',
         action: () => user.requireAuth(() => showNotificationPopup.value = true),
       },
+    ],
+  },
+  {
+    title: '数据管理',
+    items: [
       {
-        icon: 'i-lucide:download-cloud',
-        title: '检查更新',
-        action: () => checkUpdate(),
+        icon: 'i-lucide:refresh-cw',
+        title: '账单同步',
+        action: () => user.requireAuth(() => showSyncPopup.value = true),
+        subtitle: syncSubtitle,
+      },
+      {
+        icon: 'i-lucide:share',
+        title: '账单导出',
+        action: () => user.requireAuth(() => showExportPopup.value = true),
       },
     ],
   },
@@ -130,12 +131,17 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
       {
         icon: 'i-lucide:info',
         title: '关于应用',
-        action: () => router.push('/pages/mine/about/index'),
+        action: () => router.push('/pages/mine/about'),
       },
       {
         icon: 'i-lucide:help-circle',
         title: '帮助与反馈',
-        action: () => router.push('/pages/mine/help/index'),
+        action: () => router.push('/pages/mine/help'),
+      },
+      {
+        icon: 'i-lucide:download-cloud',
+        title: '检查更新',
+        action: () => checkUpdate(),
       },
     ],
   },
@@ -148,7 +154,18 @@ function goToLogin() {
 
 // 退出登录
 function logout() {
-  user.logout()
+  message.confirm({
+    title: '提示',
+    msg: '是否退出登录？',
+    confirmButtonProps: {
+      type: 'error',
+    },
+    success: (res) => {
+      if (res.action === 'confirm') {
+        user.logout()
+      }
+    },
+  })
 }
 
 // 检查更新
@@ -208,7 +225,7 @@ onShow(() => {
       <view class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view
           class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700"
-          @click="router.push('/pages/mine/help/index')"
+          @click="router.push('/pages/mine/help')"
         >
           <view class="flex items-center gap-3">
             <view class="i-lucide:help-circle h-5 w-5 text-gray-500" />
@@ -220,7 +237,7 @@ onShow(() => {
         </view>
         <view
           class="flex items-center justify-between p-4"
-          @click="router.push('/pages/mine/about/index')"
+          @click="router.push('/pages/mine/about')"
         >
           <view class="flex items-center gap-3">
             <view class="i-lucide:info h-5 w-5 text-gray-500" />
@@ -269,7 +286,7 @@ onShow(() => {
           @click="item.action"
         >
           <view class="flex items-center gap-3">
-            <view class="h-5 w-5 text-gray-500" :class="item.icon" />
+            <view class="h-4 w-4" :class="item.icon" />
             <text class="text-sm">
               {{ item.title }}
             </text>
@@ -289,7 +306,7 @@ onShow(() => {
       </view>
 
       <!-- 退出登录 -->
-      <view class="mx-3 mt-4">
+      <view class="mx-3 my-4">
         <wd-button type="error" plain block @click="logout">
           退出登录
         </wd-button>

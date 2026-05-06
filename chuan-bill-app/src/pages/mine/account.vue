@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePage({
-  name: 'account-security',
+  name: 'account',
   layout: 'default',
   style: {
     navigationBarTitleText: '账号与安全',

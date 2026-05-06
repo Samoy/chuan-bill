@@ -13,7 +13,7 @@ const userStore = useUserStore()
 const baseContent = `
 <div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
   <p style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 16px;">小川记账用户协议</p>
-  <p style="color: #999; text-align: center; margin-bottom: 24px;">更新日期：2025年4月17日 | 生效日期：2025年4月17日</p>
+  <p style="color: #999; text-align: center; margin-bottom: 24px;">更新日期：2026年4月17日 | 生效日期：2026年4月17日</p>
 
   <p>欢迎使用"小川记账"（以下简称"本应用"）。请您在使用本应用前，仔细阅读并充分理解本协议的全部内容。<b>您使用本应用即表示您已阅读并同意本协议的约束。</b></p>
 
@@ -66,33 +66,6 @@ const baseContent = `
   <p style="padding-left: 16px;">邮箱：feedback@chuanbill.com</p>
 </div>
 `
-
-// 未登录用户补充说明
-const guestNotice = `
-<div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
-  <div style="background-color: #FFF7ED; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-    <p style="font-weight: bold; color: #C2410C; margin-bottom: 8px;">游客用户特别提示</p>
-    <p style="color: #9A3412;">您当前以游客身份使用本应用，请注意以下事项：</p>
-    <p style="color: #9A3412; padding-left: 12px;">1. <b>您的账单数据仅存储在本地设备中</b>，卸载应用或清除数据将导致数据永久丢失；</p>
-    <p style="color: #9A3412; padding-left: 12px;">2. 游客模式下无法使用图片记账、语音记账、云端同步等高级功能；</p>
-    <p style="color: #9A3412; padding-left: 12px;">3. <b>强烈建议您注册登录以保障数据安全</b>，登录后本地数据可一键同步至云端。</p>
-  </div>
-</div>
-`
-
-// 已登录用户补充说明
-const userNotice = `
-<div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
-  <div style="background-color: #EFF6FF; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-    <p style="font-weight: bold; color: #1D4ED8; margin-bottom: 8px;">注册用户权益说明</p>
-    <p style="color: #1E40AF;">作为注册用户，您享有以下权益：</p>
-    <p style="color: #1E40AF; padding-left: 12px;">1. <b>账单数据云端安全存储</b>，支持多设备同步访问；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">2. 使用图片记账、语音记账等AI辅助记账功能；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">3. 您有权随时导出或删除您的数据；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">4. <b>您有权注销账号</b>，注销后我们将按照隐私政策处理您的个人信息。</p>
-  </div>
-</div>
-`
 const from = ref('')
 
 onLoad((options) => {
@@ -109,10 +82,6 @@ onBeforeUnmount(() => {
 
 <template>
   <view class="min-h-screen bg-white dark:bg-[var(--wot-dark-background)]">
-    <!-- 登录状态提示 -->
-    <rich-text v-if="!userStore.isLoggedIn" :nodes="guestNotice" />
-    <rich-text v-else :nodes="userNotice" />
-
     <!-- 通用协议内容 -->
     <rich-text :nodes="baseContent" />
   </view>

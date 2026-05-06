@@ -125,17 +125,15 @@
         "navigationBarTitleText": "关于"
       }
     },
-    // #ifdef MP-WEIXIN
     {
       "path": "pages/mine/account",
       "type": "page",
-      "name": "phone-change",
+      "name": "account",
       "layout": "default",
       "style": {
-        "navigationBarTitleText": "更换手机号"
+        "navigationBarTitleText": "账号与安全"
       }
     },
-    // #endif
     {
       "path": "pages/mine/help",
       "type": "page",
@@ -145,17 +143,6 @@
         "navigationBarTitleText": "帮助与反馈"
       }
     },
-    // #ifdef MP-WEIXIN
-    {
-      "path": "pages/mine/password",
-      "type": "page",
-      "name": "password-edit",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "修改密码"
-      }
-    },
-    // #endif
     {
       "path": "pages/mine/profile",
       "type": "page",
@@ -164,29 +151,7 @@
       "style": {
         "navigationBarTitleText": "个人信息"
       }
-    },
-    // #ifdef MP-WEIXIN
-    {
-      "path": "pages/mine/settings",
-      "type": "page",
-      "name": "settings",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "设置"
-      }
-    },
-    // #endif
-    // #ifdef H5
-    {
-      "path": "pages/mine/account-security/index",
-      "type": "page",
-      "name": "account-security",
-      "layout": "default",
-      "style": {
-        "navigationBarTitleText": "账号与安全"
-      }
     }
-    // #endif
   ],
   "subPackages": [],
   "tabBar": {

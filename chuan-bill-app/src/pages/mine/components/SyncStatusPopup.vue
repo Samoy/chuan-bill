@@ -63,11 +63,12 @@ function handleClose() {
     closable
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
+    :z-index="999"
     @update:model-value="handleClose"
   >
     <view class="p-4">
       <view class="mb-4 text-center text-lg font-500">
-        数据同步
+        账单同步
       </view>
 
       <!-- 同步状态统计 -->

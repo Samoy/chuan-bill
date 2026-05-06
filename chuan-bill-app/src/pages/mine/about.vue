@@ -38,9 +38,7 @@ const openSourceLibs = [
   <view class="box-border flex flex-col gap-4 p-4">
     <!-- 应用信息 -->
     <view class="flex flex-col items-center py-8">
-      <view class="h-20 w-20 flex items-center justify-center rounded-2xl bg-primary">
-        <view class="i-lucide:wallet h-10 w-10 text-white" />
-      </view>
+      <wd-img src="https://chuan-bill-cdn.samoy.site/default/logo.png" custom-class="w-20 h-20 rounded-2xl overflow-hidden" />
       <text class="mt-4 text-lg font-bold">
         小川记账
       </text>

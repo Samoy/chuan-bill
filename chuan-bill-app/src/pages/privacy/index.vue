@@ -13,7 +13,7 @@ const userStore = useUserStore()
 const baseContent = `
 <div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
   <p style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 16px;">小川记账隐私政策</p>
-  <p style="color: #999; text-align: center; margin-bottom: 24px;">更新日期：2025年4月17日 | 生效日期：2025年4月17日</p>
+  <p style="color: #999; text-align: center; margin-bottom: 24px;">更新日期：2026年4月17日 | 生效日期：2026年4月17日</p>
 
   <p>"小川记账"（以下简称"我们"）深知个人信息对您的重要性，我们将按照法律法规要求，采取相应安全措施，保护您的个人信息安全。请您在使用我们的服务前，仔细阅读并充分理解本隐私政策。</p>
 
@@ -86,35 +86,6 @@ const baseContent = `
   <p>我们将在收到您的请求后15个工作日内予以回复。</p>
 </div>
 `
-
-// 未登录用户补充说明
-const guestNotice = `
-<div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
-  <div style="background-color: #FFF7ED; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-    <p style="font-weight: bold; color: #C2410C; margin-bottom: 8px;">游客用户隐私须知</p>
-    <p style="color: #9A3412;">您当前以游客身份使用本应用，关于您的隐私，请知悉以下信息：</p>
-    <p style="color: #9A3412; padding-left: 12px;">1. <b>我们不会收集您的任何个人身份信息</b>；</p>
-    <p style="color: #9A3412; padding-left: 12px;">2. 您的账单数据仅存储在本地设备中，<b>我们无法访问或恢复本地数据</b>；</p>
-    <p style="color: #9A3412; padding-left: 12px;">3. 我们仅收集匿名的设备信息和崩溃日志用于改善服务质量；</p>
-    <p style="color: #9A3412; padding-left: 12px;">4. 登录后您将受到完整的隐私政策保护，<b>建议您注册登录以获得更全面的数据安全保障</b>。</p>
-  </div>
-</div>
-`
-
-// 已登录用户补充说明
-const userNotice = `
-<div style="padding: 0 16px; font-size: 14px; line-height: 1.8; color: #333;">
-  <div style="background-color: #EFF6FF; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-    <p style="font-weight: bold; color: #1D4ED8; margin-bottom: 8px;">注册用户隐私保障</p>
-    <p style="color: #1E40AF;">作为注册用户，您享有以下隐私保障：</p>
-    <p style="color: #1E40AF; padding-left: 12px;">1. <b>您的数据采用加密传输和存储</b>，确保安全性；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">2. 图片和语音数据<b>仅用于识别处理，处理完成后即删除原始文件</b>；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">3. 您有权随时<b>查看、修改、导出和删除</b>您的全部数据；</p>
-    <p style="color: #1E40AF; padding-left: 12px;">4. 您有权<b>注销账号</b>，注销后我们将在15个工作日内删除您的个人信息。</p>
-  </div>
-</div>
-`
-
 const from = ref('')
 
 onLoad((options) => {
@@ -131,10 +102,6 @@ onBeforeUnmount(() => {
 
 <template>
   <view class="min-h-screen bg-white dark:bg-[var(--wot-dark-background)]">
-    <!-- 登录状态提示 -->
-    <rich-text v-if="!userStore.isLoggedIn" :nodes="guestNotice" />
-    <rich-text v-else :nodes="userNotice" />
-
     <!-- 通用隐私政策内容 -->
     <rich-text :nodes="baseContent" />
   </view>

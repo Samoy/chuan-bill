@@ -13,12 +13,12 @@ type _LocationUrl =
   "/pages/family/statistics" |
   "/pages/message/index" |
   "/pages/mine/about" |
+  "/pages/mine/account" |
   "/pages/mine/help" |
   "/pages/mine/index" |
   "/pages/mine/profile" |
   "/pages/privacy/index" |
-  "/pages/statistics/index" |
-  "/pages/mine/account-security/index";
+  "/pages/statistics/index";
 
 interface NavigateToOptions {
   url: _LocationUrl;

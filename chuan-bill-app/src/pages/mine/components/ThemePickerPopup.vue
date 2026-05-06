@@ -19,6 +19,7 @@ function selectTheme(color: typeof themeColorOptions[0]) {
     v-model="modelValue"
     position="bottom"
     closable
+    :z-index="999"
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
   >

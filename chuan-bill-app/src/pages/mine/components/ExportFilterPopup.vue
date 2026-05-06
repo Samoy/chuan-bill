@@ -84,6 +84,7 @@ async function handleExport() {
     position="bottom"
     closable
     safe-area-inset-bottom
+    :z-index="999"
     custom-class="rounded-tl-2xl rounded-tr-2xl"
   >
     <view class="max-h-80vh p-4">

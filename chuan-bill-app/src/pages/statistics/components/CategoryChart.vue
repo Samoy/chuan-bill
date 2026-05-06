@@ -79,7 +79,7 @@ watch(() => props.month, () => {
         v-model:value="activeType"
         :options="segmentedOptions"
         size="small"
-        custom-class="!rounded-xl dark:!bg-[var(--wot-dark-background3)] w-200px!"
+        custom-class="!rounded-2xl dark:!bg-[var(--wot-dark-background3)] w-200px!"
       >
         <template #label="{ option }">
           <view class="w-200px flex items-center justify-center gap-1">
@@ -142,7 +142,7 @@ watch(() => props.month, () => {
 
 <style lang="scss" scoped>
 :deep(.wd-segmented__item--active) {
-  @apply rounded-lg;
+  @apply rounded-xl;
 }
 
 :deep(.wd-segmented__item-label) {
