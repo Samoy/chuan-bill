@@ -236,7 +236,7 @@ watch(() => user.isLoggedIn, (newVal) => {
     <view v-else class="mt-10vh flex flex-col items-center justify-center gap-5">
       <wd-status-tip tip="您还没有任何账单数据，快来记一笔吧！">
         <template #image>
-          <image mode="aspectFit" class="h-30 w-80" src="https://cdn.chuanbill.samoy.site/default/nodata.svg" />
+          <image mode="aspectFit" class="h-30 w-80" src="https://chuan-bill-cdn.samoy.site/default/nodata.svg" />
         </template>
       </wd-status-tip>
       <wd-button type="primary" @click="addBill">
