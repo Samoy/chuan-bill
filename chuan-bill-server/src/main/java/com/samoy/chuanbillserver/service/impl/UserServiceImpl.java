@@ -164,13 +164,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
         }
         // 更新用户信息
-        if (!CharSequenceUtil.isBlank(user.getNickname())) {
+        if (!CharSequenceUtil.isBlank(updateDTO.getNickname())) {
             user.setNickname(updateDTO.getNickname());
         }
-        if (!CharSequenceUtil.isBlank(user.getAvatar())) {
+        if (!CharSequenceUtil.isBlank(updateDTO.getAvatar())) {
             user.setAvatar(updateDTO.getAvatar());
         }
-        if (!ObjectUtil.isEmpty(user.getGender())) {
+        if (!ObjectUtil.isEmpty(updateDTO.getGender())) {
             user.setGender(updateDTO.getGender());
         }
         return updateById(user);

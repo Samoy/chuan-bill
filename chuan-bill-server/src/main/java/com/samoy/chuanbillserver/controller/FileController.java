@@ -1,12 +1,15 @@
 package com.samoy.chuanbillserver.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IFileService;
 import com.samoy.chuanbillserver.vo.TempFileVO;
+import com.samoy.chuanbillserver.vo.UploadTokenVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,10 +28,10 @@ public class FileController {
         return Result.success(fileService.uploadTempFile(file));
     }
 
-    @PostMapping("/upload")
-    @Operation(summary = "上传文件到R2", description = "上传文件到Cloudflare R2，返回文件URL")
-    public Result<String> uploadTempFileToR2(HttpServletRequest request, MultipartFile file) {
-        String url = fileService.uploadFileToR2(file);
-        return Result.success(url);
+    @GetMapping("/upload-token")
+    @Operation(summary = "获取上传凭证", description = "获取上传凭证，用于前端上传文件")
+    public Result<UploadTokenVO> getUploadToken(@Parameter(description = "文件名") String fileName) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(fileService.getUploadToken(userId, fileName));
     }
 }

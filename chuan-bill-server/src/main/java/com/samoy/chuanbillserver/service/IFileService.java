@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.service;
 
 import com.samoy.chuanbillserver.vo.TempFileVO;
+import com.samoy.chuanbillserver.vo.UploadTokenVO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IFileService {
@@ -14,10 +15,11 @@ public interface IFileService {
     TempFileVO uploadTempFile(MultipartFile file);
 
     /**
-     * 上传临时文件到 R2
+     * 获取上传凭证
      *
-     * @param file 文件
-     * @return 文件url
+     * @param userId   用户ID
+     * @param fileName 文件名
+     * @return 上传凭证
      */
-    String uploadFileToR2(MultipartFile file);
+    UploadTokenVO getUploadToken(String userId, String fileName);
 }

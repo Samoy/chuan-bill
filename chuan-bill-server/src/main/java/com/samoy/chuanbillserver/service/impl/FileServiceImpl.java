@@ -4,12 +4,15 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import com.qiniu.util.Auth;
+import com.qiniu.util.StringMap;
 import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IFileService;
 import com.samoy.chuanbillserver.vo.TempFileVO;
-import jakarta.annotation.Resource;
+import com.samoy.chuanbillserver.vo.UploadTokenVO;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,23 +20,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Slf4j
 @Service
 public class FileServiceImpl implements IFileService {
 
-    @Resource
-    private S3Client s3Client;
-
-    @Value("${r2.bucket-name}")
+    @Value("${qiniu.bucket}")
     private String bucketName;
 
-    @Value("${r2.public-url}")
-    private String publicUrl;
+    @Value("${qiniu.access_key}")
+    private String accessKey;
+
+    @Value("${qiniu.secret_key}")
+    private String secretKey;
+
+    @Value("${qiniu.cdn-domain}")
+    private String cdnUrl;
+
+    @Value("${qiniu.endpoint}")
+    private String endpoint;
 
     @Override
     public TempFileVO uploadTempFile(MultipartFile file) {
@@ -58,20 +63,28 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public String uploadFileToR2(MultipartFile file) {
-        String fileName = String.format("%s.%s", IdUtil.objectId(), FileUtil.extName(file.getOriginalFilename()));
-        String fileKey = "upload/" + fileName;
-        try {
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileKey)
-                    .contentType(file.getContentType())
-                    .build();
-            s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
-            return publicUrl + "/" + fileKey;
-        } catch (S3Exception | IOException e) {
-            log.error(e.getMessage(), e);
-            throw new BusinessException(ResultEnum.FILE_UPLOAD_FAILED, "文件上传失败");
-        }
+    public UploadTokenVO getUploadToken(String userId, String fileName) {
+        // 1. 动态生成唯一文件路径： /upload/{userId}/{random}.{ext}
+        String extName = FileUtil.extName(fileName);
+        String saveKey = String.format(
+                "/upload/%s/%s.%s", userId, IdUtil.fastSimpleUUID(), StrUtil.isEmpty(extName) ? "png" : extName);
+
+        // 2. 构建安全上传策略
+        StringMap putPolicy = new StringMap()
+                .put("scope", bucketName + ":" + saveKey)
+                .put("fsizeLimit", 1024 * 1024 * 10)
+                .put("insertOnly", 1)
+                .put("mimeLimit", "image/*");
+
+        // 3. 构建上传token
+        Auth auth = Auth.create(accessKey, secretKey);
+        String token = auth.uploadToken(bucketName, saveKey, SystemConstants.QINIU_UPLOAD_TOKEN_EXPIRE_TIME, putPolicy);
+        return UploadTokenVO.builder()
+                .token(token)
+                .key(saveKey)
+                .cdnUrl(cdnUrl)
+                .uploadUrl(endpoint)
+                .expireSeconds(SystemConstants.QINIU_UPLOAD_TOKEN_EXPIRE_TIME)
+                .build();
     }
 }

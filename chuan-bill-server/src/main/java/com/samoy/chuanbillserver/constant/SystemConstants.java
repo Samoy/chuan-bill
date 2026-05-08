@@ -55,4 +55,9 @@ public class SystemConstants {
      * 家庭账单分析
      */
     public static final int FAMILY_ANALYSIS_TYPE = 2;
+
+    /**
+     * 七牛上传token过期时间 - 5分钟
+     */
+    public static final long QINIU_UPLOAD_TOKEN_EXPIRE_TIME = 5 * 60;
 }
