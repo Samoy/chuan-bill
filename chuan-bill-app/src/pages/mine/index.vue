@@ -200,7 +200,7 @@ onShow(() => {
               {{ loginTip }}
             </text>
           </view>
-          <view class="i-lucide:chevron-right h-5 w-5 text-gray-400" />
+          <view class="i-lucide:chevron-right h-4 w-4" />
         </view>
       </view>
 
@@ -228,7 +228,7 @@ onShow(() => {
           @click="router.push('/pages/mine/help')"
         >
           <view class="flex items-center gap-3">
-            <view class="i-lucide:help-circle h-5 w-5 text-gray-500" />
+            <view class="i-lucide:help-circle h-4 w-4" />
             <text class="text-sm">
               帮助与反馈
             </text>
@@ -240,7 +240,7 @@ onShow(() => {
           @click="router.push('/pages/mine/about')"
         >
           <view class="flex items-center gap-3">
-            <view class="i-lucide:info h-5 w-5 text-gray-500" />
+            <view class="i-lucide:info h-4 w-4" />
             <text class="text-sm">
               关于应用
             </text>
@@ -295,7 +295,7 @@ onShow(() => {
               {{ item.subtitle.value }}
             </text>
             <!-- 徽章 -->
-            <view v-if="item.badge && item.badge.value > 0" class="h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            <view v-if="item.badge && item.badge.value > 0" class="h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
               {{ item.badge.value > 99 ? '99+' : item.badge.value }}
             </view>
             <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
