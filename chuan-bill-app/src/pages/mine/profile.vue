@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { UploadChangeEvent, UploadFile } from 'wot-design-uni/components/wd-upload/types'
-import type { ResultString } from '@/api/globals'
+import type { UploadBuildFormDataOption, UploadChangeEvent, UploadFile } from 'wot-design-uni/components/wd-upload/types'
 
 definePage({
   name: 'profile-edit',
@@ -23,17 +22,8 @@ const formData = ref({
 
 // 头像上传
 const fileList = ref<UploadFile[]>([])
-const actionUrl = ref('/file/upload')
-
-// #ifdef H5
-if (process.env.NODE_ENV === 'development') {
-  actionUrl.value = '/api/file/upload'
-}
-// #endif
-
-// #ifndef H5
-actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/upload`
-// #endif
+const actionUrl = 'https://up-z1.qiniup.com'
+const fileCdnUrl = ref<string>()
 
 // 性别选项
 const genderOptions = [
@@ -76,19 +66,28 @@ function initData() {
 function uploadChange(e: UploadChangeEvent) {
   const { fileList: files } = e
   const file = files[0]
-  if (!file || file.status !== 'success') {
-    formData.value.avatar = ''
-    return
+  if (file.status === 'success' && fileCdnUrl.value) {
+    toast.success('上传成功')
+    formData.value.avatar = fileCdnUrl.value
   }
-  const res: ResultString = JSON.parse(file.response as string)
+}
+
+async function buildFormData({ file, formData, resolve }: UploadBuildFormDataOption) {
+  let imageName = file.url.substring(file.url.lastIndexOf('/') + 1)
+  // #ifdef H5
+  imageName = imageName + file.name
+  // #endif
+  const res = await Apis.file.getUploadToken({ params: { fileName: imageName }, meta: { slient: true } })
   if (res.success) {
-    formData.value.avatar = res.data!
+    fileCdnUrl.value = res.data?.cdnUrl
+    formData = {
+      ...formData,
+      token: res.data?.token,
+      key: res.data?.key,
+      success_action_status: '200',
+    }
   }
-  else {
-    toast.error(res.message || '上传失败，请重试')
-    formData.value.avatar = ''
-    file.status = 'fail'
-  }
+  resolve(formData)
 }
 
 // 保存资料
@@ -124,6 +123,9 @@ async function handleSave() {
         :show-limit-num="false"
         custom-evoke-class="rounded-full!"
         :limit="1"
+        reupload
+        :multiple="false"
+        :build-form-data="buildFormData"
         accept="image"
         image-mode="aspectFill"
         :action="actionUrl"
@@ -190,9 +192,15 @@ async function handleSave() {
 
 <style lang="scss" scoped>
 :deep(.wd-upload__evoke) {
-  width: 80px !important;
-  height: 80px !important;
-  border-radius: 50% !important;
+  @apply rounded-full! w-20! h-20!;
+}
+
+:deep(.wd-upload__picture){
+  @apply rounded-full! w-20! h-20!
+}
+
+:deep(.wd-upload__preview .wd-icon.wd-upload__close){
+  @apply hidden!
 }
 
 .profile-gender-radio {

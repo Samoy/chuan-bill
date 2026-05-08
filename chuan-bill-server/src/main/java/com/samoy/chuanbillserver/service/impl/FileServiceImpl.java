@@ -67,7 +67,7 @@ public class FileServiceImpl implements IFileService {
         // 1. 动态生成唯一文件路径： /upload/{userId}/{random}.{ext}
         String extName = FileUtil.extName(fileName);
         String saveKey = String.format(
-                "/upload/%s/%s.%s", userId, IdUtil.fastSimpleUUID(), StrUtil.isEmpty(extName) ? "png" : extName);
+                "upload/%s/%s.%s", userId, IdUtil.fastSimpleUUID(), StrUtil.isEmpty(extName) ? "png" : extName);
 
         // 2. 构建安全上传策略
         StringMap putPolicy = new StringMap()
@@ -82,7 +82,7 @@ public class FileServiceImpl implements IFileService {
         return UploadTokenVO.builder()
                 .token(token)
                 .key(saveKey)
-                .cdnUrl(cdnUrl)
+                .cdnUrl(cdnUrl + "/" + saveKey)
                 .uploadUrl(endpoint)
                 .expireSeconds(SystemConstants.QINIU_UPLOAD_TOKEN_EXPIRE_TIME)
                 .build();

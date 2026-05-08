@@ -581,13 +581,6 @@ export interface ResultListPaymentMethodVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface ResultString {
-  code?: number;
-  message?: string;
-  data?: string;
-  timestamp?: number;
-  success?: boolean;
-}
 export interface TempFileVO {
   /**
    * 临时文件ID
@@ -623,6 +616,13 @@ export interface ResultFamilyVO {
    * 家庭信息
    */
   data?: FamilyVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultString {
+  code?: number;
+  message?: string;
+  data?: string;
   timestamp?: number;
   success?: boolean;
 }
@@ -872,8 +872,8 @@ export interface MessageVO {
 }
 export interface IPageMessageVO {
   size?: number;
-  total?: number;
   records?: MessageVO[];
+  total?: number;
   current?: number;
   /**
    * @deprecated
@@ -884,6 +884,23 @@ export interface ResultIPageMessageVO {
   code?: number;
   message?: string;
   data?: IPageMessageVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface UploadTokenVO {
+  token?: string;
+  key?: string;
+  cdnUrl?: string;
+  uploadUrl?: string;
+  expireSeconds?: number;
+}
+export interface ResultUploadTokenVO {
+  code?: number;
+  message?: string;
+  /**
+   * 上传凭证
+   */
+  data?: UploadTokenVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -1025,8 +1042,8 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
-  total?: number;
   records?: BillVO[];
+  total?: number;
   current?: number;
   /**
    * @deprecated
@@ -1412,7 +1429,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1434,6 +1450,7 @@ declare global {
        *       // 创建时间
        *       createTime?: string
        *     }>
+       *     total?: number
        *     current?: number
        *     // [deprecated]
        *     pages?: number
@@ -1461,44 +1478,6 @@ declare global {
       ): Alova2Method<ResultIPageMessageVO, 'message.getMessageList', Config>;
     };
     file: {
-      /**
-       * ---
-       *
-       * [POST] 上传文件到R2
-       *
-       * **path:** /file/upload
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   file: Blob
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: string
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      uploadTempFileToR2<
-        Config extends Alova2MethodConfig<ResultString> & {
-          params: {
-            file: Blob;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultString, 'file.uploadTempFileToR2', Config>;
       /**
        * ---
        *
@@ -1547,6 +1526,55 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTempFileVO, 'file.uploadTempFile', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取上传凭证
+       *
+       * **path:** /file/upload-token
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 文件名
+       *   fileName: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   // 上传凭证
+       *   data?: {
+       *     token?: string
+       *     key?: string
+       *     cdnUrl?: string
+       *     uploadUrl?: string
+       *     expireSeconds?: number
+       *   }
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getUploadToken<
+        Config extends Alova2MethodConfig<ResultUploadTokenVO> & {
+          params: {
+            /**
+             * 文件名
+             */
+            fileName: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultUploadTokenVO, 'file.getUploadToken', Config>;
     };
     family: {
       /**
@@ -2617,7 +2645,7 @@ declare global {
             /**
              * 账单列表查询参数
              */
-            
+
             startDate?: string;
             endDate?: string;
             categoryId?: string;
@@ -2687,7 +2715,7 @@ declare global {
             /**
              * 账单月度统计参数
              */
-            
+
             month?: string;
             familyId?: string;
           };

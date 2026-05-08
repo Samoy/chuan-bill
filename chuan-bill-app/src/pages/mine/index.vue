@@ -256,10 +256,8 @@ onShow(() => {
       <view class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
         <view class="flex items-center gap-4">
           <!-- 头像 -->
-          <view class="h-16 w-16 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-8 h-8" mode="aspectFill" />
-            <view v-else class="i-lucide:user h-8 w-8" />
-          </view>
+          <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
+          <view v-else class="i-lucide:user h-12 w-12" />
           <view class="flex-1">
             <text class="block text-lg font-bold">
               {{ user.nickname || '用户' }}
