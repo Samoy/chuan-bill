@@ -143,7 +143,7 @@ async function handleJoin() {
         <text class="mb-6 block text-sm text-gray-500">
           创建家庭、邀请成员、共同管理
         </text>
-        <wd-button type="primary" block size="large" @click="user.showLoginPopup = true">
+        <wd-button type="primary" block @click="user.showLoginPopup = true">
           立即登录
         </wd-button>
       </view>

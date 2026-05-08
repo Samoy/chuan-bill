@@ -54,10 +54,10 @@ watch(() => props.month, () => {
 
     <!-- 未登录状态 -->
     <view v-if="!user.isLoggedIn" class="flex flex-col items-center gap-3 py-6">
-      <text class="text-sm text-gray-400">
-        登录即可获取AI消费建议
-      </text>
-      <wd-button type="primary" block @click="handleLogin">
+      <view class="flex items-center gap-2 text-sm text-gray-400">
+        <view class="i-lucide:sparkles" /> 登录后获取AI消费建议
+      </view>
+      <wd-button custom-class="w-full" type="primary" block @click="handleLogin">
         立即登录
       </wd-button>
     </view>
