@@ -337,8 +337,10 @@ export default {
             未注册手机号验证通过后将自动注册
           </text>
         </view>
+        <!-- #ifdef MP-WEIXIN -->
         <wd-divider>或</wd-divider>
         <view class="i-mingcute:wechat-fill mx-auto mt-4 h-8 w-8 text-[#07C160]" @click="handleWechatLogin" />
+        <!-- #endif -->
       </view>
 
       <!-- ==================== 协议勾选区域 ==================== -->
