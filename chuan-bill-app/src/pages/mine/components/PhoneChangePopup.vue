@@ -313,7 +313,8 @@ async function handleUpdateByPassword() {
     <view class="px-6 py-4">
       <!-- 绑定手机号模式 -->
       <view v-if="mode === 'bind'">
-        <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+        <view class="mb-4 flex items-center gap-2 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+          <view class="i-lucide:info text-gray-600 dark:text-gray-400" />
           <text class="text-sm text-gray-600 dark:text-gray-400">
             您还没有绑定手机号，请先绑定手机号
           </text>
@@ -348,15 +349,10 @@ async function handleUpdateByPassword() {
       <view v-if="mode === 'code'">
         <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
           <text class="text-sm text-gray-600 dark:text-gray-400">
-            当前手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
+            当前手机号：{{ userStore.phone || '未绑定' }}
           </text>
         </view>
         <view class="pt-2">
-          <wd-input v-model="codeForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
-            <template #prefix>
-              <view class="i-lucide-phone text-gray-400" />
-            </template>
-          </wd-input>
           <wd-input v-model="codeForm.oldPhoneCode" type="number" placeholder="当前手机验证码" :maxlength="6" custom-class="login-input">
             <template #prefix>
               <view class="i-lucide-message-square text-gray-400" />
@@ -369,6 +365,11 @@ async function handleUpdateByPassword() {
               >
                 {{ oldPhoneCountdown > 0 ? `${oldPhoneCountdown}s` : '获取验证码' }}
               </text>
+            </template>
+          </wd-input>
+          <wd-input v-model="codeForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-phone text-gray-400" />
             </template>
           </wd-input>
           <wd-input v-model="codeForm.newPhoneCode" type="number" placeholder="新手机验证码" :maxlength="6" custom-class="login-input">
@@ -399,10 +400,13 @@ async function handleUpdateByPassword() {
 
       <!-- 密码换绑模式 -->
       <view v-if="mode === 'password'">
-        <view class="mb-4 rounded-xl bg-gray-200 p-4 dark:bg-gray-700">
-          <text class="text-sm text-primary">
-            使用登录密码验证身份，更换绑定手机号
-          </text>
+        <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+          <view class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <view class="i-lucide:info" />
+            <text class="text-sm">
+              使用登录密码验证身份，更换绑定手机号
+            </text>
+          </view>
         </view>
         <view class="pt-2">
           <wd-input v-model="passwordForm.password" type="safe-password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">

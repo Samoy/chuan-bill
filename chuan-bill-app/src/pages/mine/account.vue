@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import PasswordChangePopup from './components/PasswordChangePopup.vue'
+import PhoneChangePopup from './components/PhoneChangePopup.vue'
+
 definePage({
   name: 'account',
   layout: 'default',
@@ -103,9 +106,9 @@ function goToDeviceManagement() {
     </view>
 
     <!-- 修改密码弹框 -->
-    <PasswordChangeModal v-model="showPasswordModal" />
+    <PasswordChangePopup v-model="showPasswordModal" />
 
     <!-- 修改手机号弹框 -->
-    <PhoneChangeModal v-model="showPhoneModal" />
+    <PhoneChangePopup v-model="showPhoneModal" />
   </view>
 </template>
