@@ -3,7 +3,7 @@ defineOptions({
   name: 'SyncStatusPopup',
 })
 
-const modelValue = defineModel<boolean>()
+const modelValue = defineModel<boolean>({ default: false })
 const billStore = useBillStore()
 const toast = useGlobalToast()
 const loading = ref(false)
@@ -57,20 +57,17 @@ function handleClose() {
 </script>
 
 <template>
-  <wd-popup
+  <wd-action-sheet
     :model-value="modelValue"
     position="bottom"
     closable
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     :z-index="999"
+    title="账单同步"
     @update:model-value="handleClose"
   >
     <view class="p-4">
-      <view class="mb-4 text-center text-lg font-500">
-        账单同步
-      </view>
-
       <!-- 同步状态统计 -->
       <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
         <view class="mb-3 flex items-center justify-between">
@@ -131,5 +128,5 @@ function handleClose() {
         {{ billStore.pendingSyncCount === 0 ? '暂无待同步数据' : '开始同步' }}
       </wd-button>
     </view>
-  </wd-popup>
+  </wd-action-sheet>
 </template>

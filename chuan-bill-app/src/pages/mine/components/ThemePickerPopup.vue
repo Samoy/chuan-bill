@@ -5,7 +5,7 @@ defineOptions({
   name: 'ThemePickerPopup',
 })
 
-const modelValue = defineModel<boolean>()
+const modelValue = defineModel<boolean>({ default: false })
 const themeStore = useManualTheme()
 
 function selectTheme(color: typeof themeColorOptions[0]) {
@@ -15,18 +15,16 @@ function selectTheme(color: typeof themeColorOptions[0]) {
 </script>
 
 <template>
-  <wd-popup
+  <wd-action-sheet
     v-model="modelValue"
     position="bottom"
     closable
     :z-index="999"
     safe-area-inset-bottom
+    title="主题颜色"
     custom-class="rounded-tl-2xl rounded-tr-2xl"
   >
     <view class="p-4">
-      <view class="mb-4 text-center text-lg font-500">
-        主题颜色
-      </view>
       <view class="grid grid-cols-3 gap-4">
         <view
           v-for="color in themeColorOptions"
@@ -45,5 +43,5 @@ function selectTheme(color: typeof themeColorOptions[0]) {
         </view>
       </view>
     </view>
-  </wd-popup>
+  </wd-action-sheet>
 </template>

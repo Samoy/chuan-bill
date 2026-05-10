@@ -310,7 +310,7 @@ async function handleUpdateByPassword() {
     safe-area-inset-bottom
     :close-on-click-modal="false"
   >
-    <view class="px-6 py-4">
+    <view class="p-4">
       <!-- 绑定手机号模式 -->
       <view v-if="mode === 'bind'">
         <view class="mb-4 flex items-center gap-2 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">

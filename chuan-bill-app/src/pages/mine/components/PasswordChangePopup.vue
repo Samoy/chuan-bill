@@ -232,7 +232,7 @@ async function handleUpdateByCode() {
     safe-area-inset-bottom
     :close-on-click-modal="false"
   >
-    <view class="px-6 py-4">
+    <view class="p-4">
       <!-- Tab 切换（有密码时显示） -->
       <wd-tabs v-if="hasPassword" v-model="activeTab">
         <!-- 验证码验证 Tab -->

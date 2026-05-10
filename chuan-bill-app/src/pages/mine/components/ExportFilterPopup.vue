@@ -6,7 +6,7 @@ defineOptions({
   name: 'ExportFilterPopup',
 })
 
-const modelValue = defineModel<boolean>()
+const modelValue = defineModel<boolean>({ default: false })
 const toast = useGlobalToast()
 const loading = ref(false)
 
@@ -79,19 +79,16 @@ async function handleExport() {
 </script>
 
 <template>
-  <wd-popup
+  <wd-action-sheet
     v-model="modelValue"
     position="bottom"
     closable
     safe-area-inset-bottom
     :z-index="999"
     custom-class="rounded-tl-2xl rounded-tr-2xl"
+    title="数据导出"
   >
     <view class="max-h-80vh p-4">
-      <view class="mb-4 text-center text-lg font-500">
-        数据导出
-      </view>
-
       <!-- 时间范围 -->
       <view class="mb-4 flex flex-col gap-1">
         <view class="flex items-center gap-2 font-500">
@@ -152,7 +149,7 @@ async function handleExport() {
         导出
       </wd-button>
     </view>
-  </wd-popup>
+  </wd-action-sheet>
 </template>
 
 <style lang="scss" scoped>

@@ -3,7 +3,7 @@ defineOptions({
   name: 'NotificationSettingsPopup',
 })
 
-const modelValue = defineModel<boolean>()
+const modelValue = defineModel<boolean>({ default: false })
 const toast = useGlobalToast()
 
 // 通知设置
@@ -45,19 +45,16 @@ function onTimeConfirm({ value }: { value: number[] }) {
 </script>
 
 <template>
-  <wd-popup
+  <wd-action-sheet
     v-model="modelValue"
     position="bottom"
     closable
     :z-index="999"
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
+    title="通知设置"
   >
     <view class="p-4">
-      <view class="mb-4 text-center text-lg font-500">
-        通知设置
-      </view>
-
       <!-- 消息推送 -->
       <view class="mb-4 flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
         <view>
@@ -125,5 +122,5 @@ function onTimeConfirm({ value }: { value: number[] }) {
         />
       </view>
     </view>
-  </wd-popup>
+  </wd-action-sheet>
 </template>
