@@ -195,6 +195,44 @@ export interface UserProfileUpdateDTO {
    */
   gender?: string;
 }
+export interface UpdatePhoneByPasswordDTO {
+  /**
+   * 密码
+   */
+  password: string;
+  /**
+   * 新手机号
+   */
+  newPhone: string;
+  /**
+   * 新手机号验证码
+   */
+  newPhoneCode: string;
+}
+export interface UpdatePhoneByCodeDTO {
+  /**
+   * 旧手机号验证码
+   */
+  oldPhoneCode: string;
+  /**
+   * 新手机号
+   */
+  newPhone: string;
+  /**
+   * 新手机号验证码
+   */
+  newPhoneCode: string;
+}
+export interface BindPhoneDTO {
+  /**
+   * 手机号
+   */
+  phone: string;
+  /**
+   * 验证码
+   */
+  code: string;
+}
 export interface UpdatePasswordByOldDTO {
   /**
    * 用户 ID
@@ -210,10 +248,6 @@ export interface UpdatePasswordByOldDTO {
   newPassword: string;
 }
 export interface UpdatePasswordByCodeDTO {
-  /**
-   * 手机号
-   */
-  phone: string;
   /**
    * 验证码
    */
@@ -383,6 +417,20 @@ export interface SendCodeDTO {
    */
   phone: string;
 }
+export interface RetrievePasswordDTO {
+  /**
+   * 手机号
+   */
+  phone: string;
+  /**
+   * 验证码
+   */
+  code: string;
+  /**
+   * 新密码
+   */
+  newPassword: string;
+}
 export interface LoginByWechatDTO {
   /**
    * 微信登录 code
@@ -409,17 +457,17 @@ export interface LoginByPasswordDTO {
    */
   password: string;
 }
-export interface ResultBoolean {
-  code?: number;
-  message?: string;
-  data?: boolean;
-  timestamp?: number;
-  success?: boolean;
-}
 export interface ResultVoid {
   code?: number;
   message?: string;
   data?: null;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultBoolean {
+  code?: number;
+  message?: string;
+  data?: boolean;
   timestamp?: number;
   success?: boolean;
 }
@@ -872,13 +920,13 @@ export interface MessageVO {
 }
 export interface IPageMessageVO {
   size?: number;
-  records?: MessageVO[];
   total?: number;
-  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
+  current?: number;
+  records?: MessageVO[];
 }
 export interface ResultIPageMessageVO {
   code?: number;
@@ -1042,13 +1090,13 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
-  records?: BillVO[];
   total?: number;
-  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
+  current?: number;
+  records?: BillVO[];
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -1147,6 +1195,150 @@ declare global {
       /**
        * ---
        *
+       * [POST] 通过密码验证更换手机号
+       *
+       * **path:** /user/phone/update-by-password
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 密码
+       *   password: string
+       *   // 新手机号
+       *   newPhone: string
+       *   // 新手机号验证码
+       *   newPhoneCode: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      updatePhoneByPassword<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: UpdatePhoneByPasswordDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'user.updatePhoneByPassword', Config>;
+      /**
+       * ---
+       *
+       * [POST] 通过验证码更换手机号
+       *
+       * **path:** /user/phone/update-by-code
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 旧手机号验证码
+       *   oldPhoneCode: string
+       *   // 新手机号
+       *   newPhone: string
+       *   // 新手机号验证码
+       *   newPhoneCode: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      updatePhoneByCode<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: UpdatePhoneByCodeDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'user.updatePhoneByCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 获取手机验证码
+       *
+       * **path:** /user/phone/code
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getPhoneCode<Config extends Alova2MethodConfig<ResultVoid>>(
+        config?: Config
+      ): Alova2Method<ResultVoid, 'user.getPhoneCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 绑定手机号
+       *
+       * **path:** /user/phone/bind
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机号
+       *   phone: string
+       *   // 验证码
+       *   code: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      bindPhone<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: BindPhoneDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'user.bindPhone', Config>;
+      /**
+       * ---
+       *
        * [POST] 通过旧密码修改密码
        *
        * **path:** /user/password/update-by-old
@@ -1197,8 +1389,6 @@ declare global {
        * **RequestBody**
        * ```ts
        * type RequestBody = {
-       *   // 手机号
-       *   phone: string
        *   // 验证码
        *   code: string
        *   // 新密码
@@ -1429,6 +1619,10 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
+       *     total?: number
+       *     // [deprecated]
+       *     pages?: number
+       *     current?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1450,10 +1644,6 @@ declare global {
        *       // 创建时间
        *       createTime?: string
        *     }>
-       *     total?: number
-       *     current?: number
-       *     // [deprecated]
-       *     pages?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2569,6 +2759,9 @@ declare global {
        *   data?: {
        *     size?: number
        *     total?: number
+       *     // [deprecated]
+       *     pages?: number
+       *     current?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2630,9 +2823,6 @@ declare global {
        *       // 记账人头像
        *       userAvatar?: string
        *     }>
-       *     current?: number
-       *     // [deprecated]
-       *     pages?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2645,7 +2835,7 @@ declare global {
             /**
              * 账单列表查询参数
              */
-
+            
             startDate?: string;
             endDate?: string;
             categoryId?: string;
@@ -2715,7 +2905,7 @@ declare global {
             /**
              * 账单月度统计参数
              */
-
+            
             month?: string;
             familyId?: string;
           };
@@ -2922,6 +3112,47 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultVoid, 'auth.sendCode', Config>;
+      /**
+       * ---
+       *
+       * [POST] 找回密码
+       *
+       * **path:** /auth/retrieve-password
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机号
+       *   phone: string
+       *   // 验证码
+       *   code: string
+       *   // 新密码
+       *   newPassword: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      retrievePassword<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: RetrievePasswordDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'auth.retrievePassword', Config>;
       /**
        * ---
        *

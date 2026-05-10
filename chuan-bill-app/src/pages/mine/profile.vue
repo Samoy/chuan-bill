@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { UploadBuildFormDataOption, UploadChangeEvent, UploadFile } from 'wot-design-uni/components/wd-upload/types'
-
 definePage({
   name: 'profile-edit',
   layout: 'default',
@@ -20,16 +18,11 @@ const formData = ref({
   gender: '0',
 })
 
-// 头像上传
-const fileList = ref<UploadFile[]>([])
-const actionUrl = 'https://up-z1.qiniup.com'
-const fileCdnUrl = ref<string>()
-
 // 性别选项
 const genderOptions = [
-  { label: '男', value: '1' },
-  { label: '女', value: '2' },
-  { label: '保密', value: '0' },
+  { label: '男', value: 1 },
+  { label: '女', value: 2 },
+  { label: '保密', value: 0 },
 ]
 
 // 页面加载
@@ -56,38 +49,7 @@ function initData() {
       avatar: userStore.avatar || '',
       gender: userStore.gender || '0',
     }
-    if (formData.value.avatar) {
-      fileList.value = [{ url: formData.value.avatar, status: 'success' }]
-    }
   })
-}
-
-// 头像上传变化
-function uploadChange(e: UploadChangeEvent) {
-  const { fileList: files } = e
-  const file = files[0]
-  if (file.status === 'success' && fileCdnUrl.value) {
-    toast.success('上传成功')
-    formData.value.avatar = fileCdnUrl.value
-  }
-}
-
-async function buildFormData({ file, formData, resolve }: UploadBuildFormDataOption) {
-  let imageName = file.url.substring(file.url.lastIndexOf('/') + 1)
-  // #ifdef H5
-  imageName = imageName + file.name
-  // #endif
-  const res = await Apis.file.getUploadToken({ params: { fileName: imageName }, meta: { slient: true } })
-  if (res.success) {
-    fileCdnUrl.value = res.data?.cdnUrl
-    formData = {
-      ...formData,
-      token: res.data?.token,
-      key: res.data?.key,
-      success_action_status: '200',
-    }
-  }
-  resolve(formData)
 }
 
 // 保存资料
@@ -117,20 +79,7 @@ async function handleSave() {
   <view class="box-border flex flex-col gap-4 p-4">
     <!-- 头像区域 -->
     <view class="flex flex-col items-center py-6">
-      <wd-upload
-        v-model:file-list="fileList"
-        :header="{ token: userStore.token }"
-        :show-limit-num="false"
-        custom-evoke-class="rounded-full!"
-        :limit="1"
-        reupload
-        :multiple="false"
-        :build-form-data="buildFormData"
-        accept="image"
-        image-mode="aspectFill"
-        :action="actionUrl"
-        @change="uploadChange"
-      />
+      <ImageUpload v-model:url="formData.avatar" />
       <text class="mt-2 text-sm text-gray-500">
         点击更换头像
       </text>
@@ -138,18 +87,6 @@ async function handleSave() {
 
     <!-- 表单区域 -->
     <view class="rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
-      <!-- 手机号 -->
-      <view class="mb-4 flex items-center justify-between py-2">
-        <text class="text-sm text-gray-600">
-          手机号
-        </text>
-        <view class="flex items-center gap-1">
-          <text class="text-sm text-gray-400">
-            {{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
-          </text>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-        </view>
-      </view>
       <!-- 昵称 -->
       <view class="mb-4">
         <text class="mb-2 block text-sm text-gray-600">
@@ -192,15 +129,15 @@ async function handleSave() {
 
 <style lang="scss" scoped>
 :deep(.wd-upload__evoke) {
-  @apply rounded-full! w-20! h-20!;
+  @apply rounded-full! w-80px! h-80px! box-border bg-gray-200;
 }
 
-:deep(.wd-upload__picture){
-  @apply rounded-full! w-20! h-20!
+:deep(.wd-upload__picture) {
+  @apply rounded-full! box-border bg-gray-200;
 }
 
-:deep(.wd-upload__preview .wd-icon.wd-upload__close){
-  @apply hidden!
+:deep(.wd-upload__preview) {
+  @apply w-80px! h-80px! box-border m-0;
 }
 
 .profile-gender-radio {

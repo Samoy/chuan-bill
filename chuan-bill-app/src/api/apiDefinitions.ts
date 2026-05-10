@@ -18,6 +18,10 @@
  */
 export default {
   'user.updateProfile': ['POST', '/user/profile/update'],
+  'user.updatePhoneByPassword': ['POST', '/user/phone/update-by-password'],
+  'user.updatePhoneByCode': ['POST', '/user/phone/update-by-code'],
+  'user.getPhoneCode': ['POST', '/user/phone/code'],
+  'user.bindPhone': ['POST', '/user/phone/bind'],
   'user.updatePasswordByOld': ['POST', '/user/password/update-by-old'],
   'user.updatePasswordByCode': ['POST', '/user/password/update-by-code'],
   'message.markAsRead': ['POST', '/message/mark-read'],
@@ -37,6 +41,7 @@ export default {
   'bill.batchCreate': ['POST', '/bill/batchCreate'],
   'bill.addBill': ['POST', '/bill/add'],
   'auth.sendCode': ['POST', '/auth/send-code'],
+  'auth.retrievePassword': ['POST', '/auth/retrieve-password'],
   'auth.logout': ['POST', '/auth/logout'],
   'auth.loginByWechat': ['POST', '/auth/login-wechat'],
   'auth.loginByPhone': ['POST', '/auth/login-phone'],

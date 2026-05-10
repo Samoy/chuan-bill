@@ -35,8 +35,7 @@ const user = useUserStore()
 
 async function initAsr() {
   await asrClient.init({
-    // FIXME：暂时使用固定token
-    token: 'LKr82GJOAIwZAN2uPQzls2y2DOzZ05dzzlqikZvMRdlPgdHOpoRNmOUDpfsX3oOX',
+    token: user.token,
     onResult: (text: string, isSentenceEnd: boolean) => {
       webSocketError.value = false
       asrText.value = asrFullTextList.value.join().concat(text)

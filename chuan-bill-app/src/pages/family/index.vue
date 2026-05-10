@@ -204,9 +204,9 @@ async function handleJoin() {
         >
           <view class="flex items-center gap-3">
             <!-- 家庭头像 -->
-            <view class="flex items-center justify-center rounded-xl bg-primary/10 p-1">
-              <wd-img v-if="family.avatar" :src="family.avatar" class="h-12 w-12 rounded-xl" mode="aspectFill" />
-              <view v-else class="i-lucide:home h-6 w-6 text-primary" />
+            <wd-avatar v-if="family.avatar" :src="family.avatar" class="h-12 w-12 rounded-xl" mode="aspectFill" />
+            <view v-else class="h-12 w-12 flex items-center justify-center rounded-xl bg-primary/10 p-1">
+              <view class="i-mingcute:group-line h-8 w-8 text-primary" />
             </view>
             <view class="flex-1">
               <view class="flex items-center gap-2">

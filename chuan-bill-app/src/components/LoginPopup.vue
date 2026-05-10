@@ -316,7 +316,7 @@ export default {
                   <view class="i-lucide-phone text-gray-400" />
                 </template>
               </wd-input>
-              <wd-input v-model="password" type="safe-password" placeholder="登录密码" custom-class="login-input">
+              <wd-input v-model="password" type="safe-password" show-password placeholder="登录密码" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-lock text-gray-400" />
                 </template>
@@ -388,6 +388,9 @@ export default {
 
   &::after {
     display: none !important;
+  }
+  .wd-icon {
+    background: none;
   }
 }
 </style>

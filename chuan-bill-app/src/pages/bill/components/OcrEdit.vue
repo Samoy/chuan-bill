@@ -115,8 +115,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/temp/upload`
           :limit="1"
           reupload
           :header="{
-            // FIXME：暂时使用固定token
-            token: 'LKr82GJOAIwZAN2uPQzls2y2DOzZ05dzzlqikZvMRdlPgdHOpoRNmOUDpfsX3oOX',
+            token: user.token,
           }"
           :custom-class="`w-full! h-full! ${taskStatus !== TaskStatus.UploadFailed ? 'wd-upload-success' : ''}`"
           :custom-preview-class="`${taskStatus !== TaskStatus.Pending ? 'border-2 border-dashed rounded-xl border-gray-200 dark:border-gray-600' : ''}`"
