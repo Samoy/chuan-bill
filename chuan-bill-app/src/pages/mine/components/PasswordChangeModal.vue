@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { SegmentedInstance } from 'wot-design-uni/components/wd-segmented/types'
-
 defineOptions({
   name: 'PasswordChangeModal',
 })
@@ -11,13 +9,9 @@ const toast = useGlobalToast()
 const router = useRouter()
 
 // 状态
-const activeTab = ref('验证码验证')
+const activeTab = ref(1) // 0: 密码验证, 1: 验证码验证
 const hasPassword = ref(false)
 const loading = ref(false)
-const segmentedRef = ref<SegmentedInstance>()
-
-// Tab 选项
-const tabOptions = ['密码验证', '验证码验证']
 
 // 密码验证表单
 const passwordForm = ref({
@@ -40,7 +34,7 @@ let timer: ReturnType<typeof setInterval> | null = null
 
 // 密码强度
 const passwordStrength = computed(() => {
-  const pwd = activeTab.value === '密码验证' ? passwordForm.value.newPassword : codeForm.value.newPassword
+  const pwd = activeTab.value === 0 ? passwordForm.value.newPassword : codeForm.value.newPassword
   if (!pwd)
     return 0
   let strength = 0
@@ -67,16 +61,12 @@ watch(modelValue, async (val) => {
       hasPassword.value = res.data ?? false
       // 无密码时默认选中验证码 Tab
       if (!hasPassword.value) {
-        activeTab.value = '验证码验证'
+        activeTab.value = 1
       }
     }
     catch {
       hasPassword.value = false
     }
-    // 微信小程序端需要在弹框打开后更新分段器样式
-    nextTick(() => {
-      segmentedRef.value?.updateActiveStyle()
-    })
   }
   else {
     // 关闭时重置表单
@@ -88,7 +78,7 @@ watch(modelValue, async (val) => {
 function resetForms() {
   passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
   codeForm.value = { code: '', newPassword: '', confirmPassword: '' }
-  activeTab.value = '验证码验证'
+  activeTab.value = 1
   if (timer) {
     clearInterval(timer)
     timer = null
@@ -242,123 +232,154 @@ async function handleUpdateByCode() {
     safe-area-inset-bottom
     :close-on-click-modal="false"
   >
-    <view class="p-4">
+    <view class="px-6 py-2">
       <!-- Tab 切换（有密码时显示） -->
-      <view v-if="hasPassword" class="mb-4">
-        <wd-segmented
-          ref="segmentedRef"
-          v-model:value="activeTab"
-          :options="tabOptions"
-          size="small"
-        />
-      </view>
-
-      <!-- 密码验证 Tab -->
-      <view v-if="activeTab === '密码验证'">
-        <view class="mb-4">
-          <wd-input
-            v-model="passwordForm.oldPassword"
-            placeholder="请输入旧密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-        </view>
-        <view class="mb-4">
-          <wd-input
-            v-model="passwordForm.newPassword"
-            placeholder="请输入新密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-          <view v-if="passwordForm.newPassword" class="mt-2 flex items-center gap-2">
-            <text class="text-xs text-gray-500">
-              密码强度：
+      <wd-tabs v-if="hasPassword" v-model="activeTab">
+        <!-- 密码验证 Tab -->
+        <wd-tab title="密码验证">
+          <view class="pt-5">
+            <wd-input v-model="passwordForm.oldPassword" type="safe-password" show-password placeholder="旧密码" :maxlength="20" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-lock text-gray-400" />
+              </template>
+            </wd-input>
+            <wd-input v-model="passwordForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-lock text-gray-400" />
+              </template>
+            </wd-input>
+            <view v-if="passwordForm.newPassword" class="mb-4 flex items-center gap-2 pl-1 -mt-2">
+              <text class="text-xs text-gray-500">
+                密码强度：
+              </text>
+              <text class="text-xs" :class="strengthColor[passwordStrength - 1]">
+                {{ strengthText[passwordStrength - 1] || '弱' }}
+              </text>
+            </view>
+            <wd-input v-model="passwordForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-lock text-gray-400" />
+              </template>
+            </wd-input>
+            <text class="mb-4 block pl-1 text-xs text-gray-400">
+              密码需6-20位，建议包含字母和数字
             </text>
-            <text class="text-xs" :class="strengthColor[passwordStrength - 1]">
-              {{ strengthText[passwordStrength - 1] || '弱' }}
-            </text>
+            <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleUpdateByPassword">
+              确认修改
+            </wd-button>
           </view>
-        </view>
-        <view class="mb-4">
-          <wd-input
-            v-model="passwordForm.confirmPassword"
-            placeholder="请确认新密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-        </view>
-        <text class="mb-4 block text-xs text-gray-400">
-          密码需6-20位，建议包含字母和数字
-        </text>
-        <wd-button type="primary" block :loading="loading" @click="handleUpdateByPassword">
-          确认修改
-        </wd-button>
-      </view>
+        </wd-tab>
 
-      <!-- 验证码验证 Tab -->
-      <view v-if="activeTab === '验证码验证'">
-        <!-- 当前手机号 -->
+        <!-- 验证码验证 Tab -->
+        <wd-tab title="验证码验证">
+          <view class="pt-5">
+            <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+              <text class="text-sm text-gray-600 dark:text-gray-400">
+                手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
+              </text>
+            </view>
+            <wd-input v-model="codeForm.code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-message-square text-gray-400" />
+              </template>
+              <template #suffix>
+                <text
+                  class="whitespace-nowrap text-sm"
+                  :class="countdown > 0 || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
+                  @click.stop="sendCodeToCurrentPhone"
+                >
+                  {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                </text>
+              </template>
+            </wd-input>
+            <wd-input v-model="codeForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-lock text-gray-400" />
+              </template>
+            </wd-input>
+            <view v-if="codeForm.newPassword" class="mb-4 flex items-center gap-2 pl-1 -mt-2">
+              <text class="text-xs text-gray-500">
+                密码强度：
+              </text>
+              <text class="text-xs" :class="strengthColor[passwordStrength - 1]">
+                {{ strengthText[passwordStrength - 1] || '弱' }}
+              </text>
+            </view>
+            <wd-input v-model="codeForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+              <template #prefix>
+                <view class="i-lucide-lock text-gray-400" />
+              </template>
+            </wd-input>
+            <text class="mb-4 block pl-1 text-xs text-gray-400">
+              密码需6-20位，建议包含字母和数字
+            </text>
+            <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleUpdateByCode">
+              确认修改
+            </wd-button>
+          </view>
+        </wd-tab>
+      </wd-tabs>
+
+      <!-- 无密码时仅显示验证码验证 -->
+      <view v-else class="pt-5">
         <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
           <text class="text-sm text-gray-600 dark:text-gray-400">
             手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
           </text>
         </view>
-        <!-- 验证码 -->
-        <view class="mb-4 flex items-center gap-3">
-          <wd-input
-            v-model="codeForm.code"
-            placeholder="请输入验证码"
-            :maxlength="6"
-            type="number"
-            no-border
-            custom-class="flex-1"
-          />
-          <wd-button
-            :disabled="countdown > 0 || !userStore.phone"
-            size="small"
-            @click="sendCodeToCurrentPhone"
-          >
-            {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
-          </wd-button>
-        </view>
-        <!-- 新密码 -->
-        <view class="mb-4">
-          <wd-input
-            v-model="codeForm.newPassword"
-            placeholder="请输入新密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-          <view v-if="codeForm.newPassword" class="mt-2 flex items-center gap-2">
-            <text class="text-xs text-gray-500">
-              密码强度：
+        <wd-input v-model="codeForm.code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
+          <template #prefix>
+            <view class="i-lucide-message-square text-gray-400" />
+          </template>
+          <template #suffix>
+            <text
+              class="whitespace-nowrap text-sm"
+              :class="countdown > 0 || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
+              @click.stop="sendCodeToCurrentPhone"
+            >
+              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
             </text>
-            <text class="text-xs" :class="strengthColor[passwordStrength - 1]">
-              {{ strengthText[passwordStrength - 1] || '弱' }}
-            </text>
-          </view>
+          </template>
+        </wd-input>
+        <wd-input v-model="codeForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+          <template #prefix>
+            <view class="i-lucide-lock text-gray-400" />
+          </template>
+        </wd-input>
+        <view v-if="codeForm.newPassword" class="mb-4 flex items-center gap-2 pl-1 -mt-2">
+          <text class="text-xs text-gray-500">
+            密码强度：
+          </text>
+          <text class="text-xs" :class="strengthColor[passwordStrength - 1]">
+            {{ strengthText[passwordStrength - 1] || '弱' }}
+          </text>
         </view>
-        <!-- 确认密码 -->
-        <view class="mb-4">
-          <wd-input
-            v-model="codeForm.confirmPassword"
-            placeholder="请确认新密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-        </view>
-        <text class="mb-4 block text-xs text-gray-400">
+        <wd-input v-model="codeForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+          <template #prefix>
+            <view class="i-lucide-lock text-gray-400" />
+          </template>
+        </wd-input>
+        <text class="mb-4 block pl-1 text-xs text-gray-400">
           密码需6-20位，建议包含字母和数字
         </text>
-        <wd-button type="primary" block :loading="loading" @click="handleUpdateByCode">
+        <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleUpdateByCode">
           确认修改
         </wd-button>
       </view>
     </view>
   </wd-action-sheet>
 </template>
+
+<style lang="scss" scoped>
+/* 输入框样式覆盖 */
+:deep(.login-input) {
+  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100 dark:bg-gray-700;
+
+  &::after {
+    display: none !important;
+  }
+  .wd-icon {
+    background: none;
+  }
+}
+</style>

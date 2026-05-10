@@ -310,7 +310,7 @@ async function handleUpdateByPassword() {
     safe-area-inset-bottom
     :close-on-click-modal="false"
   >
-    <view class="p-4">
+    <view class="px-6 py-2">
       <!-- 绑定手机号模式 -->
       <view v-if="mode === 'bind'">
         <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
@@ -318,35 +318,30 @@ async function handleUpdateByPassword() {
             您还没有绑定手机号，请先绑定手机号
           </text>
         </view>
-        <view class="mb-4">
-          <wd-input
-            v-model="bindForm.phone"
-            placeholder="请输入手机号"
-            type="number"
-            :maxlength="11"
-            no-border
-          />
-        </view>
-        <view class="mb-4 flex items-center gap-3">
-          <wd-input
-            v-model="bindForm.code"
-            placeholder="请输入验证码"
-            :maxlength="6"
-            type="number"
-            no-border
-            custom-class="flex-1"
-          />
-          <wd-button
-            :disabled="newPhoneCountdown > 0 || !isValidPhone(bindForm.phone)"
-            size="small"
-            @click="sendCodeToNewPhone(bindForm.phone)"
-          >
-            {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '发送验证码' }}
+        <view class="pt-2">
+          <wd-input v-model="bindForm.phone" type="number" placeholder="手机号" :maxlength="11" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-phone text-gray-400" />
+            </template>
+          </wd-input>
+          <wd-input v-model="bindForm.code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-message-square text-gray-400" />
+            </template>
+            <template #suffix>
+              <text
+                class="whitespace-nowrap text-sm"
+                :class="newPhoneCountdown > 0 || !isValidPhone(bindForm.phone) ? 'text-gray-400' : 'text-blue-500'"
+                @click.stop="sendCodeToNewPhone(bindForm.phone)"
+              >
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+              </text>
+            </template>
+          </wd-input>
+          <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleBindPhone">
+            确认绑定
           </wd-button>
         </view>
-        <wd-button type="primary" block :loading="loading" @click="handleBindPhone">
-          确认绑定
-        </wd-button>
       </view>
 
       <!-- 验证码换绑模式 -->
@@ -356,54 +351,44 @@ async function handleUpdateByPassword() {
             当前手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
           </text>
         </view>
-        <view class="mb-4">
-          <wd-input
-            v-model="codeForm.newPhone"
-            placeholder="请输入新手机号"
-            type="number"
-            :maxlength="11"
-            no-border
-          />
-        </view>
-        <!-- 当前手机验证码 -->
-        <view class="mb-4 flex items-center gap-3">
-          <wd-input
-            v-model="codeForm.oldPhoneCode"
-            placeholder="当前手机验证码"
-            :maxlength="6"
-            type="number"
-            no-border
-            custom-class="flex-1"
-          />
-          <wd-button
-            :disabled="oldPhoneCountdown > 0"
-            size="small"
-            @click="sendCodeToOldPhone"
-          >
-            {{ oldPhoneCountdown > 0 ? `${oldPhoneCountdown}s` : '发送验证码' }}
+        <view class="pt-2">
+          <wd-input v-model="codeForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-phone text-gray-400" />
+            </template>
+          </wd-input>
+          <wd-input v-model="codeForm.oldPhoneCode" type="number" placeholder="当前手机验证码" :maxlength="6" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-message-square text-gray-400" />
+            </template>
+            <template #suffix>
+              <text
+                class="whitespace-nowrap text-sm"
+                :class="oldPhoneCountdown > 0 ? 'text-gray-400' : 'text-blue-500'"
+                @click.stop="sendCodeToOldPhone"
+              >
+                {{ oldPhoneCountdown > 0 ? `${oldPhoneCountdown}s` : '获取验证码' }}
+              </text>
+            </template>
+          </wd-input>
+          <wd-input v-model="codeForm.newPhoneCode" type="number" placeholder="新手机验证码" :maxlength="6" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-message-square text-gray-400" />
+            </template>
+            <template #suffix>
+              <text
+                class="whitespace-nowrap text-sm"
+                :class="newPhoneCountdown > 0 || !isValidPhone(codeForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
+                @click.stop="sendCodeToNewPhone(codeForm.newPhone)"
+              >
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+              </text>
+            </template>
+          </wd-input>
+          <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleUpdateByCode">
+            确认更换
           </wd-button>
         </view>
-        <!-- 新手机验证码 -->
-        <view class="mb-4 flex items-center gap-3">
-          <wd-input
-            v-model="codeForm.newPhoneCode"
-            placeholder="新手机验证码"
-            :maxlength="6"
-            type="number"
-            no-border
-            custom-class="flex-1"
-          />
-          <wd-button
-            :disabled="newPhoneCountdown > 0 || !isValidPhone(codeForm.newPhone)"
-            size="small"
-            @click="sendCodeToNewPhone(codeForm.newPhone)"
-          >
-            {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '发送验证码' }}
-          </wd-button>
-        </view>
-        <wd-button type="primary" block :loading="loading" @click="handleUpdateByCode">
-          确认更换
-        </wd-button>
         <!-- 切换到密码模式 -->
         <view v-if="hasPassword" class="mt-4 text-center">
           <text class="text-sm text-primary" @click="mode = 'password'">
@@ -414,47 +399,38 @@ async function handleUpdateByPassword() {
 
       <!-- 密码换绑模式 -->
       <view v-if="mode === 'password'">
-        <view class="mb-4">
-          <wd-input
-            v-model="passwordForm.newPhone"
-            placeholder="请输入新手机号"
-            type="number"
-            :maxlength="11"
-            no-border
-          />
-        </view>
-        <view class="mb-4">
-          <wd-input
-            v-model="passwordForm.password"
-            placeholder="请输入登录密码"
-            show-password
-            :maxlength="20"
-            no-border
-          />
-        </view>
-        <view class="mb-4 flex items-center gap-3">
-          <wd-input
-            v-model="passwordForm.newPhoneCode"
-            placeholder="新手机验证码"
-            :maxlength="6"
-            type="number"
-            no-border
-            custom-class="flex-1"
-          />
-          <wd-button
-            :disabled="newPhoneCountdown > 0 || !isValidPhone(passwordForm.newPhone)"
-            size="small"
-            @click="sendCodeToNewPhone(passwordForm.newPhone)"
-          >
-            {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '发送验证码' }}
+        <view class="pt-2">
+          <wd-input v-model="passwordForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-phone text-gray-400" />
+            </template>
+          </wd-input>
+          <wd-input v-model="passwordForm.password" type="safe-password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-lock text-gray-400" />
+            </template>
+          </wd-input>
+          <wd-input v-model="passwordForm.newPhoneCode" type="number" placeholder="新手机验证码" :maxlength="6" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-message-square text-gray-400" />
+            </template>
+            <template #suffix>
+              <text
+                class="whitespace-nowrap text-sm"
+                :class="newPhoneCountdown > 0 || !isValidPhone(passwordForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
+                @click.stop="sendCodeToNewPhone(passwordForm.newPhone)"
+              >
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+              </text>
+            </template>
+          </wd-input>
+          <wd-button type="primary" round block :loading="loading" custom-class="mt-2" @click="handleUpdateByPassword">
+            确认更换
           </wd-button>
         </view>
-        <wd-button type="primary" block :loading="loading" @click="handleUpdateByPassword">
-          确认更换
-        </wd-button>
         <!-- 切换回验证码模式 -->
         <view class="mt-4 text-center">
-          <text class="text-sm text-primary" @click="mode = 'code'">
+          <text class="text-xs text-primary" @click="mode = 'code'">
             使用验证码修改手机号
           </text>
         </view>
@@ -462,3 +438,17 @@ async function handleUpdateByPassword() {
     </view>
   </wd-action-sheet>
 </template>
+
+<style lang="scss" scoped>
+/* 输入框样式覆盖 */
+:deep(.login-input) {
+  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100 dark:bg-gray-700;
+
+  &::after {
+    display: none !important;
+  }
+  .wd-icon {
+    background: none;
+  }
+}
+</style>
