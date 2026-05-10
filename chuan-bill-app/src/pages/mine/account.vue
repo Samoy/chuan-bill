@@ -33,6 +33,9 @@ function handleDeleteAccount() {
     beforeConfirm: async ({ resolve }) => {
       resolve(true)
     },
+    confirmButtonProps: {
+      type: 'error',
+    },
     success: (res) => {
       if (res.action === 'confirm') {
         showDeleteModal.value = true
