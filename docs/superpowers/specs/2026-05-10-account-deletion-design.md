@@ -9,7 +9,7 @@
 ### account.vue 修改
 
 1. **移除**：`goToDeviceManagement` 函数及"登录设备管理"入口
-2. **条件显示**：注销入口仅在 `userStore.phone` 存在时显示
+2. **条件显示**：整个"安全设置"组仅在 `userStore.phone` 存在时显示（无手机号时整个组隐藏，避免空组）
 3. **交互流程**：
    - 点击"注销账号" → `message.confirm` 警告（"注销后，所有数据将被永久删除且无法恢复。确定要注销吗？"）
    - 用户确认 → 打开 `AccountDeletePopup` 弹窗
