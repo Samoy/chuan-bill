@@ -93,4 +93,12 @@ public class UserController {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(userService.bindPhone(userId, bindDTO));
     }
+
+    @Operation(summary = "注销账号", description = "通过手机验证码验证身份后注销账号")
+    @PostMapping("/account/delete")
+    public Result<Void> deleteAccount(@Validated @RequestBody DeleteAccountDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        userService.deleteAccount(userId, dto);
+        return Result.success();
+    }
 }
