@@ -56,9 +56,8 @@ function getFileName(file: any): string {
 
 async function buildFormData({ file, formData, resolve }: UploadBuildFormDataOption) {
   const fileName = getFileName(file)
-  console.log('当前文件名称', fileName)
   try {
-    const res = await Apis.file.getUploadToken({ params: { fileName }, meta: { slient: true } })
+    const res = await Apis.file.getUploadToken({ params: { fileName: encodeURIComponent(fileName) }, meta: { slient: true } })
     if (res.success && res.data) {
       fileCdnUrl.value = res.data.cdnUrl
       resolve({
@@ -106,18 +105,18 @@ function handleFileError() {
 </script>
 
 <template>
-  <wd-upload
-    v-model:file-list="fileList" :action="UPLOAD_URL" :accept="props.accept"
-    :disabled="props.disabled || uploadStatus === 'loading'" :limit="1" :show-limit-num="false" :multiple="false"
-    reupload :build-form-data="buildFormData" :custom-class="uploadStatus !== 'fail' ? 'wd-upload-success' : ''"
-    image-mode="aspectFill" @change="handleFileChange" @fail="handleFileError"
-  />
+  <view>
+    <wd-upload
+      v-model:file-list="fileList" :action="UPLOAD_URL" :accept="props.accept"
+      :disabled="props.disabled || uploadStatus === 'loading'" :limit="1" :show-limit-num="false" :multiple="false"
+      reupload :build-form-data="buildFormData" :custom-class="uploadStatus !== 'fail' ? 'wd-upload-success' : ''"
+      image-mode="aspectFill" @change="handleFileChange" @fail="handleFileError"
+    />
+  </view>
 </template>
 
 <style lang="scss">
-.wd-upload-success {
- .wd-upload__preview .wd-icon.wd-upload__close {
-    display: none !important;
-  }
+:deep(.wd-upload-success .wd-upload__preview .wd-icon.wd-upload__close) {
+  display: none;
 }
 </style>
