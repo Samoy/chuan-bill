@@ -310,7 +310,7 @@ async function handleUpdateByPassword() {
     safe-area-inset-bottom
     :close-on-click-modal="false"
   >
-    <view class="px-6 py-2">
+    <view class="px-6 py-4">
       <!-- 绑定手机号模式 -->
       <view v-if="mode === 'bind'">
         <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
@@ -391,7 +391,7 @@ async function handleUpdateByPassword() {
         </view>
         <!-- 切换到密码模式 -->
         <view v-if="hasPassword" class="mt-4 text-center">
-          <text class="text-sm text-primary" @click="mode = 'password'">
+          <text class="text-xs text-primary" @click="mode = 'password'">
             当前手机不可用？
           </text>
         </view>
@@ -399,15 +399,20 @@ async function handleUpdateByPassword() {
 
       <!-- 密码换绑模式 -->
       <view v-if="mode === 'password'">
+        <view class="mb-4 rounded-xl bg-gray-200 p-4 dark:bg-gray-700">
+          <text class="text-sm text-primary">
+            使用登录密码验证身份，更换绑定手机号
+          </text>
+        </view>
         <view class="pt-2">
-          <wd-input v-model="passwordForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
-            <template #prefix>
-              <view class="i-lucide-phone text-gray-400" />
-            </template>
-          </wd-input>
           <wd-input v-model="passwordForm.password" type="safe-password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
             <template #prefix>
               <view class="i-lucide-lock text-gray-400" />
+            </template>
+          </wd-input>
+          <wd-input v-model="passwordForm.newPhone" type="number" placeholder="新手机号" :maxlength="11" custom-class="login-input">
+            <template #prefix>
+              <view class="i-lucide-phone text-gray-400" />
             </template>
           </wd-input>
           <wd-input v-model="passwordForm.newPhoneCode" type="number" placeholder="新手机验证码" :maxlength="6" custom-class="login-input">
