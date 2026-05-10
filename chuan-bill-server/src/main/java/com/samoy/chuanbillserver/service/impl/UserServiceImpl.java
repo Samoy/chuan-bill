@@ -343,4 +343,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setPhone(bindDTO.getPhone());
         return updateById(user);
     }
+
+    @Override
+    public void deleteAccount(String userId, DeleteAccountDTO dto) {
+        User user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+
+        // 校验验证码
+        if (!verificationCodeService.verifyCode(user.getPhone(), dto.getCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID);
+        }
+
+        // 软删除 + 清除标识字段（避免重新登录产生重复记录）
+        user.setDeleted(true);
+        user.setPhone(user.getPhone() + "_deleted_" + userId);
+        user.setOpenid(user.getOpenid() != null ? user.getOpenid() + "_deleted_" + userId : null);
+        this.updateById(user);
+
+        // 登出
+        StpUtil.logout(userId);
+    }
 }

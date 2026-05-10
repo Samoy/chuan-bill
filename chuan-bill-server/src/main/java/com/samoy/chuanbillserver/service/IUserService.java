@@ -124,4 +124,12 @@ public interface IUserService extends IService<User> {
      * @return 是否绑定成功
      */
     boolean bindPhone(String userId, BindPhoneDTO bindDTO);
+
+    /**
+     * 注销账号
+     *
+     * @param userId 用户ID
+     * @param dto    注销请求参数
+     */
+    void deleteAccount(String userId, DeleteAccountDTO dto);
 }
