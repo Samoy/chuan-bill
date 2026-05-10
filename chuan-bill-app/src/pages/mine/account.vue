@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AccountDeletePopup from './components/AccountDeletePopup.vue'
 import PasswordChangePopup from './components/PasswordChangePopup.vue'
 import PhoneChangePopup from './components/PhoneChangePopup.vue'
 
@@ -11,7 +12,6 @@ definePage({
 })
 
 const userStore = useUserStore()
-const toast = useGlobalToast()
 const message = useGlobalMessage()
 
 onLoad(() => {
@@ -23,24 +23,22 @@ onLoad(() => {
 // 弹框状态
 const showPasswordModal = ref(false)
 const showPhoneModal = ref(false)
+const showDeleteModal = ref(false)
 
-// 注销账号
+// 注销账号 - 第一步：确认弹框
 function handleDeleteAccount() {
   message.confirm({
     title: '注销账号',
     msg: '注销后，所有数据将被永久删除且无法恢复。确定要注销吗？',
     beforeConfirm: async ({ resolve }) => {
-      // TODO: 调用后端注销账号接口
-      toast.info('功能开发中')
-      resolve(false)
+      resolve(true)
+    },
+    success: (res) => {
+      if (res.action === 'confirm') {
+        showDeleteModal.value = true
+      }
     },
   })
-}
-
-// 设备管理
-function goToDeviceManagement() {
-  // TODO: 跳转到设备管理页面
-  toast.info('功能开发中')
 }
 </script>
 
@@ -78,24 +76,14 @@ function goToDeviceManagement() {
       </view>
     </view>
 
-    <!-- 安全设置 -->
-    <view class="rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+    <!-- 安全设置（仅有手机号时显示） -->
+    <view v-if="userStore.phone" class="rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
       <view class="p-4 text-xs text-gray-400 font-medium">
         安全设置
       </view>
-      <!-- 登录设备 -->
-      <view
-        class="flex items-center justify-between px-4 pb-4"
-        @click="goToDeviceManagement"
-      >
-        <text class="text-sm">
-          登录设备管理
-        </text>
-        <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-      </view>
       <!-- 注销账号 -->
       <view
-        class="flex items-center justify-between border-t border-gray-100 px-4 py-4 dark:border-gray-700"
+        class="flex items-center justify-between px-4 py-4"
         @click="handleDeleteAccount"
       >
         <text class="text-sm text-red-500">
@@ -110,5 +98,8 @@ function goToDeviceManagement() {
 
     <!-- 修改手机号弹框 -->
     <PhoneChangePopup v-model="showPhoneModal" />
+
+    <!-- 注销账号弹框 -->
+    <AccountDeletePopup v-model="showDeleteModal" />
   </view>
 </template>
