@@ -24,6 +24,7 @@ export default {
   'user.bindPhone': ['POST', '/user/phone/bind'],
   'user.updatePasswordByOld': ['POST', '/user/password/update-by-old'],
   'user.updatePasswordByCode': ['POST', '/user/password/update-by-code'],
+  'user.deleteAccount': ['POST', '/user/account/delete'],
   'message.markAsRead': ['POST', '/message/mark-read'],
   'message.markAllAsRead': ['POST', '/message/mark-all-read'],
   'file.uploadTempFile': ['POST', '/file/temp/upload'],

@@ -67,7 +67,7 @@ async function handleSubmit() {
   }
   loading.value = true
   try {
-    const res = await Apis.user.accountDelete({ data: { code: code.value } })
+    const res = await Apis.user.deleteAccount({ data: { code: code.value } })
     if (res.success) {
       toast.success('账号已注销')
       modelValue.value = false

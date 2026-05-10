@@ -257,6 +257,12 @@ export interface UpdatePasswordByCodeDTO {
    */
   newPassword: string;
 }
+export interface DeleteAccountDTO {
+  /**
+   * 手机验证码
+   */
+  code: string;
+}
 export interface UpdateFamilyDTO {
   /**
    * 家庭ID
@@ -920,13 +926,13 @@ export interface MessageVO {
 }
 export interface IPageMessageVO {
   size?: number;
+  records?: MessageVO[];
   total?: number;
+  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  current?: number;
-  records?: MessageVO[];
 }
 export interface ResultIPageMessageVO {
   code?: number;
@@ -1090,13 +1096,13 @@ export interface BillVO {
 }
 export interface IPageBillVO {
   size?: number;
+  records?: BillVO[];
   total?: number;
+  current?: number;
   /**
    * @deprecated
    */
   pages?: number;
-  current?: number;
-  records?: BillVO[];
 }
 export interface ResultIPageBillVO {
   code?: number;
@@ -1419,6 +1425,43 @@ declare global {
       /**
        * ---
        *
+       * [POST] 注销账号
+       *
+       * **path:** /user/account/delete
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 手机验证码
+       *   code: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      deleteAccount<
+        Config extends Alova2MethodConfig<ResultVoid> & {
+          data: DeleteAccountDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultVoid, 'user.deleteAccount', Config>;
+      /**
+       * ---
+       *
        * [GET] 获取用户资料
        *
        * **path:** /user/profile
@@ -1619,10 +1662,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
-       *     // [deprecated]
-       *     pages?: number
-       *     current?: number
        *     // [items] start
        *     // 消息信息
        *     // [items] end
@@ -1644,6 +1683,10 @@ declare global {
        *       // 创建时间
        *       createTime?: string
        *     }>
+       *     total?: number
+       *     current?: number
+       *     // [deprecated]
+       *     pages?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -2758,10 +2801,6 @@ declare global {
        *   message?: string
        *   data?: {
        *     size?: number
-       *     total?: number
-       *     // [deprecated]
-       *     pages?: number
-       *     current?: number
        *     // [items] start
        *     // 账单信息
        *     // [items] end
@@ -2823,6 +2862,10 @@ declare global {
        *       // 记账人头像
        *       userAvatar?: string
        *     }>
+       *     total?: number
+       *     current?: number
+       *     // [deprecated]
+       *     pages?: number
        *   }
        *   timestamp?: number
        *   success?: boolean
