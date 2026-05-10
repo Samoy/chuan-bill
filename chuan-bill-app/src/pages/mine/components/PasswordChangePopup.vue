@@ -161,7 +161,7 @@ async function handleUpdateByPassword() {
       modelValue.value = false
       setTimeout(() => {
         userStore.logout()
-        router.replace('/pages/bill/index')
+        router.pushTab('/pages/mine/index')
       }, 1500)
     }
     else {
@@ -208,7 +208,7 @@ async function handleUpdateByCode() {
       modelValue.value = false
       setTimeout(() => {
         userStore.logout()
-        router.replace('/pages/bill/index')
+        router.pushTab('/pages/mine/index')
       }, 1500)
     }
     else {
@@ -240,7 +240,7 @@ async function handleUpdateByCode() {
           <view class="pt-5">
             <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
               <text class="text-sm text-gray-600 dark:text-gray-400">
-                手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
+                手机号：{{ userStore.phone || '未绑定' }}
               </text>
             </view>
             <wd-input v-model="codeForm.code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
@@ -332,7 +332,7 @@ async function handleUpdateByCode() {
       <view v-else class="pt-5">
         <view class="mb-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
           <text class="text-sm text-gray-600 dark:text-gray-400">
-            手机号：{{ userStore.phone ? userStore.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '未绑定' }}
+            手机号：{{ userStore.phone || '未绑定' }}
           </text>
         </view>
         <wd-input v-model="codeForm.code" type="number" placeholder="验证码" :maxlength="6" custom-class="login-input">
