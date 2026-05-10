@@ -245,7 +245,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user == null) {
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
         }
-        if (!CharSequenceUtil.isEmpty(user.getPhone())) {
+        if (CharSequenceUtil.isEmpty(user.getPhone())) {
             throw new BusinessException(ResultEnum.PHONE_NOT_FOUND);
         }
         verificationCodeService.sendCode(user.getPhone());
