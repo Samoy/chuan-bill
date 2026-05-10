@@ -12,5 +12,6 @@ onLaunch(() => {})
 
 .wot-theme-dark.page-wraper {
   background: #222;
+  color: #fff;
 }
 </style>

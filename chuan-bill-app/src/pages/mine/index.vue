@@ -42,6 +42,7 @@ const showSyncPopup = ref(false)
 const showThemePopup = ref(false)
 const showNotificationPopup = ref(false)
 const showExportPopup = ref(false)
+const showDarkModePopup = ref(false)
 
 // 菜单项类型
 interface MenuItem {
@@ -59,6 +60,18 @@ const syncSubtitle = computed(() => {
   return pendingCount > 0 ? `${pendingCount}条待同步` : ''
 })
 const themeSubtitle = computed(() => themeStore.currentThemeColor.value.name)
+
+// 暗黑模式映射
+type DarkModeValue = 'system' | 'light' | 'dark'
+const darkModeLabelMap: Record<DarkModeValue, string> = {
+  system: '跟随系统',
+  light: '日间模式',
+  dark: '夜间模式',
+}
+const darkModeLabel = computed(() => {
+  const mode: DarkModeValue = themeStore.followSystem.value ? 'system' : (themeStore.isDark.value ? 'dark' : 'light')
+  return darkModeLabelMap[mode]
+})
 
 // 菜单分组（已登录状态）
 const menuGroups: { title: string, items: MenuItem[] }[] = [
@@ -86,6 +99,12 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
   {
     title: '系统设置',
     items: [
+      {
+        icon: 'i-lucide:moon',
+        title: '暗黑模式',
+        action: () => showDarkModePopup.value = true,
+        subtitle: darkModeLabel,
+      },
       {
         icon: 'i-lucide:palette',
         title: '主题切换',
@@ -171,6 +190,22 @@ function logout() {
 // 检查更新
 function checkUpdate() {
   toast.info('已是最新版本')
+}
+
+// 暗黑模式选项
+const darkModeActions = (Object.entries(darkModeLabelMap) as [DarkModeValue, string][]).map(([value, label]) => ({
+  name: label,
+  value,
+}))
+
+// 选择暗黑模式
+function selectDarkMode({ item }: { item: { name: string, value: DarkModeValue } }) {
+  if (item.value === 'system') {
+    themeStore.setFollowSystem(true)
+  }
+  else {
+    themeStore.toggleTheme(item.value)
+  }
 }
 
 // 页面显示时获取未读消息数
@@ -316,5 +351,12 @@ onShow(() => {
     <ThemePickerPopup v-model="showThemePopup" />
     <NotificationSettingsPopup v-model="showNotificationPopup" />
     <ExportFilterPopup v-model="showExportPopup" />
+    <wd-action-sheet
+      v-model="showDarkModePopup"
+      :actions="darkModeActions"
+      :z-index="999"
+      cancel-text="取消"
+      @select="selectDarkMode"
+    />
   </view>
 </template>
