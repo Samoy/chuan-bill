@@ -115,7 +115,9 @@ function handleFileError() {
 </template>
 
 <style lang="scss">
-.wd-upload-success .wd-icon.wd-upload__close {
-  display: none !important;
+.wd-upload-success {
+ .wd-upload__preview .wd-icon.wd-upload__close {
+    display: none !important;
+  }
 }
 </style>
