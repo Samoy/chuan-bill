@@ -26,7 +26,7 @@ public enum ResultEnum {
     USER_NOT_FOUND(1001, "用户不存在"),
     USER_DISABLED(1002, "用户已被禁用"),
     PASSWORD_ERROR(1003, "密码错误"),
-    TOKEN_INVALID(1004, "验证码错误"),
+    CAPTCHA_INVALID(1004, "验证码错误"),
     TOKEN_EXPIRED(1005, "验证码已过期"),
     PHONE_OR_PASSWORD_MISSING(1006, "手机号或密码不能为空"),
     PHONE_MISSING(1007, "手机号不能为空"),
@@ -34,6 +34,8 @@ public enum ResultEnum {
     PASSWORD_NOT_SET(1009, "密码未设置"),
     LOGIN_ERROR(1010, "登录失败"),
     PARAM_VALID_ERROR(1011, "参数校验失败"),
+    PHONE_NOT_FOUND(1012, "当前用户未绑定手机号"),
+    PHONE_ALREADY_BOUND(1013, "当前手机号已被绑定"),
 
     // 业务错误码（账单相关） 2000+
     BILL_NOT_FOUND(2001, "账单不存在"),

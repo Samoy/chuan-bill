@@ -1,10 +1,6 @@
 package com.samoy.chuanbillserver.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
-import com.samoy.chuanbillserver.dto.LoginByPasswordDTO;
-import com.samoy.chuanbillserver.dto.LoginByPhoneDTO;
-import com.samoy.chuanbillserver.dto.LoginByWechatDTO;
-import com.samoy.chuanbillserver.dto.SendCodeDTO;
+import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;
@@ -72,12 +68,25 @@ public class AuthController {
      */
     @PostMapping("/send-code")
     @Operation(summary = "发送验证码", description = "向指定手机号发送短信验证码")
-    @SaIgnore
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {
         verificationCodeService.sendCode(sendCodeDTO.getPhone());
         return Result.success();
     }
 
+    /**
+     * 找回密码
+     */
+    @PostMapping("/retrieve-password")
+    @Operation(summary = "找回密码", description = "使用手机号和验证码进行密码重置")
+    public Result<Boolean> retrievePassword(@Validated @RequestBody RetrievePasswordDTO retrievePasswordDTO) {
+        return Result.success(userService.retrievePassword(retrievePasswordDTO));
+    }
+
+    /**
+     * 登出
+     *
+     * @return 登出结果
+     */
     @PostMapping("/logout")
     @Operation(summary = "登出", description = "用户登出，清除登录信息")
     public Result<Void> logout() {

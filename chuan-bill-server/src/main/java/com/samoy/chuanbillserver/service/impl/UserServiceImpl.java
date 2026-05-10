@@ -43,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public TokenVO loginByPassword(LoginByPasswordDTO loginDTO) {
-        if (CharSequenceUtil.isBlank(loginDTO.getPhone()) || CharSequenceUtil.isBlank(loginDTO.getPassword())) {
+        if (CharSequenceUtil.isEmpty(loginDTO.getPhone()) || CharSequenceUtil.isEmpty(loginDTO.getPassword())) {
             throw new BusinessException(ResultEnum.PHONE_OR_PASSWORD_MISSING);
         }
         // 查询用户
@@ -66,12 +66,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public TokenVO loginByPhone(LoginByPhoneDTO loginDTO) {
-        if (CharSequenceUtil.isBlank(loginDTO.getPhone())) {
+        if (CharSequenceUtil.isEmpty(loginDTO.getPhone())) {
             throw new BusinessException(ResultEnum.PHONE_MISSING);
         }
         // 验证验证码
         if (!verificationCodeService.verifyCode(loginDTO.getPhone(), loginDTO.getCode())) {
-            throw new BusinessException(ResultEnum.TOKEN_INVALID);
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID);
         }
 
         User user = getByPhone(loginDTO.getPhone());
@@ -88,14 +88,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public TokenVO loginByWechat(LoginByWechatDTO loginDTO) {
-        if (CharSequenceUtil.isBlank(loginDTO.getCode())) {
+        if (CharSequenceUtil.isEmpty(loginDTO.getCode())) {
             throw new BusinessException(ResultEnum.PARAM_VALID_ERROR, "微信登录 code 不能为空");
         }
         try {
             // 通过 code 获取 openid
             WxMaJscode2SessionResult session = wxMaService.jsCode2SessionInfo(loginDTO.getCode());
             String openid = session.getOpenid();
-            if (CharSequenceUtil.isBlank(openid)) {
+            if (CharSequenceUtil.isEmpty(openid)) {
                 throw new BusinessException(ResultEnum.LOGIN_ERROR, "获取微信 openid 失败");
             }
 
@@ -117,8 +117,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public boolean updatePassWordByOld(UpdatePasswordByOldDTO updateDTO) {
-        if (CharSequenceUtil.isBlank(updateDTO.getOldPassword())
-                || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
+        if (CharSequenceUtil.isEmpty(updateDTO.getOldPassword())
+                || CharSequenceUtil.isEmpty(updateDTO.getNewPassword())) {
             throw new BusinessException(ResultEnum.PASSWORD_MISSING);
         }
         User user = getById(updateDTO.getUserId());
@@ -138,19 +138,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public boolean updatePassWordByCode(UpdatePasswordByCodeDTO updateDTO) {
-        if (CharSequenceUtil.isBlank(updateDTO.getPhone()) || CharSequenceUtil.isBlank(updateDTO.getNewPassword())) {
-            throw new BusinessException(ResultEnum.PHONE_OR_PASSWORD_MISSING);
-        }
-
-        User user = getByPhone(updateDTO.getPhone());
+    public boolean updatePassWordByCode(String userId, UpdatePasswordByCodeDTO updateDTO) {
+        User user = this.getById(userId);
         if (user == null) {
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
         }
 
         // 验证验证码
-        if (!verificationCodeService.verifyCode(updateDTO.getPhone(), updateDTO.getCode())) {
-            throw new BusinessException(ResultEnum.TOKEN_INVALID);
+        if (!verificationCodeService.verifyCode(user.getPhone(), updateDTO.getCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID);
         }
 
         user.setPassword(BCrypt.hashpw(updateDTO.getNewPassword()));
@@ -164,10 +160,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
         }
         // 更新用户信息
-        if (!CharSequenceUtil.isBlank(updateDTO.getNickname())) {
+        if (!CharSequenceUtil.isEmpty(updateDTO.getNickname())) {
             user.setNickname(updateDTO.getNickname());
         }
-        if (!CharSequenceUtil.isBlank(updateDTO.getAvatar())) {
+        if (!CharSequenceUtil.isEmpty(updateDTO.getAvatar())) {
             user.setAvatar(updateDTO.getAvatar());
         }
         if (!ObjectUtil.isEmpty(updateDTO.getGender())) {
@@ -241,5 +237,110 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public void logout() {
         String userId = StpUtil.getLoginIdAsString();
         StpUtil.logout(userId);
+    }
+
+    @Override
+    public void getPhoneCode(String userId) {
+        User user = getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+        if (!CharSequenceUtil.isEmpty(user.getPhone())) {
+            throw new BusinessException(ResultEnum.PHONE_NOT_FOUND);
+        }
+        verificationCodeService.sendCode(user.getPhone());
+    }
+
+    @Override
+    public boolean retrievePassword(RetrievePasswordDTO retrievePasswordDTO) {
+        if (CharSequenceUtil.isEmpty(retrievePasswordDTO.getPhone())
+                || CharSequenceUtil.isEmpty(retrievePasswordDTO.getNewPassword())) {
+            throw new BusinessException(ResultEnum.PHONE_OR_PASSWORD_MISSING);
+        }
+
+        User user = getByPhone(retrievePasswordDTO.getPhone());
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+
+        // 验证验证码
+        if (!verificationCodeService.verifyCode(retrievePasswordDTO.getPhone(), retrievePasswordDTO.getCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID);
+        }
+
+        user.setPassword(BCrypt.hashpw(retrievePasswordDTO.getNewPassword()));
+        return updateById(user);
+    }
+
+    @Override
+    public boolean updatePhoneByCode(String userId, UpdatePhoneByCodeDTO updateDTO) {
+        User user = getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+        if (CharSequenceUtil.isEmpty(user.getPhone())) {
+            throw new BusinessException(ResultEnum.PHONE_NOT_FOUND);
+        }
+        // 验证旧手机的验证码
+        if (!verificationCodeService.verifyCode(user.getPhone(), updateDTO.getOldPhoneCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID, "当前手机验证码不正确");
+        }
+        // 检测新手机是否已被绑定
+        User existUser = getByPhone(updateDTO.getNewPhone());
+        if (existUser != null && !ObjUtil.equal(existUser.getId(), userId)) {
+            throw new BusinessException(ResultEnum.PHONE_ALREADY_BOUND);
+        }
+        // 验证新手机验证码
+        if (!verificationCodeService.verifyCode(updateDTO.getNewPhone(), updateDTO.getNewPhoneCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID, "新手机验证码不正确");
+        }
+        user.setPhone(updateDTO.getNewPhone());
+        return updateById(user);
+    }
+
+    @Override
+    public boolean updatePhoneByPassword(String userId, UpdatePhoneByPasswordDTO updateDTO) {
+        User user = getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+        if (CharSequenceUtil.isEmpty(user.getPassword())) {
+            throw new BusinessException(ResultEnum.PASSWORD_NOT_SET);
+        }
+        if (!BCrypt.checkpw(updateDTO.getPassword(), user.getPassword())) {
+            throw new BusinessException(ResultEnum.PASSWORD_ERROR);
+        }
+        // 验证新手机号的验证码
+        if (!verificationCodeService.verifyCode(updateDTO.getNewPhone(), updateDTO.getNewPhoneCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID, "新手机验证码不正确");
+        }
+        // 检测新手机是否已被绑定
+        User existUser = getByPhone(updateDTO.getNewPhone());
+        if (existUser != null && !ObjUtil.equal(existUser.getId(), userId)) {
+            throw new BusinessException(ResultEnum.PHONE_ALREADY_BOUND);
+        }
+        user.setPhone(updateDTO.getNewPhone());
+        return updateById(user);
+    }
+
+    @Override
+    public boolean bindPhone(String userId, BindPhoneDTO bindDTO) {
+        User user = getById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultEnum.USER_NOT_FOUND);
+        }
+        if (!CharSequenceUtil.isEmpty(user.getPhone())) {
+            throw new BusinessException(ResultEnum.PHONE_ALREADY_BOUND);
+        }
+        if (!verificationCodeService.verifyCode(bindDTO.getPhone(), bindDTO.getCode())) {
+            throw new BusinessException(ResultEnum.CAPTCHA_INVALID);
+        }
+        // 检查手机号是否已被其他用户绑定
+        User existUser = getByPhone(bindDTO.getPhone());
+        if (existUser != null) {
+            throw new BusinessException(ResultEnum.PHONE_ALREADY_BOUND);
+        }
+        user.setPhone(bindDTO.getPhone());
+        return updateById(user);
     }
 }

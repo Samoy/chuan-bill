@@ -1,10 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
-import com.samoy.chuanbillserver.dto.UpdatePasswordByCodeDTO;
-import com.samoy.chuanbillserver.dto.UpdatePasswordByOldDTO;
-import com.samoy.chuanbillserver.dto.UserProfileUpdateDTO;
+import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.vo.UserVO;
@@ -46,10 +43,10 @@ public class UserController {
     }
 
     @PostMapping("/password/update-by-code")
-    @SaIgnore
-    @Operation(summary = "通过验证码修改密码", description = "使用手机验证码设置新密码（无需登录）")
+    @Operation(summary = "通过验证码修改密码", description = "使用手机验证码设置新密码")
     public Result<Boolean> updatePasswordByCode(@Validated @RequestBody UpdatePasswordByCodeDTO updateDTO) {
-        return Result.success(userService.updatePassWordByCode(updateDTO));
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(userService.updatePassWordByCode(userId, updateDTO));
     }
 
     @GetMapping("/has-password")
@@ -57,5 +54,43 @@ public class UserController {
     public Result<Boolean> hasPassword() {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(userService.hasPassword(userId));
+    }
+
+    @PostMapping("/phone/code")
+    @Operation(summary = "获取手机验证码", description = "向当前登录的用户获取手机验证码")
+    public Result<Void> getPhoneCode() {
+        String userId = StpUtil.getLoginIdAsString();
+        userService.getPhoneCode(userId);
+        return Result.success();
+    }
+
+    /**
+     * 通过验证码更换手机号
+     */
+    @PostMapping("/phone/update-by-code")
+    @Operation(summary = "通过验证码更换手机号", description = "使用手机验证码更换手机号")
+    public Result<Boolean> updatePhoneByCode(@Validated @RequestBody UpdatePhoneByCodeDTO updateDTO) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(userService.updatePhoneByCode(userId, updateDTO));
+    }
+
+    /**
+     * 通过密码验证更换手机号
+     */
+    @PostMapping("/phone/update-by-password")
+    @Operation(summary = "通过密码验证更换手机号", description = "使用密码验证更换手机号")
+    public Result<Boolean> updatePhoneByPassword(@Validated @RequestBody UpdatePhoneByPasswordDTO updateDTO) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(userService.updatePhoneByPassword(userId, updateDTO));
+    }
+
+    /**
+     * 绑定手机号
+     */
+    @PostMapping("/phone/bind")
+    @Operation(summary = "绑定手机号", description = "绑定手机号")
+    public Result<Boolean> bindPhone(@Validated @RequestBody BindPhoneDTO bindDTO) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(userService.bindPhone(userId, bindDTO));
     }
 }
