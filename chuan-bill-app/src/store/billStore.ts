@@ -31,6 +31,10 @@ export const useBillStore = defineStore('bill', () => {
     localBillList.value.filter(bill => bill.syncStatus === 'success').length,
   )
 
+  const failedSyncCount = computed(() =>
+    localBillList.value.filter(bill => bill.syncStatus === 'failed').length,
+  )
+
   const lastSyncTime = ref<string>('')
 
   async function initBillData() {
@@ -147,54 +151,66 @@ export const useBillStore = defineStore('bill', () => {
    * 同步本地账单到服务器
    * 仅同步 syncStatus 为 'init' 的账单
    */
-  async function syncLocalBillToServer(): Promise<{ success: boolean, successCount: number }> {
+  async function syncLocalBillToServer(): Promise<{ success: boolean, successCount: number, failedCount: number }> {
     const pendingBills = localBillList.value.filter(bill => bill.syncStatus === 'init')
     if (pendingBills.length === 0) {
-      return { success: true, successCount: 0 }
+      return { success: true, successCount: 0, failedCount: 0 }
     }
 
     try {
-      // 映射 LocalBill 为 AddBillDTO 格式
-      const bills = pendingBills.map((bill) => {
-        const name = bill.name!
-
-        return {
-          name,
-          categoryId: bill.category?.id || '',
-          type: bill.type!,
-          amount: bill.amount!,
-          time: bill.time!,
-          paymentMethodId: bill.paymentMethod?.id,
-          remark: bill.remark,
-        }
-      })
+      const bills = pendingBills.map(bill => ({
+        name: bill.name!,
+        categoryId: bill.category?.id || '',
+        type: bill.type!,
+        amount: bill.amount!,
+        time: bill.time!,
+        paymentMethodId: bill.paymentMethod?.id,
+        remark: bill.remark,
+      }))
       const response = await Apis.bill.batchCreate({ data: { bills } })
 
-      if (response.success) {
-        const successCount = response.data || 0
+      if (response.success && response.data) {
+        const result = response.data
 
-        // 按时间顺序标记成功同步的账单
-        const sortedPendingBills = [...pendingBills].sort((a, b) =>
-          dayjs(a.time).valueOf() - dayjs(b.time).valueOf(),
-        )
-        for (let i = 0; i < successCount && i < sortedPendingBills.length; i++) {
-          const bill = localBillList.value.find(item => item.id === sortedPendingBills[i].id)
+        // 根据 details 精确标记每条账单状态
+        for (const detail of result.details || []) {
+          if (detail.index == null)
+            continue
+          const pendingBill = pendingBills[detail.index]
+          if (!pendingBill)
+            continue
+          const bill = localBillList.value.find(item => item.id === pendingBill.id)
           if (bill) {
-            bill.syncStatus = 'success'
+            bill.syncStatus = detail.status === 'SUCCESS' ? 'success' : 'failed'
           }
         }
 
         lastSyncTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
-        return { success: true, successCount }
+        return {
+          success: true,
+          successCount: result.successCount || 0,
+          failedCount: result.failedCount || 0,
+        }
       }
 
       console.error('同步本地账单失败:', response.message)
-      return { success: false, successCount: 0 }
+      return { success: false, successCount: 0, failedCount: pendingBills.length }
     }
     catch (error) {
       console.error('同步本地账单失败:', error)
-      return { success: false, successCount: 0 }
+      return { success: false, successCount: 0, failedCount: pendingBills.length }
     }
+  }
+
+  /**
+   * 重试失败的同步账单
+   * 将 'failed' 状态重置为 'init'，然后重新同步
+   */
+  async function retryFailedSync() {
+    localBillList.value
+      .filter(bill => bill.syncStatus === 'failed')
+      .forEach(bill => bill.syncStatus = 'init')
+    return syncLocalBillToServer()
   }
 
   async function getMonthlyBillStats(month: string, familyId?: string): Promise<BillMonthlyStatsVO | undefined> {
@@ -224,12 +240,14 @@ export const useBillStore = defineStore('bill', () => {
     hasLocalBills,
     pendingSyncCount,
     syncedCount,
+    failedSyncCount,
     lastSyncTime,
     addLocalBill,
     updateLocalBill,
     deleteLocalBill,
     clearLocalBills,
     syncLocalBillToServer,
+    retryFailedSync,
     categoryListMap,
     paymentMethodList,
     isInitialzed,
