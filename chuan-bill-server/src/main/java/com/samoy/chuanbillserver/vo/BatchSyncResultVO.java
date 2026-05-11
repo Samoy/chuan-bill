@@ -1,22 +1,26 @@
 package com.samoy.chuanbillserver.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 
-/**
- * 批量同步结果
- */
+/** 批量同步结果 */
 @Data
+@Schema(description = "批量同步结果")
 public class BatchSyncResultVO {
-    /** 总数 */
+    @Schema(description = "总数", example = "5")
     private int total;
-    /** 成功数 */
+
+    @Schema(description = "成功数", example = "3")
     private int successCount;
-    /** 失败数 */
+
+    @Schema(description = "失败数", example = "2")
     private int failedCount;
-    /** 状态：ALL_SUCCESS / PARTIAL_SUCCESS / ALL_FAILED */
+
+    @Schema(description = "状态：ALL_SUCCESS / PARTIAL_SUCCESS / ALL_FAILED", example = "PARTIAL_SUCCESS")
     private String status;
-    /** 每条账单的同步详情 */
+
+    @Schema(description = "每条账单的同步详情")
     private List<BillSyncDetailVO> details;
 
     public static BatchSyncResultVO of(List<BillSyncDetailVO> details, int total) {

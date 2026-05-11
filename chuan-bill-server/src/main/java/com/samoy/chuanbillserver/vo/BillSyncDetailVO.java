@@ -1,19 +1,22 @@
 package com.samoy.chuanbillserver.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * 单条账单同步详情
- */
+/** 单条账单同步详情 */
 @Data
+@Schema(description = "单条账单同步详情")
 public class BillSyncDetailVO {
-    /** 批次中的索引（0-based） */
+    @Schema(description = "批次中的索引（0-based）", example = "0")
     private int index;
-    /** 同步状态：SUCCESS / FAILED */
+
+    @Schema(description = "同步状态：SUCCESS / FAILED", example = "SUCCESS")
     private String status;
-    /** 成功时返回服务器生成的 ID */
+
+    @Schema(description = "成功时返回服务器生成的 ID", example = "123456")
     private Long billId;
-    /** 失败时的错误原因 */
+
+    @Schema(description = "失败时的错误原因", example = "分类不存在")
     private String reason;
 
     public static BillSyncDetailVO success(int index, Long billId) {
