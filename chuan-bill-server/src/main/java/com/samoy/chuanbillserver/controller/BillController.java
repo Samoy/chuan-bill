@@ -11,6 +11,7 @@ import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
 import com.samoy.chuanbillserver.service.IPaymentMethodService;
+import com.samoy.chuanbillserver.vo.BatchSyncResultVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
@@ -61,7 +62,7 @@ public class BillController {
 
     @PostMapping("/batchCreate")
     @Operation(summary = "批量添加账单", description = "批量创建账单记录，用于数据同步")
-    public Result<Integer> batchCreate(@Validated @RequestBody BatchCreateBillDTO dto) {
+    public Result<BatchSyncResultVO> batchCreate(@Validated @RequestBody BatchCreateBillDTO dto) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(billService.batchCreate(userId, dto));
     }

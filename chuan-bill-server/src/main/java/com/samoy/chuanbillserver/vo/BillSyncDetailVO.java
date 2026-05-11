@@ -14,12 +14,12 @@ public class BillSyncDetailVO {
     private String status;
 
     @Schema(description = "成功时返回服务器生成的 ID", example = "123456")
-    private Long billId;
+    private String billId;
 
     @Schema(description = "失败时的错误原因", example = "分类不存在")
     private String reason;
 
-    public static BillSyncDetailVO success(int index, Long billId) {
+    public static BillSyncDetailVO success(int index, String billId) {
         BillSyncDetailVO detail = new BillSyncDetailVO();
         detail.setIndex(index);
         detail.setStatus("SUCCESS");

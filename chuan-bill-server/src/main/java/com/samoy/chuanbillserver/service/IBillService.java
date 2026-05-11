@@ -8,6 +8,7 @@ import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
+import com.samoy.chuanbillserver.vo.BatchSyncResultVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import java.util.List;
@@ -54,9 +55,9 @@ public interface IBillService extends IService<Bill> {
      *
      * @param userId 用户ID
      * @param dto    批量账单信息
-     * @return 成功创建的条数
+     * @return 批量同步结果，包含每条账单的同步状态
      */
-    int batchCreate(String userId, BatchCreateBillDTO dto);
+    BatchSyncResultVO batchCreate(String userId, BatchCreateBillDTO dto);
 
     /**
      * 更新账单

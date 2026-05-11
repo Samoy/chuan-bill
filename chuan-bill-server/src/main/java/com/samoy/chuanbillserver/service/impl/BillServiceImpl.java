@@ -21,7 +21,9 @@ import com.samoy.chuanbillserver.entity.User;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.*;
+import com.samoy.chuanbillserver.vo.BatchSyncResultVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
+import com.samoy.chuanbillserver.vo.BillSyncDetailVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
 import com.samoy.chuanbillserver.vo.PaymentMethodVO;
@@ -33,7 +35,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -103,33 +104,40 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
     }
 
     @Override
-    public int batchCreate(String userId, BatchCreateBillDTO dto) {
+    public BatchSyncResultVO batchCreate(String userId, BatchCreateBillDTO dto) {
         List<AddBillDTO> bills = dto.getBills();
         if (bills == null || bills.isEmpty()) {
-            return 0;
+            return BatchSyncResultVO.of(Collections.emptyList(), 0);
         }
-        // 转换为 Bill 实体列表
-        List<Bill> billList = bills.stream()
-                .map(addBillDTO -> {
-                    Bill bill = new Bill();
-                    bill.setUserId(userId);
-                    bill.setName(addBillDTO.getName());
-                    bill.setCategoryId(addBillDTO.getCategoryId());
-                    bill.setPaymentMethodId(addBillDTO.getPaymentMethodId());
-                    bill.setType(addBillDTO.getType());
-                    bill.setAmount(addBillDTO.getAmount());
-                    bill.setTime(addBillDTO.getTime());
-                    bill.setRemark(addBillDTO.getRemark());
-                    bill.setSource(addBillDTO.getSource() != null ? addBillDTO.getSource() : "manual");
-                    if (addBillDTO.getFamilyId() != null) {
-                        bill.setFamilyId(addBillDTO.getFamilyId());
-                    }
-                    return bill;
-                })
-                .toList();
-        // 使用 MyBatis-Plus 的 saveBatch 批量保存
-        ((IBillService) AopContext.currentProxy()).saveBatch(billList);
-        return billList.size();
+
+        List<BillSyncDetailVO> details = new ArrayList<>();
+        for (int i = 0; i < bills.size(); i++) {
+            AddBillDTO addBillDTO = bills.get(i);
+            try {
+                Bill bill = new Bill();
+                bill.setUserId(userId);
+                bill.setName(addBillDTO.getName());
+                bill.setCategoryId(addBillDTO.getCategoryId());
+                bill.setPaymentMethodId(addBillDTO.getPaymentMethodId());
+                bill.setType(addBillDTO.getType());
+                bill.setAmount(addBillDTO.getAmount());
+                bill.setTime(addBillDTO.getTime());
+                bill.setRemark(addBillDTO.getRemark());
+                bill.setSource(addBillDTO.getSource() != null ? addBillDTO.getSource() : "manual");
+                if (addBillDTO.getFamilyId() != null) {
+                    bill.setFamilyId(addBillDTO.getFamilyId());
+                }
+                this.save(bill);
+                details.add(BillSyncDetailVO.success(i, bill.getId()));
+            } catch (Exception e) {
+                String reason = e.getMessage();
+                if (reason != null && reason.length() > 200) {
+                    reason = reason.substring(0, 200);
+                }
+                details.add(BillSyncDetailVO.failed(i, reason));
+            }
+        }
+        return BatchSyncResultVO.of(details, bills.size());
     }
 
     @Override
