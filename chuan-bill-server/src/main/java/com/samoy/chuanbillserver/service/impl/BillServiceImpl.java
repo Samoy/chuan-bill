@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Service;
  * @author Samoy
  * @since 2026-03-14
  */
+@Slf4j
 @Service
 public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IBillService {
 
@@ -110,6 +112,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             return BatchSyncResultVO.of(Collections.emptyList(), 0);
         }
 
+        // 逐条保存而非批量，以支持部分成功语义：单条失败不影响其他账单的持久化
         List<BillSyncDetailVO> details = new ArrayList<>();
         for (int i = 0; i < bills.size(); i++) {
             AddBillDTO addBillDTO = bills.get(i);
@@ -130,6 +133,7 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
                 this.save(bill);
                 details.add(BillSyncDetailVO.success(i, bill.getId()));
             } catch (Exception e) {
+                log.warn("账单同步失败，索引: {}", i, e);
                 String reason = e.getMessage();
                 if (reason != null && reason.length() > 200) {
                     reason = reason.substring(0, 200);
