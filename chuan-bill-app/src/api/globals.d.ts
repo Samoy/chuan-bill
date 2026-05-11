@@ -743,6 +743,53 @@ export interface ResultInteger {
   timestamp?: number;
   success?: boolean;
 }
+export interface BillSyncDetailVO {
+  /**
+   * 批次中的索引（0-based）
+   */
+  index?: number;
+  /**
+   * 同步状态：SUCCESS / FAILED
+   */
+  status?: string;
+  /**
+   * 成功时返回服务器生成的 ID
+   */
+  billId?: string;
+  /**
+   * 失败时的错误原因
+   */
+  reason?: string;
+}
+export interface BatchSyncResultVO {
+  /**
+   * 总数
+   */
+  total?: number;
+  /**
+   * 成功数
+   */
+  successCount?: number;
+  /**
+   * 失败数
+   */
+  failedCount?: number;
+  /**
+   * 状态：ALL_SUCCESS / PARTIAL_SUCCESS / ALL_FAILED
+   */
+  status?: string;
+  /**
+   * 每条账单的同步详情
+   */
+  details?: BillSyncDetailVO[];
+}
+export interface ResultBatchSyncResultVO {
+  code?: number;
+  message?: string;
+  data?: BatchSyncResultVO;
+  timestamp?: number;
+  success?: boolean;
+}
 export interface TokenVO {
   /**
    * 访问令牌
@@ -2636,19 +2683,30 @@ declare global {
        * type Response = {
        *   code?: number
        *   message?: string
-       *   data?: number
+       *   data?: {
+       *     total?: number
+       *     successCount?: number
+       *     failedCount?: number
+       *     status?: string
+       *     details?: Array<{
+       *       index?: number
+       *       status?: string
+       *       billId?: string
+       *       reason?: string
+       *     }>
+       *   }
        *   timestamp?: number
        *   success?: boolean
        * }
        * ```
        */
       batchCreate<
-        Config extends Alova2MethodConfig<ResultInteger> & {
+        Config extends Alova2MethodConfig<ResultBatchSyncResultVO> & {
           data: BatchCreateBillDTO;
         }
       >(
         config: Config
-      ): Alova2Method<ResultInteger, 'bill.batchCreate', Config>;
+      ): Alova2Method<ResultBatchSyncResultVO, 'bill.batchCreate', Config>;
       /**
        * ---
        *
