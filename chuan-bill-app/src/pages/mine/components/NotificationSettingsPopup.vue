@@ -8,18 +8,33 @@ const toast = useGlobalToast()
 
 // 通知设置
 const settings = ref({
-  pushEnabled: true,
-  billReminderEnabled: true,
+  pushEnabled: false,
+  billReminderEnabled: false,
   billReminderTime: '20:00',
-  familyNotificationEnabled: true,
+  familyNotificationEnabled: false,
 })
 
 const timePickerVisible = ref(false)
 const timeValue = ref('20:00')
 
 // 加载设置
-onMounted(() => {
-  // TODO: 从后端加载通知设置
+onMounted(async () => {
+  try {
+    const res = await Apis.preference.getAll()
+    if (res.success && res.data) {
+      const prefs = res.data
+      if (prefs['notification.billReminder.enabled'] !== undefined) {
+        settings.value.billReminderEnabled = prefs['notification.billReminder.enabled'] === 'true'
+      }
+      if (prefs['notification.billReminder.time'] !== undefined) {
+        settings.value.billReminderTime = prefs['notification.billReminder.time']
+        timeValue.value = prefs['notification.billReminder.time']
+      }
+    }
+  }
+  catch {
+    // 静默失败，使用默认值
+  }
 })
 
 // 消息推送开关变化
@@ -33,8 +48,24 @@ function onPushChange(value: boolean) {
 
 // 保存设置
 async function saveSettings() {
-  // TODO: 调用后端保存通知设置
-  toast.success('设置已保存')
+  try {
+    await Apis.preference.set({
+      data: {
+        key: 'notification.billReminder.enabled',
+        value: String(settings.value.billReminderEnabled),
+      },
+    })
+    await Apis.preference.set({
+      data: {
+        key: 'notification.billReminder.time',
+        value: settings.value.billReminderTime,
+      },
+    })
+    toast.success('设置已保存')
+  }
+  catch {
+    toast.error('保存失败')
+  }
 }
 
 // 时间选择确认
