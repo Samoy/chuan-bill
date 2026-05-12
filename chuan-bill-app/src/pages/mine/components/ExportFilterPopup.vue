@@ -162,14 +162,14 @@ async function handleExport() {
 .expense-radio {
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply border-red-400! bg-red-400! text-white! shadow-red-100/20 shadow-lg;
+      @apply border-red-400! bg-red-400! text-white! shadow-red-400/20 shadow-lg;
     }
   }
 }
 .income-radio {
   &.is-checked {
     :deep(.wd-radio__label) {
-      @apply border-green-500! bg-green-500! text-white! shadow-green-100/20 shadow-lg;
+      @apply border-green-500! bg-green-500! text-white! shadow-green-500/20 shadow-lg;
     }
   }
 }

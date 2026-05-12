@@ -19,7 +19,7 @@ export const useMessageStore = defineStore('message', () => {
     if (!user.isLoggedIn)
       return
     try {
-      const res = await Apis.message.getUnreadCount()
+      const res = await Apis.message.getUnreadCount({ meta: { slient: true } })
       if (res.success && res.data) {
         unreadCount.value = res.data
       }
