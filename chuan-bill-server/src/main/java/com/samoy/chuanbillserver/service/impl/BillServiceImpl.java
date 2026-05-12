@@ -195,7 +195,10 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             throw new BusinessException(ResultEnum.BILL_NOT_FOUND);
         }
         if (!Objects.equals(bill.getUserId(), userId)) {
-            throw new BusinessException(ResultEnum.BILL_NOT_ALLOW_VIEW);
+            // 如果是家庭共享账单，检查是否为家庭成员
+            if (bill.getFamilyId() == null || !familyService.isMember(userId, bill.getFamilyId())) {
+                throw new BusinessException(ResultEnum.BILL_NOT_ALLOW_VIEW);
+            }
         }
         // 单个账单查询，直接使用简化版本
         return this.getBillVO(bill);
