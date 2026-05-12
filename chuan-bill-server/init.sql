@@ -233,6 +233,21 @@ CREATE TABLE
   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '消息表';
 
 -- ===============================
+-- 用户偏好设置表(t_user_preference)
+-- ===============================
+CREATE TABLE
+  IF NOT EXISTS `t_user_preference` (
+    `id`          VARCHAR(64)  PRIMARY KEY NOT NULL COMMENT '主键ID',
+    `user_id`     VARCHAR(64)  NOT NULL             COMMENT '用户ID',
+    `pref_key`    VARCHAR(100) NOT NULL             COMMENT '偏好键名',
+    `pref_value`  TEXT                              COMMENT '偏好值（JSON字符串）',
+    `create_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY `uk_user_key` (`user_id`, `pref_key`),
+    KEY `idx_user_id` (`user_id`)
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户偏好设置表';
+
+-- ===============================
 -- AI分析建议表(t_ai_suggestion)
 -- ===============================
 CREATE TABLE IF NOT EXISTS `t_ai_suggestion`
