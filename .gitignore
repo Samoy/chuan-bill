@@ -4,4 +4,4 @@ nul
 .env
 temp/
 settings.local.json
-docs/superpowers
+*/superpowers/
