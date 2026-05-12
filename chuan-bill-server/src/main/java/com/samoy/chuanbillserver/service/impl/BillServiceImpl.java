@@ -26,6 +26,7 @@ import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillSyncDetailVO;
 import com.samoy.chuanbillserver.vo.BillVO;
 import com.samoy.chuanbillserver.vo.CategoryVO;
+import com.samoy.chuanbillserver.vo.FamilyMemberVO;
 import com.samoy.chuanbillserver.vo.PaymentMethodVO;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
@@ -61,6 +62,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
 
     @Resource
     private IUserService userService;
+
+    @Resource
+    private IMessageService messageService;
 
     @Override
     public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
@@ -102,7 +106,12 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             }
             bill.setFamilyId(addBillDTO.getFamilyId());
         }
-        return this.save(bill);
+        boolean saved = this.save(bill);
+        // 家庭账单通知：通知家庭其他成员
+        if (saved && bill.getFamilyId() != null) {
+            sendFamilyBillNotification(bill, userId);
+        }
+        return saved;
     }
 
     @Override
@@ -218,6 +227,40 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         vo.setExpense(expense);
         vo.setBalance(balance);
         return vo;
+    }
+
+    /**
+     * 发送家庭账单通知给家庭其他成员
+     */
+    private void sendFamilyBillNotification(Bill bill, String userId) {
+        try {
+            List<FamilyMemberVO> members = familyService.getMembers(userId, bill.getFamilyId());
+
+            // 获取记账人昵称
+            String nickname = members.stream()
+                    .filter(m -> m.getUserId().equals(userId))
+                    .findFirst()
+                    .map(FamilyMemberVO::getUserNickname)
+                    .orElse("未知用户");
+
+            // 获取分类名
+            Category category = categoryService.getById(bill.getCategoryId());
+            String categoryName = category != null ? category.getName() : "未分类";
+
+            String content = String.format(
+                    "{\"categoryName\":\"%s\",\"amount\":\"%s\",\"type\":\"%s\"}",
+                    categoryName, bill.getAmount().toPlainString(), bill.getType());
+
+            for (FamilyMemberVO member : members) {
+                if (member.getUserId().equals(userId)) {
+                    continue;
+                }
+                messageService.sendMessage(
+                        member.getUserId(), nickname + " 记了一笔账单", content, "bill", bill.getId(), "bill");
+            }
+        } catch (Exception e) {
+            log.error("发送家庭账单通知失败，账单ID: {}", bill.getId(), e);
+        }
     }
 
     private LambdaQueryWrapper<Bill> buildQueryWrapper(String userId, BillListDTO billListDTO) {
