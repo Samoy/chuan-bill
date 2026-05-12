@@ -463,6 +463,22 @@ export interface LoginByPasswordDTO {
    */
   password: string;
 }
+export interface PreferenceSetDTO {
+  /**
+   * 偏好设置键
+   */
+  key: string;
+  /**
+   * 偏好设置值
+   */
+  value: string;
+}
+export interface PreferenceDeleteDTO {
+  /**
+   * 偏好设置键
+   */
+  key: string;
+}
 export interface ResultVoid {
   code?: number;
   message?: string;
@@ -1196,6 +1212,13 @@ export interface ResultAiAnalysisVO {
    * AI分析结果
    */
   data?: AiAnalysisVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultRecordStringString {
+  code?: number;
+  message?: string;
+  data?: Record<string, string>;
   timestamp?: number;
   success?: boolean;
 }
@@ -3422,6 +3445,154 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTokenVO, 'auth.loginByPassword', Config>;
+    };
+    preference: {
+      /**
+       * ---
+       *
+       * [POST] 设置偏好
+       *
+       * **path:** /preference/set
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 偏好设置键
+       *   key: string
+       *   // 偏好设置值
+       *   value: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      set<
+        Config extends Alova2MethodConfig<ResultVoid> & {
+          data: PreferenceSetDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultVoid, 'preference.set', Config>;
+      /**
+       * ---
+       *
+       * [DELETE] 删除偏好
+       *
+       * **path:** /preference/delete
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 偏好设置键
+       *   key: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: null
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      delete<
+        Config extends Alova2MethodConfig<ResultVoid> & {
+          params: {
+            /**
+             * 偏好设置键
+             */
+            key: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultVoid, 'preference.delete', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取偏好
+       *
+       * **path:** /preference/get
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 偏好设置键
+       *   key: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: string
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      get<
+        Config extends Alova2MethodConfig<ResultString> & {
+          params: {
+            /**
+             * 偏好设置键
+             */
+            key: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultString, 'preference.get', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取所有偏好
+       *
+       * **path:** /preference/all
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: Record<string, string>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getAll<Config extends Alova2MethodConfig<ResultRecordStringString>>(
+        config?: Config
+      ): Alova2Method<ResultRecordStringString, 'preference.getAll', Config>;
     };
     statistics: {
       /**
