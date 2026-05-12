@@ -64,6 +64,12 @@
       <artifactId>spring-boot-starter-websocket</artifactId>
     </dependency>
 
+    <!-- Quartz 调度器 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-quartz</artifactId>
+    </dependency>
+
     <!--      sa-token 权限认账  -->
     <dependency>
       <groupId>cn.dev33</groupId>

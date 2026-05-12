@@ -23,6 +23,8 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+  quartz:
+    job-store-type: memory
 
 sa-token:
   token-name: token
