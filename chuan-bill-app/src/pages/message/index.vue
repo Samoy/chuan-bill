@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MessageVO } from '@/api/globals'
+import type { MessageListDTO, MessageVO } from '@/api/globals'
 
 definePage({
   name: 'message-list',
@@ -8,19 +8,31 @@ definePage({
   },
 })
 
+const router = useRouter()
 const messageStore = useMessageStore()
 const currentPage = ref(1)
 const pageSize = 20
 const finished = ref(false)
 const loading = ref(false)
 
+// 类型筛选 Tab
+const activeTab = ref('')
+const tabs = [
+  { name: '', label: '全部' },
+  { name: 'system', label: '系统' },
+  { name: 'family', label: '家庭' },
+  { name: 'bill', label: '账单' },
+]
+
 async function loadMessages(page = 1) {
   loading.value = true
   try {
-    const result = await messageStore.fetchMessageList({
+    const params: MessageListDTO = {
       page,
       size: pageSize,
-    })
+      ...(activeTab.value ? { type: activeTab.value } : {}),
+    }
+    const result = await messageStore.fetchMessageList(params)
     if (result) {
       currentPage.value = page
       finished.value = !result.records || result.records.length < pageSize
@@ -37,6 +49,13 @@ async function loadMessages(page = 1) {
 onLoad(() => {
   loadMessages(1)
 })
+
+// 切换 Tab
+function onTabChange(tab: string) {
+  activeTab.value = tab
+  finished.value = false
+  loadMessages(1)
+}
 
 // 加载更多
 function loadMore() {
@@ -62,16 +81,51 @@ async function markAllRead() {
   })
 }
 
-// 点击消息标记已读
+// 点击消息
 async function handleMessageClick(msg: MessageVO) {
+  // 标记已读
   if (msg.status === 0) {
     await messageStore.markAsRead(msg.id!)
+  }
+  // 根据类型跳转
+  if (msg.type === 'bill' && msg.relatedId) {
+    router.push(`/pages/bill/index?id=${msg.relatedId}`)
+  }
+  else if (msg.type === 'family') {
+    router.push('/pages/family/index')
+  }
+}
+
+// 解析账单消息 content
+function parseBillContent(msg: MessageVO): { categoryName: string, amount: string, type: string } | null {
+  if (msg.type !== 'bill' || !msg.content)
+    return null
+  try {
+    return JSON.parse(msg.content)
+  }
+  catch {
+    return null
   }
 }
 </script>
 
 <template>
   <view class="box-border flex flex-col gap-3 py-3">
+    <!-- 类型筛选 Tab -->
+    <view class="mx-3 flex gap-2">
+      <view
+        v-for="tab in tabs"
+        :key="tab.name"
+        class="rounded-full px-4 py-1.5 text-xs transition-all"
+        :class="activeTab === tab.name
+          ? 'bg-primary text-white'
+          : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'"
+        @click="onTabChange(tab.name)"
+      >
+        {{ tab.label }}
+      </view>
+    </view>
+
     <!-- 顶部操作 -->
     <view v-if="messageStore.hasUnread" class="mx-3 flex justify-end">
       <text class="text-sm text-primary" @click="markAllRead">
@@ -104,7 +158,20 @@ async function handleMessageClick(msg: MessageVO) {
                 {{ msg.createTime }}
               </text>
             </view>
-            <text class="mt-1 block text-xs leading-relaxed" :class="msg.status === 0 ? 'text-gray-600' : 'text-gray-400'">
+            <!-- 账单类型消息：解析 JSON 渲染 -->
+            <view v-if="parseBillContent(msg)" class="mt-1 flex items-center gap-1">
+              <text class="text-xs text-gray-600">
+                {{ parseBillContent(msg)?.categoryName }}
+              </text>
+              <text
+                class="text-xs font-500"
+                :class="parseBillContent(msg)?.type === 'expense' ? 'text-red-400' : 'text-green-500'"
+              >
+                ¥{{ parseBillContent(msg)?.amount }}
+              </text>
+            </view>
+            <!-- 普通消息：直接显示 content -->
+            <text v-else class="mt-1 block text-xs leading-relaxed" :class="msg.status === 0 ? 'text-gray-600' : 'text-gray-400'">
               {{ msg.content }}
             </text>
           </view>
