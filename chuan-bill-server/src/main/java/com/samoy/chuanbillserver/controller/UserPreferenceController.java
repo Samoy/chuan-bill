@@ -1,12 +1,14 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.dto.PreferenceSetDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserPreferenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import java.util.Map;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +42,9 @@ public class UserPreferenceController {
 
     @PostMapping("/set")
     @Operation(summary = "设置偏好", description = "设置单个偏好值")
-    public Result<Boolean> set(
-            @Parameter(description = "偏好键名", required = true) @RequestParam String key,
-            @Parameter(description = "偏好值", required = true) @RequestParam String value) {
+    public Result<Boolean> set(@RequestBody @Valid PreferenceSetDTO dto) {
         String userId = StpUtil.getLoginIdAsString();
-        userPreferenceService.setValue(userId, key, value);
+        userPreferenceService.setValue(userId, dto.getKey(), dto.getValue());
         return Result.success(true);
     }
 

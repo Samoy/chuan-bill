@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -32,6 +33,7 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
     }
 
     @Override
+    @Transactional
     public void setValue(String userId, String key, String value) {
         UserPreference existing = this.getOne(new LambdaQueryWrapper<UserPreference>()
                 .eq(UserPreference::getUserId, userId)

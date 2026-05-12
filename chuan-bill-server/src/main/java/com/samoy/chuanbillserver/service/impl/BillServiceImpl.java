@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samoy.chuanbillserver.dao.BillMapper;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
@@ -50,6 +51,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IBillService {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Resource
     private ICategoryService categoryService;
@@ -250,9 +253,11 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             Category category = categoryService.getById(bill.getCategoryId());
             String categoryName = category != null ? category.getName() : "未分类";
 
-            String content = String.format(
-                    "{\"categoryName\":\"%s\",\"amount\":\"%s\",\"type\":\"%s\"}",
-                    categoryName, bill.getAmount().toPlainString(), bill.getType());
+            Map<String, String> contentMap = new HashMap<>();
+            contentMap.put("categoryName", categoryName);
+            contentMap.put("amount", bill.getAmount().toPlainString());
+            contentMap.put("type", bill.getType().toString());
+            String content = objectMapper.writeValueAsString(contentMap);
 
             for (FamilyMemberVO member : members) {
                 if (member.getUserId().equals(userId)) {
