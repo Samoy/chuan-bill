@@ -187,7 +187,7 @@ async function openBillById(id: string) {
     }
   }
   catch {
-    // 账单不存在或无权查看
+    useGlobalToast().error('无法查看该账单')
   }
 }
 

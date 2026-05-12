@@ -107,6 +107,19 @@ function parseBillContent(msg: MessageVO): { categoryName: string, amount: strin
     return null
   }
 }
+
+// 缓存账单消息解析结果，避免模板中重复解析
+const billContentMap = computed(() => {
+  const map = new Map<string, ReturnType<typeof parseBillContent>>()
+  for (const msg of messageStore.messageList) {
+    map.set(msg.id!, parseBillContent(msg))
+  }
+  return map
+})
+
+function getBillContent(msg: MessageVO) {
+  return billContentMap.value.get(msg.id!) ?? null
+}
 </script>
 
 <template>
@@ -159,15 +172,15 @@ function parseBillContent(msg: MessageVO): { categoryName: string, amount: strin
               </text>
             </view>
             <!-- 账单类型消息：解析 JSON 渲染 -->
-            <view v-if="parseBillContent(msg)" class="mt-1 flex items-center gap-1">
+            <view v-if="getBillContent(msg)" class="mt-1 flex items-center gap-1">
               <text class="text-xs text-gray-600">
-                {{ parseBillContent(msg)?.categoryName }}
+                {{ getBillContent(msg)?.categoryName }}
               </text>
               <text
                 class="text-xs font-500"
-                :class="parseBillContent(msg)?.type === 'expense' ? 'text-red-400' : 'text-green-500'"
+                :class="getBillContent(msg)?.type === 'expense' ? 'text-red-400' : 'text-green-500'"
               >
-                ¥{{ parseBillContent(msg)?.amount }}
+                ¥{{ getBillContent(msg)?.amount }}
               </text>
             </view>
             <!-- 普通消息：直接显示 content -->
