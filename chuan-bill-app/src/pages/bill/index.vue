@@ -178,8 +178,24 @@ function goToLogin() {
   user.showLoginPopup = true
 }
 
-onLoad(() => {
+async function openBillById(id: string) {
+  try {
+    const res = await Apis.bill.getBillDetail({ params: { id } })
+    if (res.success && res.data) {
+      currentBill.value = res.data
+      showBillDetailModal.value = true
+    }
+  }
+  catch {
+    // 账单不存在或无权查看
+  }
+}
+
+onLoad((options) => {
   refresh()
+  if (options?.id) {
+    openBillById(options.id)
+  }
 })
 
 onPullDownRefresh(async () => {
