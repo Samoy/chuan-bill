@@ -8,10 +8,11 @@ const toast = useGlobalToast()
 
 // 通知设置
 const settings = ref({
-  pushEnabled: false,
+  masterEnabled: false,
   billReminderEnabled: false,
   billReminderTime: '20:00',
   familyNotificationEnabled: false,
+  systemNotificationEnabled: true,
 })
 
 const timePickerVisible = ref(false)
@@ -23,12 +24,21 @@ onMounted(async () => {
     const res = await Apis.preference.getAll()
     if (res.success && res.data) {
       const prefs = res.data
+      if (prefs['notification.master.enabled'] !== undefined) {
+        settings.value.masterEnabled = prefs['notification.master.enabled'] === 'true'
+      }
       if (prefs['notification.billReminder.enabled'] !== undefined) {
         settings.value.billReminderEnabled = prefs['notification.billReminder.enabled'] === 'true'
       }
       if (prefs['notification.billReminder.time'] !== undefined) {
         settings.value.billReminderTime = prefs['notification.billReminder.time']
         timeValue.value = prefs['notification.billReminder.time']
+      }
+      if (prefs['notification.family.enabled'] !== undefined) {
+        settings.value.familyNotificationEnabled = prefs['notification.family.enabled'] === 'true'
+      }
+      if (prefs['notification.system.enabled'] !== undefined) {
+        settings.value.systemNotificationEnabled = prefs['notification.system.enabled'] === 'true'
       }
     }
   }
@@ -37,18 +47,26 @@ onMounted(async () => {
   }
 })
 
-// 消息推送开关变化
-function onPushChange(value: boolean) {
+// 总开关变化
+function onMasterChange({ value }: { value: boolean }) {
   if (!value) {
-    settings.value.billReminderEnabled = false
-    settings.value.familyNotificationEnabled = false
+    // 关闭总开关时，保存所有子开关为关闭状态
+    saveAllSettings()
   }
-  saveSettings()
+  else {
+    saveAllSettings()
+  }
 }
 
-// 保存设置
-async function saveSettings() {
+// 保存所有设置
+async function saveAllSettings() {
   try {
+    await Apis.preference.set({
+      data: {
+        key: 'notification.master.enabled',
+        value: String(settings.value.masterEnabled),
+      },
+    })
     await Apis.preference.set({
       data: {
         key: 'notification.billReminder.enabled',
@@ -61,6 +79,18 @@ async function saveSettings() {
         value: settings.value.billReminderTime,
       },
     })
+    await Apis.preference.set({
+      data: {
+        key: 'notification.family.enabled',
+        value: String(settings.value.familyNotificationEnabled),
+      },
+    })
+    await Apis.preference.set({
+      data: {
+        key: 'notification.system.enabled',
+        value: String(settings.value.systemNotificationEnabled),
+      },
+    })
     toast.success('设置已保存')
   }
   catch {
@@ -68,10 +98,15 @@ async function saveSettings() {
   }
 }
 
+// 子开关变化时保存
+function onSubSettingChange() {
+  saveAllSettings()
+}
+
 // 时间选择确认
 function onTimeConfirm({ value }: { value: number[] }) {
   settings.value.billReminderTime = `${String(value[0]).padStart(2, '0')}:${String(value[1]).padStart(2, '0')}`
-  saveSettings()
+  saveAllSettings()
 }
 </script>
 
@@ -86,17 +121,35 @@ function onTimeConfirm({ value }: { value: number[] }) {
     title="通知设置"
   >
     <view class="p-4">
-      <!-- 消息推送 -->
+      <!-- 通知总开关 -->
       <view class="mb-4 flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
         <view>
           <text class="block text-sm font-medium">
-            消息推送
+            通知总开关
           </text>
           <text class="mt-1 block text-xs text-gray-500">
-            接收应用推送通知
+            关闭后所有通知和提醒将被禁用
           </text>
         </view>
-        <wd-switch v-model="settings.pushEnabled" size="20px" @change="onPushChange" />
+        <wd-switch v-model="settings.masterEnabled" size="20px" @change="onMasterChange" />
+      </view>
+
+      <!-- 系统通知 -->
+      <view class="mb-4 flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+        <view>
+          <text class="block text-sm font-medium">
+            系统通知
+          </text>
+          <text class="mt-1 block text-xs text-gray-500">
+            系统公告、活动提醒等
+          </text>
+        </view>
+        <wd-switch
+          v-model="settings.systemNotificationEnabled"
+          :disabled="!settings.masterEnabled"
+          size="20px"
+          @change="onSubSettingChange"
+        />
       </view>
 
       <!-- 账单提醒 -->
@@ -116,10 +169,11 @@ function onTimeConfirm({ value }: { value: number[] }) {
             v-model:visible="timePickerVisible"
             type="time"
             title="选择提醒时间"
+            :disabled="!settings.masterEnabled"
             @confirm="onTimeConfirm"
           >
             <text
-              v-if="settings.billReminderEnabled"
+              v-if="settings.billReminderEnabled && settings.masterEnabled"
               class="text-xs text-primary"
               @click="timePickerVisible = true"
             >
@@ -128,9 +182,9 @@ function onTimeConfirm({ value }: { value: number[] }) {
           </wd-datetime-picker>
           <wd-switch
             v-model="settings.billReminderEnabled"
-            :disabled="!settings.pushEnabled"
+            :disabled="!settings.masterEnabled"
             size="20px"
-            @change="saveSettings"
+            @change="onSubSettingChange"
           />
         </view>
       </view>
@@ -147,9 +201,9 @@ function onTimeConfirm({ value }: { value: number[] }) {
         </view>
         <wd-switch
           v-model="settings.familyNotificationEnabled"
-          :disabled="!settings.pushEnabled"
+          :disabled="!settings.masterEnabled"
           size="20px"
-          @change="saveSettings"
+          @change="onSubSettingChange"
         />
       </view>
     </view>

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BillReminderJob implements Job {
 
+    private static final String KEY_MASTER = "notification.master.enabled";
     private static final String KEY_ENABLED = "notification.billReminder.enabled";
     private static final String KEY_TIME = "notification.billReminder.time";
     private static final String KEY_LAST_SENT = "notification.billReminder.lastSentDate";
@@ -51,6 +52,12 @@ public class BillReminderJob implements Job {
             String userId = enabledPref.getUserId();
 
             try {
+                // 检查总开关是否开启
+                String masterEnabled = userPreferenceService.getValue(userId, KEY_MASTER);
+                if (!"true".equals(masterEnabled)) {
+                    continue;
+                }
+
                 // 检查提醒时间是否匹配
                 String reminderTime = userPreferenceService.getValue(userId, KEY_TIME);
                 if (!currentTime.equals(reminderTime)) {

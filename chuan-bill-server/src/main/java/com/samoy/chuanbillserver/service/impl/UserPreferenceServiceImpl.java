@@ -1,6 +1,5 @@
 package com.samoy.chuanbillserver.service.impl;
 
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.dao.UserPreferenceMapper;
@@ -43,7 +42,6 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
             this.updateById(existing);
         } else {
             UserPreference pref = new UserPreference();
-            pref.setId(IdUtil.fastSimpleUUID());
             pref.setUserId(userId);
             pref.setPrefKey(key);
             pref.setPrefValue(value);
