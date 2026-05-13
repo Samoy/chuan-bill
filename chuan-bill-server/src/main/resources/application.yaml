@@ -69,3 +69,11 @@ qiniu:
   bucket: ${QINIU_BUCKET}
   cdn-domain: ${QINIU_CDN_DOMAIN}
   endpoint: ${QINIU_ENDPOINT}
+
+preference:
+  allowed-keys:
+    - notification.master.enabled
+    - notification.billReminder.enabled
+    - notification.billReminder.time
+    - notification.family.enabled
+    - notification.system.enabled

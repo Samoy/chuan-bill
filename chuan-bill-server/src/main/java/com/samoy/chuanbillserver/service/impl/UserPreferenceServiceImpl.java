@@ -8,9 +8,11 @@ import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IUserPreferenceService;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper, UserPreference>
         implements IUserPreferenceService {
 
-    /** 允许客户端写入的偏好键白名单 */
-    private static final Set<String> ALLOWED_KEYS = Set.of(
-            "notification.master.enabled",
-            "notification.billReminder.enabled",
-            "notification.billReminder.time",
-            "notification.family.enabled",
-            "notification.system.enabled");
+    @Value("${preference.allowed-keys:}")
+    private List<String> allowedKeyList;
+
+    private Set<String> getAllowedKeys() {
+        return new HashSet<>(allowedKeyList);
+    }
 
     @Override
     public String getValue(String userId, String key) {
@@ -45,7 +46,7 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
     @Override
     @Transactional
     public void setValue(String userId, String key, String value) {
-        if (!ALLOWED_KEYS.contains(key)) {
+        if (!getAllowedKeys().contains(key)) {
             throw new BusinessException(ResultEnum.BAD_REQUEST);
         }
         setValueInternal(userId, key, value);
@@ -81,7 +82,7 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
 
     @Override
     public void deleteValue(String userId, String key) {
-        if (!ALLOWED_KEYS.contains(key)) {
+        if (!getAllowedKeys().contains(key)) {
             throw new BusinessException(ResultEnum.BAD_REQUEST);
         }
         this.remove(new LambdaQueryWrapper<UserPreference>()
