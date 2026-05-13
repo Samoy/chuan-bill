@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.samoy.chuanbillserver.dao.UserPreferenceMapper;
 import com.samoy.chuanbillserver.entity.UserPreference;
+import com.samoy.chuanbillserver.exception.BusinessException;
+import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IUserPreferenceService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper, UserPreference>
         implements IUserPreferenceService {
 
+    /** 允许客户端写入的偏好键白名单 */
+    private static final Set<String> ALLOWED_KEYS = Set.of(
+            "notification.master.enabled",
+            "notification.billReminder.enabled",
+            "notification.billReminder.time",
+            "notification.family.enabled",
+            "notification.system.enabled");
+
     @Override
     public String getValue(String userId, String key) {
         UserPreference pref = this.getOne(new LambdaQueryWrapper<UserPreference>()
@@ -34,6 +45,14 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
     @Override
     @Transactional
     public void setValue(String userId, String key, String value) {
+        if (!ALLOWED_KEYS.contains(key)) {
+            throw new BusinessException(ResultEnum.BAD_REQUEST);
+        }
+        setValueInternal(userId, key, value);
+    }
+
+    @Override
+    public void setValueInternal(String userId, String key, String value) {
         UserPreference existing = this.getOne(new LambdaQueryWrapper<UserPreference>()
                 .eq(UserPreference::getUserId, userId)
                 .eq(UserPreference::getPrefKey, key));
@@ -62,6 +81,9 @@ public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper,
 
     @Override
     public void deleteValue(String userId, String key) {
+        if (!ALLOWED_KEYS.contains(key)) {
+            throw new BusinessException(ResultEnum.BAD_REQUEST);
+        }
         this.remove(new LambdaQueryWrapper<UserPreference>()
                 .eq(UserPreference::getUserId, userId)
                 .eq(UserPreference::getPrefKey, key));

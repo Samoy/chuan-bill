@@ -80,7 +80,7 @@ public class BillReminderJob implements Job {
 
                 if (billCount > 0) {
                     // 今天已有账单，记录已发送避免重复检查
-                    userPreferenceService.setValue(userId, KEY_LAST_SENT, today);
+                    userPreferenceService.setValueInternal(userId, KEY_LAST_SENT, today);
                     continue;
                 }
 
@@ -88,7 +88,7 @@ public class BillReminderJob implements Job {
                 messageService.sendMessage(userId, "记账提醒", "您今天还没有记账哦，点击记录一笔", "system", null, null);
 
                 // 记录已发送日期
-                userPreferenceService.setValue(userId, KEY_LAST_SENT, today);
+                userPreferenceService.setValueInternal(userId, KEY_LAST_SENT, today);
                 log.info("已发送记账提醒给用户: {}", userId);
             } catch (Exception e) {
                 log.error("发送记账提醒失败，用户: {}", userId, e);
