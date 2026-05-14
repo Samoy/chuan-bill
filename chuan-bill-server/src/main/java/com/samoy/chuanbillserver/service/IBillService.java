@@ -6,11 +6,13 @@ import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
+import com.samoy.chuanbillserver.dto.ExportBillDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.vo.BatchSyncResultVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillVO;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -93,4 +95,13 @@ public interface IBillService extends IService<Bill> {
      * @return 月账单统计信息
      */
     BillMonthlyStatsVO getMonthlyStats(String userId, BillMonthlyStatsDTO billMonthlyStatsDTO);
+
+    /**
+     * 导出账单
+     *
+     * @param userId 用户ID
+     * @param dto    导出参数
+     * @param response HTTP响应
+     */
+    void exportBill(String userId, ExportBillDTO dto, HttpServletResponse response);
 }
