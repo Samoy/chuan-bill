@@ -34,7 +34,9 @@ onMounted(async () => {
     <view class="flex flex-1 items-center justify-end gap-3">
       <view class="flex items-center gap-1">
         <view class="h-4 w-4 flex items-center justify-center rounded-full bg-red-400 text-center">
-          <text class="i-icon-park-outline:expenses h-2 w-2 text-white" />
+          <text class="text-xs text-white">
+            支
+          </text>
         </view>
         <text class="text-red-400">
           {{ statistics?.expense }}
@@ -42,7 +44,9 @@ onMounted(async () => {
       </view>
       <view class="flex items-center gap-1">
         <view class="h-4 w-4 flex items-center justify-center rounded-full bg-green-500 text-center">
-          <text class="i-icon-park-outline:income h-2 w-2 text-white" />
+          <text class="text-xs text-white">
+            收
+          </text>
         </view>
         <text class="text-green-500">
           {{ statistics?.income }}
@@ -50,7 +54,9 @@ onMounted(async () => {
       </view>
       <view class="flex items-center gap-1">
         <view class="h-4 w-4 flex items-center justify-center rounded-full bg-primary text-center">
-          <text class="i-icon-park-outline:consume h-2 w-2 text-white" />
+          <text class="text-xs text-white">
+            余
+          </text>
         </view>
         <text class="text-primary">
           {{ statistics?.balance }}

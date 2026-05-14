@@ -170,8 +170,8 @@ async function handleJoin() {
         </view>
         <view class="flex-1 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="showJoinPopup = true">
           <view class="flex items-center gap-3">
-            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
-              <view class="i-lucide:log-in h-5 w-5 text-green-600" />
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:log-in h-5 w-5 text-primary" />
             </view>
             <view>
               <text class="block text-sm font-500">
@@ -244,7 +244,7 @@ async function handleJoin() {
               </view>
             </view>
             <view
-              class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-50 py-2 text-green-500 transition-all active:scale-95"
+              class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary/5 py-2 text-primary transition-all active:scale-95"
               @click.stop="router.push(`/pages/family/statistics?familyId=${family.id}&familyName=${encodeURIComponent(family.name || '')}`)"
             >
               <view class="i-lucide:bar-chart-3 h-4 w-4" />
