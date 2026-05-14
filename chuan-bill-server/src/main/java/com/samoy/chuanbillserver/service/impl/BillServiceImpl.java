@@ -13,6 +13,7 @@ import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
+import com.samoy.chuanbillserver.dto.ExportBillDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.entity.Bill;
 import com.samoy.chuanbillserver.entity.Category;
@@ -22,6 +23,8 @@ import com.samoy.chuanbillserver.entity.User;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.*;
+import com.samoy.chuanbillserver.utils.ExcelExportUtil;
+import com.samoy.chuanbillserver.utils.PdfExportUtil;
 import com.samoy.chuanbillserver.vo.BatchSyncResultVO;
 import com.samoy.chuanbillserver.vo.BillMonthlyStatsVO;
 import com.samoy.chuanbillserver.vo.BillSyncDetailVO;
@@ -30,10 +33,13 @@ import com.samoy.chuanbillserver.vo.CategoryVO;
 import com.samoy.chuanbillserver.vo.FamilyMemberVO;
 import com.samoy.chuanbillserver.vo.PaymentMethodVO;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -233,6 +239,67 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         vo.setExpense(expense);
         vo.setBalance(balance);
         return vo;
+    }
+
+    @Override
+    public void exportBill(String userId, ExportBillDTO dto, HttpServletResponse response) {
+        // 1. 校验时间范围不超过3个月
+        if (dto.getStartDate() != null && dto.getEndDate() != null) {
+            LocalDate start = LocalDate.parse(dto.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            LocalDate end = LocalDate.parse(dto.getEndDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            long months = ChronoUnit.MONTHS.between(start.withDayOfMonth(1), end.withDayOfMonth(1));
+            if (months > 3) {
+                throw new BusinessException(ResultEnum.BILL_EXPORT_TIME_RANGE_EXCEEDED);
+            }
+        }
+
+        // 2. 构建查询条件（复用筛选逻辑，不分页）
+        BillListDTO listDTO = new BillListDTO();
+        listDTO.setStartDate(dto.getStartDate());
+        listDTO.setEndDate(dto.getEndDate());
+        listDTO.setType(dto.getType());
+        listDTO.setCategoryId(dto.getCategoryId());
+        listDTO.setPaymentMethodId(dto.getPaymentMethodId());
+        listDTO.setFamilyId(dto.getFamilyId());
+
+        if (listDTO.getFamilyId() != null && !familyService.isMember(userId, listDTO.getFamilyId())) {
+            throw new BusinessException(ResultEnum.FAMILY_NOT_MEMBER);
+        }
+
+        LambdaQueryWrapper<Bill> wrapper = buildQueryWrapper(userId, listDTO);
+
+        // 3. 查询记录数量限制
+        long count = this.count(wrapper);
+        if (count == 0) {
+            throw new BusinessException(ResultEnum.BILL_EXPORT_NO_DATA);
+        }
+        if (count > 10000) {
+            throw new BusinessException(ResultEnum.BILL_EXPORT_DATA_TOO_LARGE);
+        }
+
+        // 4. 查询数据并转换
+        List<Bill> billList = baseMapper.selectList(wrapper);
+        List<BillVO> billVOList = convertToBillVOList(billList);
+
+        // 5. 生成文件并写入响应
+        try {
+            String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            if ("excel".equals(dto.getFormat())) {
+                response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                response.setHeader("Content-Disposition", "attachment; filename=bills_" + dateStr + ".xlsx");
+                ExcelExportUtil.export(billVOList, response.getOutputStream());
+            } else {
+                response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "attachment; filename=bills_" + dateStr + ".pdf");
+                PdfExportUtil.export(billVOList, response.getOutputStream());
+            }
+            response.getOutputStream().flush();
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("导出账单失败", e);
+            throw new BusinessException(ResultEnum.BILL_EXPORT_FAILED);
+        }
     }
 
     /**
