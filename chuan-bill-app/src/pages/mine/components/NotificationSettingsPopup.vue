@@ -48,16 +48,17 @@ onMounted(async () => {
 })
 
 // 开关变化时保存
-async function onSettingChange(key:string, value: boolean | string) {
+async function onSettingChange(key: string, value: boolean | string) {
   try {
-   await Apis.preference.set({
+    await Apis.preference.set({
       data: {
         key,
         value: String(value),
       },
     })
     toast.success('设置已保存')
-  }catch {
+  }
+  catch {
     toast.error('保存失败')
   }
 }
