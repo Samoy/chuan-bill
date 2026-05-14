@@ -46,6 +46,10 @@ public enum ResultEnum {
     BILL_TEXT_FAILED(2102, "账单文本识别失败"),
     BILL_ANALYSIS_FAILED(2103, "账单分析失败"),
     AI_ANALYSIS_RATE_LIMITED(2104, "今日AI分析次数已用完"),
+    BILL_EXPORT_TIME_RANGE_EXCEEDED(2105, "时间范围不能超过3个月"),
+    BILL_EXPORT_DATA_TOO_LARGE(2106, "数据量过大，请缩小筛选范围"),
+    BILL_EXPORT_NO_DATA(2107, "无导出数据"),
+    BILL_EXPORT_FAILED(2108, "导出失败"),
 
     // 文件错误码 3000+
     FILE_NOT_FOUND(3001, "文件不存在"),
