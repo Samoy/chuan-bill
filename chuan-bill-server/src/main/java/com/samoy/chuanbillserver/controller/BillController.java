@@ -6,6 +6,7 @@ import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
+import com.samoy.chuanbillserver.dto.ExportBillDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IBillService;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -105,5 +107,12 @@ public class BillController {
             @Validated @ModelAttribute BillMonthlyStatsDTO billMonthlyStatsDTO) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(billService.getMonthlyStats(userId, billMonthlyStatsDTO));
+    }
+
+    @PostMapping("/export")
+    @Operation(summary = "导出账单", description = "根据筛选条件导出账单，支持 Excel 和 PDF 格式")
+    public void exportBill(@Validated @RequestBody ExportBillDTO dto, HttpServletResponse response) {
+        String userId = StpUtil.getLoginIdAsString();
+        billService.exportBill(userId, dto, response);
     }
 }
