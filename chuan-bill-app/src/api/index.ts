@@ -8,7 +8,11 @@ import { createApis, withConfigType } from './createApis'
 export { alovaInstance }
 
 // Configure method options for specific APIs
-export const $$userConfigMap = withConfigType({})
+export const $$userConfigMap = withConfigType({
+  'bill.exportBill': {
+    responseType: 'arraybuffer',
+  },
+})
 
 // Create the global Apis object
 const Apis = createApis(alovaInstance, $$userConfigMap)

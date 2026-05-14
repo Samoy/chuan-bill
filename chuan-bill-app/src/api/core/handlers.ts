@@ -47,7 +47,7 @@ export async function handleAlovaResponse(
 ) {
   const globalToast = useGlobalToast()
   // Extract status code and data from UniApp response
-  const { statusCode, data } = response as UniNamespace.RequestSuccessCallbackResult
+  const { statusCode, data, header } = response as UniNamespace.RequestSuccessCallbackResult
 
   function handleError(code: number, message: string) {
     // 处理401/403错误
@@ -84,6 +84,36 @@ export async function handleAlovaResponse(
       globalToast.error(message)
       throw new ApiError(message, code, data)
     }
+  }
+
+  // Handle arraybuffer responses (e.g., file downloads)
+  // When responseType is 'arraybuffer', successful responses are ArrayBuffer
+  // but error responses may still be JSON with Content-Type: application/json
+  if (data instanceof ArrayBuffer) {
+    const contentType = header?.['content-type'] || header?.['Content-Type'] || ''
+
+    // If the response is JSON (error from backend), parse it
+    if (contentType.includes('application/json')) {
+      try {
+        const textDecoder = new TextDecoder('utf-8')
+        const jsonString = textDecoder.decode(data)
+        const json = JSON.parse(jsonString) as ApiResponse
+
+        if (json.code >= 400) {
+          handleError(json.code, json.message || '请求失败')
+        }
+
+        // If code is 0 or 200 (success), still return the parsed JSON
+        return json
+      }
+      catch {
+        // If parsing fails, treat as regular binary response
+        return response
+      }
+    }
+
+    // For non-JSON arraybuffer responses (successful binary download), return the ArrayBuffer data
+    return data
   }
 
   // The data is already parsed by UniApp adapter
