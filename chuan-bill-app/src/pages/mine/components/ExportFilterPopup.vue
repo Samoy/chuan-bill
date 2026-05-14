@@ -35,46 +35,65 @@ async function handleExport() {
     return
   }
 
-  // TODO: 后端导出接口待实现，当前显示提示
-  toast.info('导出功能开发中')
-
-  /* 后端接口实现后启用以下代码
   loading.value = true
-
   try {
-    const params = {
-      ...filterData.value,
-      format: selectedFormat.value,
+    const params = { ...filterData.value, format: selectedFormat.value }
+    const res = await Apis.bill.exportBill({ data: params })
+
+    // res is ArrayBuffer (binary stream)
+    const format = selectedFormat.value
+    const ext = format === 'excel' ? '.xlsx' : '.pdf'
+    const fileName = `bills_${dayjs().format('YYYY-MM-DD')}${ext}`
+
+    // #ifdef H5
+    {
+      const blob = new Blob([res], {
+        type: format === 'excel'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/pdf',
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      a.click()
+      URL.revokeObjectURL(url)
     }
+    // #endif
 
-    const res = await Apis.bill.export({ data: params })
+    // #ifdef MP-WEIXIN
+    {
+      const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`
+      const fs = uni.getFileSystemManager()
+      fs.writeFileSync(filePath, res, 'binary')
+      await uni.openDocument({ filePath, showMenu: true })
+    }
+    // #endif
 
-    if (res.success && res.data?.downloadUrl) {
-      const downloadRes = await uni.downloadFile({ url: res.data.downloadUrl })
+    // #ifdef APP-PLUS
+    {
+      const filePath = `${plus.io.PRIVATE_DOC}/${fileName}`
+      const fs = plus.io.getFileSystemManager()
+      fs.writeFileSync(filePath, res, 'binary')
+      await uni.openDocument({ filePath, showMenu: true })
+    }
+    // #endif
 
-      if (downloadRes.statusCode === 200) {
-        await uni.openDocument({
-          filePath: downloadRes.tempFilePath,
-          showMenu: true,
-        })
-        toast.success('导出成功')
-        modelValue.value = false
-      }
-      else {
-        toast.error('下载失败')
-      }
+    toast.success('导出成功')
+    modelValue.value = false
+  }
+  catch (e: any) {
+    // If backend returned JSON error (not binary), parse it
+    if (e?.message) {
+      toast.error(e.message)
     }
     else {
-      toast.error(res.message || '导出失败')
+      toast.error('导出失败，请重试')
     }
-  }
-  catch {
-    toast.error('导出失败，请重试')
   }
   finally {
     loading.value = false
   }
-  */
 }
 </script>
 
