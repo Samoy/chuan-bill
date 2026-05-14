@@ -2,6 +2,7 @@ package com.samoy.chuanbillserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.samoy.chuanbillserver.config.PreferenceProperties;
 import com.samoy.chuanbillserver.dao.UserPreferenceMapper;
 import com.samoy.chuanbillserver.entity.UserPreference;
 import com.samoy.chuanbillserver.exception.BusinessException;
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2026-05-12
  */
 @Service
+@RequiredArgsConstructor
 public class UserPreferenceServiceImpl extends ServiceImpl<UserPreferenceMapper, UserPreference>
         implements IUserPreferenceService {
 
-    @Value("${preference.allowed-keys:}")
-    private List<String> allowedKeyList;
+    private final PreferenceProperties preferenceProperties;
 
     private Set<String> getAllowedKeys() {
-        return new HashSet<>(allowedKeyList);
+        return new HashSet<>(preferenceProperties.getAllowedKeys());
     }
 
     @Override
