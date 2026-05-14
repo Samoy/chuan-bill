@@ -263,6 +263,16 @@ export interface DeleteAccountDTO {
    */
   code: string;
 }
+export interface PreferenceSetDTO {
+  /**
+   * 偏好键名
+   */
+  key: string;
+  /**
+   * 偏好值
+   */
+  value: string;
+}
 export interface UpdateFamilyDTO {
   /**
    * 家庭ID
@@ -373,6 +383,36 @@ export interface UpdateBillDTO {
    */
   familyId?: string;
 }
+export interface ExportBillDTO {
+  /**
+   * 开始日期
+   */
+  startDate?: string;
+  /**
+   * 结束日期
+   */
+  endDate?: string;
+  /**
+   * 分类 ID
+   */
+  categoryId?: string;
+  /**
+   * 账单类型：income-收入，expense-支出，空字符串：全部
+   */
+  type?: string;
+  /**
+   * 支付方式 ID
+   */
+  paymentMethodId?: string;
+  /**
+   * 家庭 ID
+   */
+  familyId?: string;
+  /**
+   * 导出格式：excel 或 pdf
+   */
+  format: string;
+}
 export interface AddBillDTO {
   /**
    * 账单名称
@@ -463,22 +503,6 @@ export interface LoginByPasswordDTO {
    */
   password: string;
 }
-export interface PreferenceSetDTO {
-  /**
-   * 偏好设置键
-   */
-  key: string;
-  /**
-   * 偏好设置值
-   */
-  value: string;
-}
-export interface PreferenceDeleteDTO {
-  /**
-   * 偏好设置键
-   */
-  key: string;
-}
 export interface ResultVoid {
   code?: number;
   message?: string;
@@ -542,6 +566,13 @@ export interface ResultUserVO {
    * 用户信息
    */
   data?: UserVO;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultMapStringString {
+  code?: number;
+  message?: string;
+  data?: Record<string, string>;
   timestamp?: number;
   success?: boolean;
 }
@@ -752,13 +783,6 @@ export interface ResultFamilyJoinApplyVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface ResultInteger {
-  code?: number;
-  message?: string;
-  data?: number;
-  timestamp?: number;
-  success?: boolean;
-}
 export interface BillSyncDetailVO {
   /**
    * 批次中的索引（0-based）
@@ -802,6 +826,9 @@ export interface BatchSyncResultVO {
 export interface ResultBatchSyncResultVO {
   code?: number;
   message?: string;
+  /**
+   * 批量同步结果
+   */
   data?: BatchSyncResultVO;
   timestamp?: number;
   success?: boolean;
@@ -1215,13 +1242,6 @@ export interface ResultAiAnalysisVO {
   timestamp?: number;
   success?: boolean;
 }
-export interface ResultRecordStringString {
-  code?: number;
-  message?: string;
-  data?: Record<string, string>;
-  timestamp?: number;
-  success?: boolean;
-}
 declare global {
   interface Apis {
     user: {
@@ -1597,6 +1617,154 @@ declare global {
       hasPassword<Config extends Alova2MethodConfig<ResultBoolean>>(
         config?: Config
       ): Alova2Method<ResultBoolean, 'user.hasPassword', Config>;
+    };
+    preference: {
+      /**
+       * ---
+       *
+       * [POST] 设置偏好
+       *
+       * **path:** /preference/set
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 偏好键名
+       *   key: string
+       *   // 偏好值
+       *   value: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      set<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: PreferenceSetDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'preference.set', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取单个偏好
+       *
+       * **path:** /preference/get
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 偏好键名
+       *   key: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: string
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      get<
+        Config extends Alova2MethodConfig<ResultString> & {
+          params: {
+            /**
+             * 偏好键名
+             */
+            key: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultString, 'preference.get', Config>;
+      /**
+       * ---
+       *
+       * [GET] 获取所有偏好
+       *
+       * **path:** /preference/all
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: Record<string, string>
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      getAll<Config extends Alova2MethodConfig<ResultMapStringString>>(
+        config?: Config
+      ): Alova2Method<ResultMapStringString, 'preference.getAll', Config>;
+      /**
+       * ---
+       *
+       * [DELETE] 删除偏好
+       *
+       * **path:** /preference/delete
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 偏好键名
+       *   key: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      delete_<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          params: {
+            /**
+             * 偏好键名
+             */
+            key: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'preference.delete_', Config>;
     };
     message: {
       /**
@@ -2621,6 +2789,49 @@ declare global {
       /**
        * ---
        *
+       * [POST] 导出账单
+       *
+       * **path:** /bill/export
+       *
+       * ---
+       *
+       * **RequestBody**
+       * ```ts
+       * type RequestBody = {
+       *   // 开始日期
+       *   startDate?: string
+       *   // 结束日期
+       *   endDate?: string
+       *   // 分类 ID
+       *   categoryId?: string
+       *   // 账单类型：income-收入，expense-支出，空字符串：全部
+       *   type?: string
+       *   // 支付方式 ID
+       *   paymentMethodId?: string
+       *   // 家庭 ID
+       *   familyId?: string
+       *   // 导出格式：excel 或 pdf
+       *   format: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = null
+       * ```
+       */
+      exportBill<
+        Config extends Alova2MethodConfig<null> & {
+          data: ExportBillDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<null, 'bill.exportBill', Config>;
+      /**
+       * ---
+       *
        * [POST] 删除账单
        *
        * **path:** /bill/delete
@@ -2706,15 +2917,28 @@ declare global {
        * type Response = {
        *   code?: number
        *   message?: string
+       *   // 批量同步结果
        *   data?: {
+       *     // 总数
        *     total?: number
+       *     // 成功数
        *     successCount?: number
+       *     // 失败数
        *     failedCount?: number
+       *     // 状态：ALL_SUCCESS / PARTIAL_SUCCESS / ALL_FAILED
        *     status?: string
+       *     // 每条账单的同步详情
+       *     // [items] start
+       *     // 单条账单同步详情
+       *     // [items] end
        *     details?: Array<{
+       *       // 批次中的索引（0-based）
        *       index?: number
+       *       // 同步状态：SUCCESS / FAILED
        *       status?: string
+       *       // 成功时返回服务器生成的 ID
        *       billId?: string
+       *       // 失败时的错误原因
        *       reason?: string
        *     }>
        *   }
@@ -3445,154 +3669,6 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultTokenVO, 'auth.loginByPassword', Config>;
-    };
-    preference: {
-      /**
-       * ---
-       *
-       * [POST] 设置偏好
-       *
-       * **path:** /preference/set
-       *
-       * ---
-       *
-       * **RequestBody**
-       * ```ts
-       * type RequestBody = {
-       *   // 偏好设置键
-       *   key: string
-       *   // 偏好设置值
-       *   value: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: null
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      set<
-        Config extends Alova2MethodConfig<ResultVoid> & {
-          data: PreferenceSetDTO;
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultVoid, 'preference.set', Config>;
-      /**
-       * ---
-       *
-       * [DELETE] 删除偏好
-       *
-       * **path:** /preference/delete
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 偏好设置键
-       *   key: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: null
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      delete<
-        Config extends Alova2MethodConfig<ResultVoid> & {
-          params: {
-            /**
-             * 偏好设置键
-             */
-            key: string;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultVoid, 'preference.delete', Config>;
-      /**
-       * ---
-       *
-       * [GET] 获取偏好
-       *
-       * **path:** /preference/get
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 偏好设置键
-       *   key: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: string
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      get<
-        Config extends Alova2MethodConfig<ResultString> & {
-          params: {
-            /**
-             * 偏好设置键
-             */
-            key: string;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultString, 'preference.get', Config>;
-      /**
-       * ---
-       *
-       * [GET] 获取所有偏好
-       *
-       * **path:** /preference/all
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: Record<string, string>
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      getAll<Config extends Alova2MethodConfig<ResultRecordStringString>>(
-        config?: Config
-      ): Alova2Method<ResultRecordStringString, 'preference.getAll', Config>;
     };
     statistics: {
       /**
