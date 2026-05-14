@@ -47,66 +47,25 @@ onMounted(async () => {
   }
 })
 
-// 总开关变化
-function onMasterChange({ value }: { value: boolean }) {
-  if (!value) {
-    // 关闭总开关时，保存所有子开关为关闭状态
-    saveAllSettings()
-  }
-  else {
-    saveAllSettings()
-  }
-}
-
-// 保存所有设置
-async function saveAllSettings() {
+// 开关变化时保存
+async function onSettingChange(key:string, value: boolean | string) {
   try {
-    await Apis.preference.set({
+   await Apis.preference.set({
       data: {
-        key: 'notification.master.enabled',
-        value: String(settings.value.masterEnabled),
-      },
-    })
-    await Apis.preference.set({
-      data: {
-        key: 'notification.billReminder.enabled',
-        value: String(settings.value.billReminderEnabled),
-      },
-    })
-    await Apis.preference.set({
-      data: {
-        key: 'notification.billReminder.time',
-        value: settings.value.billReminderTime,
-      },
-    })
-    await Apis.preference.set({
-      data: {
-        key: 'notification.family.enabled',
-        value: String(settings.value.familyNotificationEnabled),
-      },
-    })
-    await Apis.preference.set({
-      data: {
-        key: 'notification.system.enabled',
-        value: String(settings.value.systemNotificationEnabled),
+        key,
+        value: String(value),
       },
     })
     toast.success('设置已保存')
-  }
-  catch {
+  }catch {
     toast.error('保存失败')
   }
-}
-
-// 子开关变化时保存
-function onSubSettingChange() {
-  saveAllSettings()
 }
 
 // 时间选择确认
 function onTimeConfirm({ value }: { value: number[] }) {
   settings.value.billReminderTime = `${String(value[0]).padStart(2, '0')}:${String(value[1]).padStart(2, '0')}`
-  saveAllSettings()
+  onSettingChange('notification.billReminder.time', settings.value.billReminderTime)
 }
 </script>
 
@@ -131,7 +90,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
             关闭后所有通知和提醒将被禁用
           </text>
         </view>
-        <wd-switch v-model="settings.masterEnabled" size="20px" @change="onMasterChange" />
+        <wd-switch v-model="settings.masterEnabled" size="20px" @change="onSettingChange('notification.master.enabled', settings.masterEnabled)" />
       </view>
 
       <!-- 系统通知 -->
@@ -148,7 +107,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
           v-model="settings.systemNotificationEnabled"
           :disabled="!settings.masterEnabled"
           size="20px"
-          @change="onSubSettingChange"
+          @change="onSettingChange('notification.system.enabled', settings.systemNotificationEnabled)"
         />
       </view>
 
@@ -184,7 +143,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
             v-model="settings.billReminderEnabled"
             :disabled="!settings.masterEnabled"
             size="20px"
-            @change="onSubSettingChange"
+            @change="onSettingChange('notification.billReminder.enabled', settings.billReminderEnabled)"
           />
         </view>
       </view>
@@ -203,7 +162,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
           v-model="settings.familyNotificationEnabled"
           :disabled="!settings.masterEnabled"
           size="20px"
-          @change="onSubSettingChange"
+          @change="onSettingChange('notification.family.enabled', settings.familyNotificationEnabled)"
         />
       </view>
     </view>
