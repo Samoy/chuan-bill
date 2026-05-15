@@ -27,7 +27,7 @@ watch(dateRange, (newVal) => {
     filterData.value.startDate = dayjs(newVal[0]).format('YYYY-MM-DD')
     filterData.value.endDate = dayjs(newVal[1]).format('YYYY-MM-DD')
   }
-}, { deep: true })
+}, { deep: true, immediate: true })
 
 // 导出
 async function handleExport() {
