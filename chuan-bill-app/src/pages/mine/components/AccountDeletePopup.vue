@@ -1,5 +1,8 @@
 <script setup lang="ts">
-defineOptions({ name: 'AccountDeleteModal' })
+defineOptions({ name: 'AccountDeleteModal', options: {
+  virtualHost: true,
+  styleIsolation: 'shared',
+} })
 
 const modelValue = defineModel<boolean>({ default: false })
 const userStore = useUserStore()

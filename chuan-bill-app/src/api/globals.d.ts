@@ -2823,12 +2823,12 @@ declare global {
        * ```
        */
       exportBill<
-        Config extends Alova2MethodConfig<null> & {
+        Config extends Alova2MethodConfig<ArrayBuffer> & {
           data: ExportBillDTO;
         }
       >(
         config: Config
-      ): Alova2Method<null, 'bill.exportBill', Config>;
+      ): Alova2Method<ArrayBuffer, 'bill.exportBill', Config>;
       /**
        * ---
        *
@@ -3183,7 +3183,7 @@ declare global {
             /**
              * 账单列表查询参数
              */
-            
+
             startDate?: string;
             endDate?: string;
             categoryId?: string;
@@ -3253,7 +3253,7 @@ declare global {
             /**
              * 账单月度统计参数
              */
-            
+
             month?: string;
             familyId?: string;
           };

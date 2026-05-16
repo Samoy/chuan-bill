@@ -4,6 +4,10 @@ import dayjs from 'dayjs'
 
 defineOptions({
   name: 'ExportFilterPopup',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
 })
 
 const modelValue = defineModel<boolean>({ default: false })
@@ -28,6 +32,24 @@ watch(dateRange, (newVal) => {
     filterData.value.endDate = dayjs(newVal[1]).format('YYYY-MM-DD')
   }
 }, { deep: true, immediate: true })
+
+async function saveFileToAPP(fileName: string, data: ArrayBuffer) {
+  return new Promise<PlusIoDirectoryEntry>((resolve, reject) => {
+    plus.io.requestFileSystem(plus.io.PUBLIC_DOCUMENTS, (fs) => {
+      fs.root?.getFile(fileName, { create: true }, (entry) => {
+        entry.createWriter((writer) => {
+          writer.writeAsBinary(uni.arrayBufferToBase64(data))
+          writer.onwrite = (res) => {
+            if (res.target) {
+              resolve(res.target)
+            }
+          }
+          writer.onerror = reject
+        }, reject)
+      }, reject)
+    }, reject)
+  })
+}
 
 // 导出
 async function handleExport() {
@@ -71,12 +93,7 @@ async function handleExport() {
     // #endif
 
     // #ifdef APP-PLUS
-    {
-      const filePath = `${plus.io.PRIVATE_DOC}/${fileName}`
-      const fs = plus.io.getFileSystemManager()
-      fs.writeFileSync(filePath, res, 'binary')
-      await uni.openDocument({ filePath, showMenu: true })
-    }
+    await saveFileToAPP(fileName, res)
     // #endif
 
     toast.success('导出成功')

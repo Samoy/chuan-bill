@@ -1,6 +1,10 @@
 <script setup lang="ts">
 defineOptions({
   name: 'NotificationSettingsPopup',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
 })
 
 const modelValue = defineModel<boolean>({ default: false })

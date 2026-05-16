@@ -1,6 +1,6 @@
 package com.samoy.chuanbillserver.utils;
 
-import cn.idev.excel.EasyExcel;
+import cn.idev.excel.FastExcel;
 import cn.idev.excel.annotation.ExcelProperty;
 import cn.idev.excel.annotation.write.style.ColumnWidth;
 import com.samoy.chuanbillserver.vo.BillVO;
@@ -72,6 +72,6 @@ public class ExcelExportUtil {
                 })
                 .toList();
 
-        EasyExcel.write(outputStream, BillExcelRow.class).sheet("账单").doWrite(rows);
+        FastExcel.write(outputStream, BillExcelRow.class).sheet("账单").doWrite(rows);
     }
 }

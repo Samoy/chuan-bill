@@ -4,4 +4,5 @@ nul
 .env
 temp/
 settings.local.json
-*/superpowers/
+superpowers/
+.qoder/

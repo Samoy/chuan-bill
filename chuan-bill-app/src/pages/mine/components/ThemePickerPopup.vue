@@ -3,6 +3,10 @@ import { themeColorOptions } from '@/composables/types/theme'
 
 defineOptions({
   name: 'ThemePickerPopup',
+  options: {
+    virtualHost: true,
+    styleIsolation: 'shared',
+  },
 })
 
 const modelValue = defineModel<boolean>({ default: false })
