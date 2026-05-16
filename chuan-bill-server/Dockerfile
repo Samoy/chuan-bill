@@ -14,11 +14,17 @@ RUN mvn clean package -DskipTests -B
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
+# 创建非 root 用户
+RUN addgroup -S app && adduser -S app -G app
+
 # 从构建阶段复制 JAR 文件
 COPY --from=builder /app/target/*.jar app.jar
+
+# 切换到非 root 用户
+USER app
 
 # 暴露端口
 EXPOSE 8080
 
-# 启动应用
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 启动应用，设置 JVM 容器感知参数
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
