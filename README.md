@@ -1,10 +1,6 @@
 # 小川记账 (Chuan Bill)
 
 <p align="center">
-  <img alt="logo" src="logo.png" width="200">
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license">
   <img src="https://img.shields.io/badge/Java-17-orange" alt="Java">
@@ -31,7 +27,7 @@
 | 前端 | uni-app 3.0 / Vue 3.4 / TypeScript 5.5 |
 | UI 组件 | wot-design-uni 1.14 / UnoCSS |
 | 后端 | Spring Boot 3.5 / Java 17 |
-| ORM | MyBatis-Plus 3.5 |
+| ORM | MyBatis-Plus 3.5.15 |
 | 认证 | Sa-Token 1.44 |
 | 数据库 | MySQL 8.0 + Redis 6.0 |
 | 部署 | Docker + Nginx |
