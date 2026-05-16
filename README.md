@@ -46,7 +46,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/chuan-bill.git
+git clone https://github.com/samoy/chuan-bill.git
 cd chuan-bill
 
 # 安装前端依赖
@@ -63,8 +63,10 @@ mvn spring-boot:run
 
 ### Docker 部署
 
+> Docker 部署配置将在后续版本中提供
+
 ```bash
-# 使用 docker-compose 一键部署
+# 使用 docker-compose 一键部署（即将支持）
 docker-compose up -d
 ```
 
