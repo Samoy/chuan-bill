@@ -52,13 +52,23 @@ mysql -u root -p chuan_bill < init.sql
 
 ### 配置
 
-```bash
-# 复制环境变量模板
-cp .env.example .env
+项目使用 Spring Profile 进行环境配置：
 
-# 编辑配置
-vim .env
+- `application.yaml` - 公共配置
+- `application-dev.yaml` - 开发环境配置
+- `application-prod.yaml` - 生产环境配置
+
+开发环境默认使用 `dev` profile，无需额外配置。如需切换环境，设置 `spring.profiles.active` 参数：
+
+```bash
+# 使用开发环境配置（默认）
+mvn spring-boot:run
+
+# 使用生产环境配置
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
+
+敏感信息通过环境变量注入，参考 `application-dev.yaml` 中的 `${VARIABLE_NAME:default}` 格式。
 
 ### 运行
 
