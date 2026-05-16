@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:chuan_bill}?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      password: ${REDIS_PASSWORD}
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+          max-wait: 3000ms
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+dashscope:
+  api-key: ${DASHSCOPE_API_KEY}
+  bill-recognition:
+    app-id: ${DASHSCOPE_BILL_RECOGNITION_APP_ID}
+  bill-analysis:
+    app-id: ${DASHSCOPE_BILL_ANALYSIS_APP_ID}
+
+wx:
+  miniapp:
+    appid: ${WX_MINIAPP_APPID}
+    secret: ${WX_MINIAPP_SECRET}
+
+qiniu:
+  access_key: ${QINIU_ACCESS_KEY}
+  secret_key: ${QINIU_SECRET_KEY}
+  bucket: ${QINIU_BUCKET}
+  cdn-domain: ${QINIU_CDN_DOMAIN}
+  endpoint: ${QINIU_ENDPOINT}

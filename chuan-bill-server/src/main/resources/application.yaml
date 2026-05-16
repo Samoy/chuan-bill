@@ -5,24 +5,6 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/chuan_bill?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:123456}
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      database: 0
-      password: ${REDIS_PASSWORD:}
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
-          max-wait: -1ms
   quartz:
     job-store-type: memory
 
@@ -41,34 +23,12 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 springdoc:
   api-docs:
     path: /v3/api-docs
-    enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
-dashscope:
-  api-key: ${DASHSCOPE_API_KEY}
-  bill-recognition:
-    app-id: ${DASHSCOPE_BILL_RECOGNITION_APP_ID}
-  bill-analysis:
-    app-id: ${DASHSCOPE_BILL_ANALYSIS_APP_ID}
-
-wx:
-  miniapp:
-    appid: ${WX_MINIAPP_APPID}
-    secret: ${WX_MINIAPP_SECRET}
-
-qiniu:
-  access_key: ${QINIU_ACCESS_KEY}
-  secret_key: ${QINIU_SECRET_KEY}
-  bucket: ${QINIU_BUCKET}
-  cdn-domain: ${QINIU_CDN_DOMAIN}
-  endpoint: ${QINIU_ENDPOINT}
 
 preference:
   allowed-keys:
