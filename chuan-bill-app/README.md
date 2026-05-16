@@ -1,10 +1,6 @@
 # 小川记账 - 前端
 
-<p align="center">
-  <img alt="logo" src="https://starter.wot-ui.cn/logo.svg" width="200">
-</p>
-
-<p align="center">
+<p>
   <img src="https://img.shields.io/badge/uni--app-3.0-brightgreen" alt="uni-app">
   <img src="https://img.shields.io/badge/Vue-3-brightgreen" alt="Vue">
   <img src="https://img.shields.io/badge/TypeScript-5.5-blue" alt="TypeScript">

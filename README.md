@@ -1,6 +1,6 @@
 # 小川记账 (Chuan Bill)
 
-<p align="center">
+<p>
   <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license">
   <img src="https://img.shields.io/badge/Java-17-orange" alt="Java">

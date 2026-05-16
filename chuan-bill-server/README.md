@@ -1,6 +1,6 @@
 # 小川记账 - 后端
 
-<p align="center">
+<p>
   <img src="https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen" alt="Spring Boot">
   <img src="https://img.shields.io/badge/Java-17-orange" alt="Java">
   <img src="https://img.shields.io/badge/MyBatis--Plus-3.5-blue" alt="MyBatis-Plus">
