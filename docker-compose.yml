@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./chuan-bill-server
+      dockerfile: Dockerfile
+    container_name: chuan-bill-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=chuan_bill
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+      - DASHSCOPE_BILL_RECOGNITION_APP_ID=${DASHSCOPE_BILL_RECOGNITION_APP_ID}
+      - DASHSCOPE_BILL_ANALYSIS_APP_ID=${DASHSCOPE_BILL_ANALYSIS_APP_ID}
+      - WX_MINIAPP_APPID=${WX_MINIAPP_APPID}
+      - WX_MINIAPP_SECRET=${WX_MINIAPP_SECRET}
+      - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
+      - QINIU_SECRET_KEY=${QINIU_SECRET_KEY}
+      - QINIU_BUCKET=${QINIU_BUCKET}
+      - QINIU_CDN_DOMAIN=${QINIU_CDN_DOMAIN}
+      - QINIU_ENDPOINT=${QINIU_ENDPOINT}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - chuan-bill-network
+
+  frontend:
+    build:
+      context: ./chuan-bill-app
+      dockerfile: Dockerfile
+    container_name: chuan-bill-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - chuan-bill-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: chuan-bill-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=chuan_bill
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./chuan-bill-server/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chuan-bill-network
+
+  redis:
+    image: redis:6-alpine
+    container_name: chuan-bill-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - chuan-bill-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  chuan-bill-network:
+    driver: bridge
