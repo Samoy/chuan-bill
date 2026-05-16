@@ -46,7 +46,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/samoy/chuan-bill.git
+git clone https://codeup.aliyun.com/tryhard/chuan-bill.git
 cd chuan-bill
 
 # 安装前端依赖
@@ -76,8 +76,6 @@ docker-compose up -d
 chuan-bill/
 ├── chuan-bill-app/          # 前端项目 (uni-app)
 ├── chuan-bill-server/       # 后端项目 (Spring Boot)
-├── docs/                    # 项目文档
-├── docker-compose.yml       # Docker 编排配置
 └── package.json             # 根目录 package.json
 ```
 
