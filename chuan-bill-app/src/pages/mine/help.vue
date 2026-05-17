@@ -116,7 +116,7 @@ const faqCategories = [
       },
       {
         question: '手机号可以更换吗？',
-        answer: '该功能正在开发中，请关注后续版本更新。',
+        answer: '可以，登录后进入「我的」→「账号与安全」→「手机号」，支持密码修改或验证码修改两种方式。',
       },
       {
         question: '登录不了怎么办？',
@@ -130,7 +130,7 @@ const faqCategories = [
     list: [
       {
         question: '怎么切换主题？',
-        answer: '「我的」→「主题设置」→ 选择跟随系统或手动切换深色/浅色主题。还可自定义主题色。',
+        answer: '「我的」→「主题切换」→ 选择跟随系统或手动切换深色/浅色主题。还可自定义主题色。',
       },
       {
         question: '怎么修改头像和昵称？',
@@ -221,22 +221,20 @@ function goToAiChat() {
       <!-- 分类标签 -->
       <scroll-view
         scroll-x
-        class="mb-3 whitespace-nowrap"
+        class="mb-3 min-w-full whitespace-nowrap"
         :show-scrollbar="false"
       >
-        <view class="inline-flex gap-2">
-          <view
-            v-for="(cat, ci) in faqCategories"
-            :key="ci"
-            class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition-colors"
-            :class="activeCategory === ci
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'"
-            @click="activeCategory = ci"
-          >
-            <view :class="cat.icon" class="h-3.5 w-3.5" />
-            <text>{{ cat.label }}</text>
-          </view>
+        <view
+          v-for="(cat, ci) in faqCategories"
+          :key="ci"
+          class="mr-2 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs transition-colors"
+          :class="activeCategory === ci
+            ? 'bg-primary text-white'
+            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'"
+          @click="activeCategory = ci"
+        >
+          <view :class="cat.icon" class="h-3.5 w-3.5" />
+          <text>{{ cat.label }}</text>
         </view>
       </scroll-view>
       <view class="rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
@@ -279,7 +277,7 @@ function goToAiChat() {
         还有其他问题？
       </text>
       <text class="mt-1 block text-sm text-primary">
-        反馈邮箱：feedback@chuanbill.com
+        反馈邮箱：chuanbill@samoy.site
       </text>
     </view>
   </view>

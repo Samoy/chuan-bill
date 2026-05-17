@@ -63,7 +63,7 @@ const baseContent = `
 
   <p style="font-size: 15px; font-weight: bold; margin-top: 20px;">九、联系方式</p>
   <p>如您对本协议有任何疑问或建议，可通过以下方式联系我们：</p>
-  <p style="padding-left: 16px;">邮箱：feedback@chuanbill.com</p>
+  <p style="padding-left: 16px;">邮箱：chuanbill@samoy.site</p>
 </div>
 `
 const from = ref('')

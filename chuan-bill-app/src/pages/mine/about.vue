@@ -114,7 +114,7 @@ const openSourceLibs = [
         <view class="flex items-center gap-2">
           <view class="i-lucide:mail h-4 w-4 text-gray-400" />
           <text class="text-sm">
-            feedback@chuanbill.com
+            chuanbill@samoy.site
           </text>
         </view>
       </view>
