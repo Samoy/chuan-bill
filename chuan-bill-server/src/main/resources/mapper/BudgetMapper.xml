@@ -2,4 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.samoy.chuanbillserver.dao.BudgetMapper">
 
+    <select id="getMonthlyExpense" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(amount), 0)
+        FROM t_bill
+        WHERE user_id = #{userId}
+          AND type = 'expense'
+          AND deleted = 0
+          AND DATE_FORMAT(time, '%Y-%m') = #{month}
+    </select>
+
 </mapper>

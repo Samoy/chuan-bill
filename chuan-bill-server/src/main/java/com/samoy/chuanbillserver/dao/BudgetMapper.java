@@ -2,13 +2,13 @@ package com.samoy.chuanbillserver.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.samoy.chuanbillserver.entity.Budget;
+import java.math.BigDecimal;
+import org.apache.ibatis.annotations.Param;
 
-/**
- * <p>
- * 预算表 Mapper 接口
- * </p>
- *
- * @author Samoy
- * @since 2026-03-14
- */
-public interface BudgetMapper extends BaseMapper<Budget> {}
+public interface BudgetMapper extends BaseMapper<Budget> {
+
+    /**
+     * 实时计算用户指定月份的支出总额
+     */
+    BigDecimal getMonthlyExpense(@Param("userId") String userId, @Param("month") String month);
+}
