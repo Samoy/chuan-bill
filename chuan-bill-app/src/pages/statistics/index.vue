@@ -17,6 +17,7 @@ definePage({
 setupEcharts()
 
 const statisticsStore = useStatisticsStore()
+const budgetStore = useBudgetStore()
 const user = useUserStore()
 
 // 当前选中的月份
@@ -60,6 +61,9 @@ onShow(() => {
     statisticsStore.setAnalysisContext(AiSuggestionType.USER)
     statisticsStore.fetchAll(currentMonth.value)
     statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+    if (user.isLoggedIn) {
+      budgetStore.fetchBudget(currentMonth.value)
+    }
   })
 })
 
@@ -67,12 +71,18 @@ onShow(() => {
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
   statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, month)
+  if (user.isLoggedIn) {
+    budgetStore.fetchBudget(month)
+  }
 }, { immediate: true })
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
   statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  if (user.isLoggedIn) {
+    budgetStore.fetchBudget(currentMonth.value)
+  }
 })
 </script>
 
@@ -136,6 +146,9 @@ watch(() => user.isLoggedIn, () => {
         </view>
       </view>
     </view>
+
+    <!-- 预算卡片 -->
+    <BudgetCard :month="currentMonth" />
 
     <!-- 分类饼图 -->
     <view class="mx-3">
