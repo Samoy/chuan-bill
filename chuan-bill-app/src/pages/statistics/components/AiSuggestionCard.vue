@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { AI_SUGGESTION_TYPE_FAMILY } from '@/common/constant'
-import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
+import { AiSuggestionType } from '@/constant/ai'
 
 defineOptions({
   name: 'AiSuggestionCard',
@@ -9,7 +8,7 @@ defineOptions({
 
 const props = defineProps<{
   month: string
-  analysisType?: typeof AI_SUGGESTION_TYPE_FAMILY | typeof AI_SUGGESTION_TYPE_USER
+  analysisType?: typeof AiSuggestionType.FAMILY | typeof AiSuggestionType.USER
   familyId?: string
 }>()
 
@@ -20,12 +19,12 @@ const statisticsStore = useStatisticsStore()
 
 function handleLogin() {
   user.requireAuth(() => {
-    statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month, props.familyId)
+    statisticsStore.fetchAiSuggestion(props.analysisType || AiSuggestionType.USER, props.month, props.familyId)
   })
 }
 
 function fetchAnalysis() {
-  statisticsStore.fetchAiSuggestion(props.analysisType || AI_SUGGESTION_TYPE_USER, props.month, props.familyId, true)
+  statisticsStore.fetchAiSuggestion(props.analysisType || AiSuggestionType.USER, props.month, props.familyId, true)
 }
 
 const remainingLabel = computed(() => {

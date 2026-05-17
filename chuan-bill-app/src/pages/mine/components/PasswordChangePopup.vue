@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SmsScene } from '@/constant/sms'
+
 defineOptions({
   name: 'PasswordChangeModal',
   options: {
@@ -108,7 +110,7 @@ async function sendCodeToCurrentPhone() {
 
   sending.value = true
   try {
-    const res = await Apis.user.getPhoneCode()
+    const res = await Apis.user.getPhoneCode({ params: { scene: SmsScene.RESET_PASSWORD } })
     if (res.success) {
       toast.success('验证码已发送')
       countdown.value = 60

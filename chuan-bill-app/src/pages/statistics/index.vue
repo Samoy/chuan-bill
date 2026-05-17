@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
+import { AiSuggestionType } from '@/constant/ai'
 import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import CategoryChart from './components/CategoryChart.vue'
@@ -57,22 +57,22 @@ function onMonthSelect({ value }: { value: string }) {
 
 onShow(() => {
   nextTick(() => {
-    statisticsStore.setAnalysisContext(AI_SUGGESTION_TYPE_USER)
+    statisticsStore.setAnalysisContext(AiSuggestionType.USER)
     statisticsStore.fetchAll(currentMonth.value)
-    statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_USER, currentMonth.value)
+    statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
   })
 })
 
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
-  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_USER, month)
+  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, month)
 }, { immediate: true })
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(AI_SUGGESTION_TYPE_USER, currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
 })
 </script>
 

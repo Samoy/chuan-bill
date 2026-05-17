@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { BillVO } from '@/api/globals'
-import { SOURCE_MAP } from '@/common/constant'
+import { SOURCE_MAP } from '@/constant/bill'
 
 defineOptions({
   name: 'BillSection',

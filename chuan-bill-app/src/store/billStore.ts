@@ -2,7 +2,7 @@ import type { AddBillDTO, BillMonthlyStatsVO, BillVO, CategoryVO, PaymentMethodV
 import dayjs from 'dayjs'
 import { add, subtract } from 'mathjs'
 import { v4 as uuid } from 'uuid'
-import { LOCAL_PAY_CATEGORY_LIST, LOCAL_PAYMENT_METHOD_LIST } from '@/common/constant'
+import { LOCAL_PAY_CATEGORY_LIST, LOCAL_PAYMENT_METHOD_LIST } from '@/constant/bill'
 
 // 扩展 BillVO 类型，添加同步状态
 interface LocalBillVO extends BillVO {

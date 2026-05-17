@@ -19,3 +19,5 @@ dist
 *.njsproj
 *.sln
 *.sw?
+
+globals.d.d.ts.bak.*

@@ -1,6 +1,6 @@
 ---
 name: alova-api-fix
-description: Fix Alova API generated type definitions for Chuan Bill project. Use when working with src/api/globals.d.ts after running pnpm alova-gen to fix (1) amount/money fields from number to string type to match backend @JsonFormat annotation, (2) DTO field duplications in params where @ModelAttribute expands DTO to flat query parameters. Must be used immediately after pnpm alova-gen generates new API definitions.
+description: Fix Alova API generated type definitions for Chuan Bill project. Use when working with src/api/globals.d.ts after running pnpm alova-gen to fix (1) amount/money fields from number to string type to match backend @JsonFormat annotation, (2) DTO field duplications in params where @ModelAttribute expands DTO to flat query parameters, (3) binary response types where void-returning file download endpoints incorrectly generate null instead of ArrayBuffer. Must be used immediately after pnpm alova-gen generates new API definitions.
 ---
 
 # Alova API Fix
@@ -14,7 +14,25 @@ description: Fix Alova API generated type definitions for Chuan Bill project. Us
 
 **涉及字段**: `amount`, `minAmount`, `maxAmount`, `balance`, `income`, `expense`, `budget`, `price`, `money`, `totalAmount`, `totalIncome`, `totalExpense`
 
-### 问题 2: DTO 参数重复
+### 问题 2: 二进制响应类型错误
+后端文件下载接口（如 `exportBill`）返回类型为 `void`，实际通过 `HttpServletResponse` 写入二进制流。alova-gen 为 `void` 生成 `null` 泛型，但前端需要 `ArrayBuffer` 才能正确处理文件下载。
+
+**涉及接口**: `bill.exportBill`（可通过 `BINARY_RESPONSE_METHODS` 列表扩展）
+
+**示例**:
+```typescript
+// 修复前（alova-gen 生成）
+exportBill<Config extends Alova2MethodConfig<null> & { ... }>(
+  config: Config
+): Alova2Method<null, 'bill.exportBill', Config>;
+
+// 修复后（正确）
+exportBill<Config extends Alova2MethodConfig<ArrayBuffer> & { ... }>(
+  config: Config
+): Alova2Method<ArrayBuffer, 'bill.exportBill', Config>;
+```
+
+### 问题 3: DTO 参数重复
 后端使用 `@ModelAttribute` 注解将 DTO 字段展开为 query 参数。虽然 `alova.config.ts` 中的 `handleApi` 函数已配置为展开 DTO 字段，但生成的代码仍然保留了原始的 DTO 对象字段，导致 params 中同时存在 DTO 对象和展开的扁平字段。
 
 **示例**:
@@ -55,7 +73,8 @@ python .claude/skills/alova-api-fix/scripts/fix_alova_api.py src/api/globals.d.t
 1. 提取所有 DTO 接口定义
 2. 将所有金额字段从 `number` 改为 `string`
 3. 删除 params 中重复的 DTO 对象字段（仅当字段已展开时才删除）
-4. 自动创建带时间戳的备份文件
+4. 修复文件下载接口的二进制响应类型（`null` → `ArrayBuffer`）
+5. 自动创建带时间戳的备份文件
 
 ### 步骤 3: 验证修复结果
 
@@ -66,6 +85,12 @@ pnpm type-check
 ## 手动修复（备选）
 
 如果自动脚本无法解决问题，可以手动修复：
+
+### 手动修复二进制响应类型
+
+在 `globals.d.ts` 中搜索 `Alova2MethodConfig<null>` 和 `Alova2Method<null,`，找到文件下载相关的接口（如 `exportBill`），将 `null` 替换为 `ArrayBuffer`。
+
+**匹配模式**: `Alova2MethodConfig<null>` → `Alova2MethodConfig<ArrayBuffer>`，`Alova2Method<null,` → `Alova2Method<ArrayBuffer,`
 
 ### 手动修复金额字段
 
@@ -98,6 +123,7 @@ pnpm type-check
 
 - [ ] 运行 `python .claude/skills/alova-api-fix/scripts/fix_alova_api.py` 成功
 - [ ] 所有金额相关字段为 `string` 类型
+- [ ] 二进制响应接口（如 `exportBill`）的泛型为 `ArrayBuffer` 而非 `null`
 - [ ] Query 参数中的 DTO 对象已删除，保留展开的扁平字段
 - [ ] Body 参数中的 DTO 对象已保留（不受影响）
 - [ ] 运行 `pnpm type-check` 无错误
@@ -141,4 +167,5 @@ handleApi: (apiDescriptor) => {
 
 - 后端金额格式化：`@JsonFormat(shape = JsonFormat.Shape.STRING)`
 - 后端 DTO 展开：`@ModelAttribute` 注解
+- 后端文件导出：`BillController.exportBill()` 使用 `HttpServletResponse` 写入二进制流
 - 备份文件：生成前自动备份到 `src/api/globals.d.ts.bak.{timestamp}`

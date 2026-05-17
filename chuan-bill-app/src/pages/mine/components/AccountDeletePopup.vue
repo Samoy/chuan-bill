@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SmsScene } from '@/constant/sms'
+
 defineOptions({ name: 'AccountDeleteModal', options: {
   virtualHost: true,
   styleIsolation: 'shared',
@@ -38,7 +40,7 @@ async function sendCode() {
     return
   sending.value = true
   try {
-    const res = await Apis.user.getPhoneCode()
+    const res = await Apis.user.getPhoneCode({ params: { scene: SmsScene.LOGIN } })
     if (res.success) {
       toast.success('验证码已发送')
       countdown.value = 60

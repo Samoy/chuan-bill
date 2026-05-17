@@ -25,7 +25,8 @@ export default {
   'user.updatePasswordByOld': ['POST', '/user/password/update-by-old'],
   'user.updatePasswordByCode': ['POST', '/user/password/update-by-code'],
   'user.deleteAccount': ['POST', '/user/account/delete'],
-  'preference.set': ['POST', '/preference/set'],
+  'preference.setPreference': ['POST', '/preference/set'],
+  'preference.deletePreference': ['POST', '/preference/delete'],
   'message.markAsRead': ['POST', '/message/mark-read'],
   'message.markAllAsRead': ['POST', '/message/mark-all-read'],
   'file.uploadTempFile': ['POST', '/file/temp/upload'],
@@ -55,8 +56,8 @@ export default {
   'statistics.getMembersStats': ['GET', '/statistics/members-bill'],
   'statistics.getDailyTrend': ['GET', '/statistics/daily-trend'],
   'statistics.getCategoryStats': ['GET', '/statistics/category'],
-  'preference.get': ['GET', '/preference/get'],
-  'preference.getAll': ['GET', '/preference/all'],
+  'preference.getPreference': ['GET', '/preference/get'],
+  'preference.getAllPreference': ['GET', '/preference/all'],
   'message.getUnreadCount': ['GET', '/message/unread-count'],
   'message.getMessageList': ['GET', '/message/page-list'],
   'file.getUploadToken': ['GET', '/file/upload-token'],
@@ -71,6 +72,5 @@ export default {
   'bill.getCategories': ['GET', '/bill/categories'],
   'ai.text': ['GET', '/ai/text'],
   'ai.ocr': ['GET', '/ai/ocr'],
-  'ai.analysis': ['GET', '/ai/analysis'],
-  'preference.delete_': ['DELETE', '/preference/delete']
+  'ai.analysis': ['GET', '/ai/analysis']
 };

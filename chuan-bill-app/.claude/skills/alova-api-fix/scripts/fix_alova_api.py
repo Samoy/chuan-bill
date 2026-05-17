@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
 Alova API 生成文件自动修复脚本
-修复两个问题：
+修复三个问题：
 1. 金额字段类型：将 number 转换为 string（匹配后端 @JsonFormat(shape = JsonFormat.Shape.STRING)）
 2. DTO 参数重复：删除 params 中的 DTO 对象字段（后端 @ModelAttribute 已展开为扁平字段）
+3. 二进制响应类型：将文件下载接口的 null 泛型修复为 ArrayBuffer（后端通过 HttpServletResponse 写入二进制流）
 
 用法：
     python fix_alova_api.py [path/to/globals.d.ts]
@@ -141,6 +142,37 @@ def fix_dto_params(content: str, dto_definitions: dict) -> tuple[str, list]:
     return content, changes
 
 
+# 后端返回二进制数据的接口（void 返回类型 + HttpServletResponse）
+# alova-gen 会为 void 生成 null，但这些接口实际返回文件流，应为 ArrayBuffer
+BINARY_RESPONSE_METHODS = [
+    'bill.exportBill',
+]
+
+
+def fix_binary_response_types(content: str) -> tuple[str, list]:
+    """修复二进制响应接口的类型：null -> ArrayBuffer"""
+    changes = []
+
+    for method in BINARY_RESPONSE_METHODS:
+        module, name = method.split('.')
+        # 匹配方法定义块中的 null 泛型
+        # 示例: Alova2MethodConfig<null>  ->  Alova2MethodConfig<ArrayBuffer>
+        #       Alova2Method<null, 'bill.exportBill'  ->  Alova2Method<ArrayBuffer, 'bill.exportBill'
+        method_escaped = re.escape(method)
+        replacements = [
+            (r'(Alova2MethodConfig<)null(>)', r'\1ArrayBuffer\2'),
+            (rf"(Alova2Method<)null(,\s*'{method_escaped}')", r'\1ArrayBuffer\2'),
+        ]
+
+        for pattern, replacement in replacements:
+            new_content, count = re.subn(pattern, replacement, content)
+            if count > 0:
+                changes.append(f"{method}: null -> ArrayBuffer ({count} 处)")
+                content = new_content
+
+    return content, changes
+
+
 def fix_api_definitions(file_path: str) -> tuple[str, list]:
     """修复 apiDefinitions.ts 中的重复条目"""
     path = Path(file_path)
@@ -233,6 +265,16 @@ def main():
     else:
         print("  无需修复 DTO 参数")
 
+    # 步骤 3.5: 修复二进制响应类型
+    print("\n[步骤 3.5] 修复二进制响应类型 (null -> ArrayBuffer)...")
+    content, binary_changes = fix_binary_response_types(content)
+    if binary_changes:
+        print("  变更:")
+        for change in binary_changes:
+            print(f"    [OK] {change}")
+    else:
+        print("  无需修复二进制响应类型")
+
     # 步骤 4: 写回文件
     if content != original_content:
         # 创建备份
@@ -247,7 +289,7 @@ def main():
         print("[OK] 修复完成!")
         print(f"  备份文件: {backup_path}")
 
-        total_changes = len(amount_changes) + len(dto_changes)
+        total_changes = len(amount_changes) + len(dto_changes) + len(binary_changes)
         print(f"  共 {total_changes} 项变更")
     else:
         print("\n" + "=" * 50)

@@ -503,17 +503,17 @@ export interface LoginByPasswordDTO {
    */
   password: string;
 }
-export interface ResultVoid {
-  code?: number;
-  message?: string;
-  data?: null;
-  timestamp?: number;
-  success?: boolean;
-}
 export interface ResultBoolean {
   code?: number;
   message?: string;
   data?: boolean;
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultVoid {
+  code?: number;
+  message?: string;
+  data?: null;
   timestamp?: number;
   success?: boolean;
 }
@@ -1379,6 +1379,16 @@ declare global {
        *
        * ---
        *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 验证码场景
+       *   scene: string
+       * }
+       * ```
+       *
+       * ---
+       *
        * **Response**
        * ```ts
        * type Response = {
@@ -1390,8 +1400,17 @@ declare global {
        * }
        * ```
        */
-      getPhoneCode<Config extends Alova2MethodConfig<ResultVoid>>(
-        config?: Config
+      getPhoneCode<
+        Config extends Alova2MethodConfig<ResultVoid> & {
+          params: {
+            /**
+             * 验证码场景
+             */
+            scene: string;
+          };
+        }
+      >(
+        config: Config
       ): Alova2Method<ResultVoid, 'user.getPhoneCode', Config>;
       /**
        * ---
@@ -1651,13 +1670,55 @@ declare global {
        * }
        * ```
        */
-      set<
+      setPreference<
         Config extends Alova2MethodConfig<ResultBoolean> & {
           data: PreferenceSetDTO;
         }
       >(
         config: Config
-      ): Alova2Method<ResultBoolean, 'preference.set', Config>;
+      ): Alova2Method<ResultBoolean, 'preference.setPreference', Config>;
+      /**
+       * ---
+       *
+       * [POST] 删除偏好
+       *
+       * **path:** /preference/delete
+       *
+       * ---
+       *
+       * **Query Parameters**
+       * ```ts
+       * type QueryParameters = {
+       *   // 偏好键名
+       *   key: string
+       * }
+       * ```
+       *
+       * ---
+       *
+       * **Response**
+       * ```ts
+       * type Response = {
+       *   code?: number
+       *   message?: string
+       *   data?: boolean
+       *   timestamp?: number
+       *   success?: boolean
+       * }
+       * ```
+       */
+      deletePreference<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          params: {
+            /**
+             * 偏好键名
+             */
+            key: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'preference.deletePreference', Config>;
       /**
        * ---
        *
@@ -1688,7 +1749,7 @@ declare global {
        * }
        * ```
        */
-      get<
+      getPreference<
         Config extends Alova2MethodConfig<ResultString> & {
           params: {
             /**
@@ -1699,7 +1760,7 @@ declare global {
         }
       >(
         config: Config
-      ): Alova2Method<ResultString, 'preference.get', Config>;
+      ): Alova2Method<ResultString, 'preference.getPreference', Config>;
       /**
        * ---
        *
@@ -1720,51 +1781,9 @@ declare global {
        * }
        * ```
        */
-      getAll<Config extends Alova2MethodConfig<ResultMapStringString>>(
+      getAllPreference<Config extends Alova2MethodConfig<ResultMapStringString>>(
         config?: Config
-      ): Alova2Method<ResultMapStringString, 'preference.getAll', Config>;
-      /**
-       * ---
-       *
-       * [DELETE] 删除偏好
-       *
-       * **path:** /preference/delete
-       *
-       * ---
-       *
-       * **Query Parameters**
-       * ```ts
-       * type QueryParameters = {
-       *   // 偏好键名
-       *   key: string
-       * }
-       * ```
-       *
-       * ---
-       *
-       * **Response**
-       * ```ts
-       * type Response = {
-       *   code?: number
-       *   message?: string
-       *   data?: boolean
-       *   timestamp?: number
-       *   success?: boolean
-       * }
-       * ```
-       */
-      delete_<
-        Config extends Alova2MethodConfig<ResultBoolean> & {
-          params: {
-            /**
-             * 偏好键名
-             */
-            key: string;
-          };
-        }
-      >(
-        config: Config
-      ): Alova2Method<ResultBoolean, 'preference.delete_', Config>;
+      ): Alova2Method<ResultMapStringString, 'preference.getAllPreference', Config>;
     };
     message: {
       /**

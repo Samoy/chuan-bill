@@ -1,9 +1,11 @@
+// 账单来源
 export const SOURCE_MAP = {
   manual: '手动添加',
   ocr: '图片识别',
   voice: '语音输入',
 }
 
+// 支付方式列表
 export const LOCAL_PAYMENT_METHOD_LIST = [
   {
     id: 'pay_001',
@@ -49,6 +51,7 @@ export const LOCAL_PAYMENT_METHOD_LIST = [
   },
 ]
 
+// 消费类型列表
 export const LOCAL_PAY_CATEGORY_LIST = [
   {
     id: 'cat_exp_001',
@@ -179,6 +182,3 @@ export const LOCAL_PAY_CATEGORY_LIST = [
     isDefault: true,
   },
 ]
-
-export const AI_SUGGESTION_TYPE_USER = 1
-export const AI_SUGGESTION_TYPE_FAMILY = 2

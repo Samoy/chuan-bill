@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SmsScene } from '@/constant/sms'
+
 defineOptions({
   name: 'PhoneChangeModal',
   options: {
@@ -115,7 +117,7 @@ async function sendCodeToOldPhone() {
 
   oldPhoneSending.value = true
   try {
-    const res = await Apis.user.getPhoneCode()
+    const res = await Apis.user.getPhoneCode({ params: { scene: SmsScene.CHANGE_BIND_PHONE } })
     if (res.success) {
       toast.success('验证码已发送')
       oldPhoneCountdown.value = 60
@@ -150,7 +152,7 @@ async function sendCodeToNewPhone(phone: string) {
 
   newPhoneSending.value = true
   try {
-    const res = await Apis.auth.sendCode({ data: { phone } })
+    const res = await Apis.user.getPhoneCode({ params: { scene: SmsScene.BIND_PHONE } })
     if (res.success) {
       toast.success('验证码已发送')
       newPhoneCountdown.value = 60

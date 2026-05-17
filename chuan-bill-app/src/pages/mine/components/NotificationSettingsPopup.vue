@@ -25,7 +25,7 @@ const timeValue = ref('20:00')
 // 加载设置
 onMounted(async () => {
   try {
-    const res = await Apis.preference.getAll()
+    const res = await Apis.preference.getAllPreference()
     if (res.success && res.data) {
       const prefs = res.data
       if (prefs['notification.master.enabled'] !== undefined) {
@@ -54,7 +54,7 @@ onMounted(async () => {
 // 开关变化时保存
 async function onSettingChange(key: string, value: boolean | string) {
   try {
-    await Apis.preference.set({
+    await Apis.preference.setPreference({
       data: {
         key,
         value: String(value),

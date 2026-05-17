@@ -1,6 +1,8 @@
 package com.samoy.chuanbillserver.utils;
 
 import com.aliyun.auth.credentials.provider.DefaultCredentialProvider;
+import com.aliyun.auth.credentials.provider.EnvironmentVariableCredentialProvider;
+import com.aliyun.auth.credentials.provider.SystemPropertiesCredentialProvider;
 import com.aliyun.sdk.service.dypnsapi20170525.AsyncClient;
 import com.aliyun.sdk.service.dypnsapi20170525.models.SendSmsVerifyCodeRequest;
 import com.aliyun.sdk.service.dypnsapi20170525.models.SendSmsVerifyCodeResponse;
@@ -23,7 +25,10 @@ import org.springframework.stereotype.Component;
 public class SmsUtil {
 
     public void sendSms(SmsScene smsScene, String phone, String code) throws ExecutionException, InterruptedException {
-        DefaultCredentialProvider provider = DefaultCredentialProvider.builder().build();
+        DefaultCredentialProvider provider = DefaultCredentialProvider.builder()
+                .customizeProviders(
+                        SystemPropertiesCredentialProvider.create(), EnvironmentVariableCredentialProvider.create())
+                .build();
 
         try (AsyncClient client = AsyncClient.builder()
                 .region("cn-hangzhou")

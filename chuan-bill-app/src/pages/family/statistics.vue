@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AI_SUGGESTION_TYPE_FAMILY } from '@/common/constant'
+import { AI_SUGGESTION_TYPE_FAMILY } from '@/constant/ai'
 import AiSuggestionCard from '@/pages/statistics/components/AiSuggestionCard.vue'
 import { setupEcharts } from '../../utils/echarts-setup'
 import CategoryChart from '../statistics/components/CategoryChart.vue'

@@ -1,8 +1,7 @@
 import type { BillMonthlyStatsVO } from '@/api/globals'
-import type { AI_SUGGESTION_TYPE_FAMILY } from '@/common/constant'
 import dayjs from 'dayjs'
 import { add, divide, multiply } from 'mathjs'
-import { AI_SUGGESTION_TYPE_USER } from '@/common/constant'
+import { AiSuggestionType } from '@/constant/ai'
 
 interface CategoryStatItem {
   categoryId: string
@@ -12,12 +11,10 @@ interface CategoryStatItem {
   percentage: number
 }
 
-type AnalysisType = typeof AI_SUGGESTION_TYPE_USER | typeof AI_SUGGESTION_TYPE_FAMILY
-
 export const useStatisticsStore = defineStore('statistics', () => {
   const user = useUserStore()
   const billStore = useBillStore()
-  const currentAnalysisType = ref<AnalysisType>(AI_SUGGESTION_TYPE_USER)
+  const currentAnalysisType = ref<AiSuggestionType>(AiSuggestionType.USER)
   const currentFamilyId = ref<string>()
 
   const overview = ref<BillMonthlyStatsVO | null>(null)
@@ -31,7 +28,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
   const trendLoading = ref(false)
   const aiLoading = ref(false)
 
-  function setAnalysisContext(type: AnalysisType, familyId?: string) {
+  function setAnalysisContext(type: AiSuggestionType, familyId?: string) {
     if (type !== currentAnalysisType.value || familyId !== currentFamilyId.value) {
       reset()
       currentAnalysisType.value = type
@@ -180,7 +177,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
    * @param familyId 家庭id
    * @param regenerate 是否重新生成
    */
-  async function fetchAiSuggestion(analysisType: AnalysisType, month: string, familyId?: string, regenerate = false) {
+  async function fetchAiSuggestion(analysisType: AiSuggestionType, month: string, familyId?: string, regenerate = false) {
     if (!user.isLoggedIn)
       return
     aiLoading.value = true
@@ -208,7 +205,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
   /**
    * 获取缓存的AI建议（不触发AI生成，无缓存时返回空）
    */
-  async function fetchAiSuggestionCached(analysisType: AnalysisType, month: string, familyId?: string) {
+  async function fetchAiSuggestionCached(analysisType: AiSuggestionType, month: string, familyId?: string) {
     if (!user.isLoggedIn)
       return
     try {
