@@ -8,9 +8,9 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MYSQL_DATABASE=chuan_bill
-      - MYSQL_USERNAME=root
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -25,6 +25,8 @@ services:
       - QINIU_BUCKET=${QINIU_BUCKET}
       - QINIU_CDN_DOMAIN=${QINIU_CDN_DOMAIN}
       - QINIU_ENDPOINT=${QINIU_ENDPOINT}
+      - ALIBABA_CLOUD_ACCESS_KEY_ID=${ALIBABA_CLOUD_ACCESS_KEY_ID}
+      - ALIBABA_CLOUD_ACCESS_KEY_SECRET=${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s

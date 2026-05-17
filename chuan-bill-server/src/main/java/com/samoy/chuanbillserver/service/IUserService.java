@@ -90,8 +90,9 @@ public interface IUserService extends IService<User> {
      * 获取手机验证码
      *
      * @param userId 用户id
+     * @param sceneCode  验证码场景
      */
-    void getPhoneCode(String userId);
+    void getPhoneCode(String userId, String sceneCode);
 
     /**
      * 重制密码

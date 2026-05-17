@@ -6,6 +6,7 @@ import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -58,9 +59,9 @@ public class UserController {
 
     @PostMapping("/phone/code")
     @Operation(summary = "获取手机验证码", description = "向当前登录的用户获取手机验证码")
-    public Result<Void> getPhoneCode() {
+    public Result<Void> getPhoneCode(@Parameter(description = "验证码场景") String scene) {
         String userId = StpUtil.getLoginIdAsString();
-        userService.getPhoneCode(userId);
+        userService.getPhoneCode(userId, scene);
         return Result.success();
     }
 

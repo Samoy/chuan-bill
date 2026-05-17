@@ -28,29 +28,30 @@ public class UserPreferenceController {
 
     @GetMapping("/get")
     @Operation(summary = "获取单个偏好", description = "根据键名获取单个偏好值")
-    public Result<String> get(@Parameter(description = "偏好键名", required = true) @RequestParam String key) {
+    public Result<String> getPreference(@Parameter(description = "偏好键名", required = true) @RequestParam String key) {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(userPreferenceService.getValue(userId, key));
     }
 
     @GetMapping("/all")
     @Operation(summary = "获取所有偏好", description = "获取用户所有偏好设置")
-    public Result<Map<String, String>> getAll() {
+    public Result<Map<String, String>> getAllPreference() {
         String userId = StpUtil.getLoginIdAsString();
         return Result.success(userPreferenceService.getAll(userId));
     }
 
     @PostMapping("/set")
     @Operation(summary = "设置偏好", description = "设置单个偏好值")
-    public Result<Boolean> set(@RequestBody @Valid PreferenceSetDTO dto) {
+    public Result<Boolean> setPreference(@RequestBody @Valid PreferenceSetDTO dto) {
         String userId = StpUtil.getLoginIdAsString();
         userPreferenceService.setValue(userId, dto.getKey(), dto.getValue());
         return Result.success(true);
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     @Operation(summary = "删除偏好", description = "删除单个偏好设置")
-    public Result<Boolean> delete(@Parameter(description = "偏好键名", required = true) @RequestParam String key) {
+    public Result<Boolean> deletePreference(
+            @Parameter(description = "偏好键名", required = true) @RequestParam String key) {
         String userId = StpUtil.getLoginIdAsString();
         userPreferenceService.deleteValue(userId, key);
         return Result.success(true);

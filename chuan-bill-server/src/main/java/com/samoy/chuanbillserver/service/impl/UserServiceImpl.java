@@ -12,6 +12,7 @@ import com.samoy.chuanbillserver.constant.SystemConstants;
 import com.samoy.chuanbillserver.dao.UserMapper;
 import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.entity.User;
+import com.samoy.chuanbillserver.enums.SmsScene;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IUserService;
@@ -240,7 +241,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public void getPhoneCode(String userId) {
+    public void getPhoneCode(String userId, String sceneCode) {
         User user = getById(userId);
         if (user == null) {
             throw new BusinessException(ResultEnum.USER_NOT_FOUND);
@@ -248,7 +249,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (CharSequenceUtil.isEmpty(user.getPhone())) {
             throw new BusinessException(ResultEnum.PHONE_NOT_FOUND);
         }
-        verificationCodeService.sendCode(user.getPhone());
+        verificationCodeService.sendCode(SmsScene.fromCode(sceneCode), user.getPhone());
     }
 
     @Override

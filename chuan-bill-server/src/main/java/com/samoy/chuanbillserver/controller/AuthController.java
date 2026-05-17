@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import com.samoy.chuanbillserver.dto.*;
+import com.samoy.chuanbillserver.enums.SmsScene;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;
@@ -69,7 +70,7 @@ public class AuthController {
     @PostMapping("/send-code")
     @Operation(summary = "发送验证码", description = "向指定手机号发送短信验证码")
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {
-        verificationCodeService.sendCode(sendCodeDTO.getPhone());
+        verificationCodeService.sendCode(SmsScene.LOGIN, sendCodeDTO.getPhone());
         return Result.success();
     }
 

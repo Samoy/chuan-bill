@@ -36,6 +36,7 @@ public enum ResultEnum {
     PARAM_VALID_ERROR(1011, "参数校验失败"),
     PHONE_NOT_FOUND(1012, "当前用户未绑定手机号"),
     PHONE_ALREADY_BOUND(1013, "当前手机号已被绑定"),
+    SMS_SEND_FAILED(1014, "短信验证码发送失败"),
 
     // 业务错误码（账单相关） 2000+
     BILL_NOT_FOUND(2001, "账单不存在"),

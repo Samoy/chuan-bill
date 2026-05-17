@@ -1,12 +1,15 @@
 package com.samoy.chuanbillserver.service.impl;
 
 import com.samoy.chuanbillserver.constant.SystemConstants;
+import com.samoy.chuanbillserver.enums.SmsScene;
 import com.samoy.chuanbillserver.exception.BusinessException;
 import com.samoy.chuanbillserver.result.ResultEnum;
 import com.samoy.chuanbillserver.service.IVerificationCodeService;
+import com.samoy.chuanbillserver.utils.SmsUtil;
 import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +20,27 @@ public class VerificationCodeServiceImpl implements IVerificationCodeService {
     @Resource
     private RedisTemplate<String, String> redisTemplate;
 
+    @Resource
+    private SmsUtil smsUtil;
+
+    @Value("${spring.profiles.active}")
+    private String env;
+
     @Override
-    public void sendCode(String phone) {
+    public void sendCode(SmsScene smsScene, String phone) {
         String code = generateCode();
-        // TODO：模拟发送验证码，实际开发中应使用短信服务
-        log.info("向手机号 {} 发送验证码 {}", phone, code);
+        // 如果是开发测试环境，使用以下方式生成验证码
+        if ("dev".equals(env)) {
+            log.info("向手机号 {} 发送验证码 {}", phone, code);
+        }
+        if ("prod".equals(env)) {
+            try {
+                smsUtil.sendSms(smsScene, phone, code);
+            } catch (Exception e) {
+                log.error("发送短信验证码失败，场景：{}, 手机号：{}，验证码：{}", smsScene.getScene(), phone, code, e);
+                throw new BusinessException(ResultEnum.SMS_SEND_FAILED);
+            }
+        }
 
         // 保存验证码到Redis
         String key = SystemConstants.CODE_CACHE_KEY_PREFIX + phone;
@@ -48,7 +67,7 @@ public class VerificationCodeServiceImpl implements IVerificationCodeService {
     }
 
     /**
-     * 生成验证码(模拟实现，实际开发中应使用短信服务)
+     * 生成验证码
      *
      * @return 验证码
      */

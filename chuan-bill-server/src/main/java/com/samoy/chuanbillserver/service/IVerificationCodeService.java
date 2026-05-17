@@ -1,13 +1,16 @@
 package com.samoy.chuanbillserver.service;
 
+import com.samoy.chuanbillserver.enums.SmsScene;
+
 public interface IVerificationCodeService {
 
     /**
      * 发送验证码
      *
-     * @param phone 手机号
+     * @param smsScene 短信场景
+     * @param phone    手机号
      */
-    void sendCode(String phone);
+    void sendCode(SmsScene smsScene, String phone);
 
     /**
      * 验证码验证
