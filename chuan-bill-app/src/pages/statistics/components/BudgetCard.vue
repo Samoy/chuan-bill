@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import BudgetSettingPopup from './BudgetSettingPopup.vue'
 
 defineOptions({
   name: 'BudgetCard',
+  options: { virtualHost: true, styleIsolation: 'shared' },
 })
 
 const props = defineProps<{

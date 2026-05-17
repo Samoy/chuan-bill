@@ -78,7 +78,7 @@ function sumbit() {
       金额
     </view>
     <wd-input
-      v-model="formData.amount" :rules="[{ required: true, message: '请输入账单金额' }]" no-border type="digit" placeholder="0.00" custom-class="mt-2"
+      v-model="formData.amount" :rules="[{ required: true, message: '请输入账单金额' }]" no-border type="digit" placeholder="0.00" custom-class="mt-2 px-1! py-0.5!"
       prop="amount"
       custom-input-class="!text-[32px] !font-bold"
     />

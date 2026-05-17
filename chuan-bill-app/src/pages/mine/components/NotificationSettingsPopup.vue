@@ -15,8 +15,9 @@ const settings = ref({
   masterEnabled: false,
   billReminderEnabled: false,
   billReminderTime: '20:00',
+  budgetNotificationEnabled: false,
   familyNotificationEnabled: false,
-  systemNotificationEnabled: true,
+  systemNotificationEnabled: false,
 })
 
 const timePickerVisible = ref(false)
@@ -37,6 +38,9 @@ onMounted(async () => {
       if (prefs['notification.billReminder.time'] !== undefined) {
         settings.value.billReminderTime = prefs['notification.billReminder.time']
         timeValue.value = prefs['notification.billReminder.time']
+      }
+      if (prefs['notification.budget.enabled'] !== undefined) {
+        settings.value.budgetNotificationEnabled = prefs['notification.system.enabled'] === 'true'
       }
       if (prefs['notification.family.enabled'] !== undefined) {
         settings.value.familyNotificationEnabled = prefs['notification.family.enabled'] === 'true'
@@ -151,6 +155,24 @@ function onTimeConfirm({ value }: { value: number[] }) {
             @change="onSettingChange('notification.billReminder.enabled', settings.billReminderEnabled)"
           />
         </view>
+      </view>
+
+      <!-- 预算提醒 -->
+      <view class="mb-4 flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+        <view>
+          <text class="block text-sm font-medium">
+            预算提醒
+          </text>
+          <text class="mt-1 block text-xs text-gray-500">
+            支出达到预算阈值(80%)时提醒
+          </text>
+        </view>
+        <wd-switch
+          v-model="settings.budgetNotificationEnabled"
+          :disabled="!settings.masterEnabled"
+          size="20px"
+          @change="onSettingChange('notification.budget.enabled', settings.budgetNotificationEnabled)"
+        />
       </view>
 
       <!-- 家庭通知 -->

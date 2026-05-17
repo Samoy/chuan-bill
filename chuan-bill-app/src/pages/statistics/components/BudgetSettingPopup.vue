@@ -89,22 +89,23 @@ function onDelete() {
   >
     <view class="p-4">
       <!-- 金额输入 -->
-      <view class="mb-6 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
-        <text class="mb-2 block text-xs text-gray-500">
-          预算金额
-        </text>
-        <view class="flex items-center gap-2">
+      <view class="mb-4 flex flex-col items-center gap-2 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+        <view class="flex items-center gap-2 text-[32px]">
           <text class="text-2xl text-primary font-bold">
             ¥
           </text>
           <wd-input
             v-model="amount"
             type="number"
-            placeholder="请输入月度预算金额"
-            custom-class="flex-1"
-            :border="false"
+            placeholder="1000"
+            custom-class="flex-1 rounded-xl px-1! py-0.5!"
+            custom-input-class="text-[32px]! font-bold!"
+            no-border
           />
         </view>
+        <text class="block text-xs text-gray-500">
+          预算金额
+        </text>
       </view>
 
       <!-- 操作按钮 -->

@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { AiSuggestionType } from '@/constant/ai'
 import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
+import BudgetCard from './components/BudgetCard.vue'
 import CategoryChart from './components/CategoryChart.vue'
 import DailyTrendChart from './components/DailyTrendChart.vue'
 
