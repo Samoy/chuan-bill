@@ -75,6 +75,9 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
     @Resource
     private IMessageService messageService;
 
+    @Resource
+    private IBudgetService budgetService;
+
     @Override
     public List<BillVO> getBillList(String userId, BillListDTO billListDTO) {
         if (billListDTO.getFamilyId() != null && !familyService.isMember(userId, billListDTO.getFamilyId())) {
@@ -116,6 +119,14 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             bill.setFamilyId(addBillDTO.getFamilyId());
         }
         boolean saved = this.save(bill);
+        // 预算预警检查
+        if (saved && "expense".equals(bill.getType())) {
+            try {
+                budgetService.checkBudgetAlert(userId);
+            } catch (Exception ignored) {
+                // 预算检查失败不影响账单保存
+            }
+        }
         // 家庭账单通知：通知家庭其他成员
         if (saved && bill.getFamilyId() != null) {
             sendFamilyBillNotification(bill, userId);
@@ -182,7 +193,16 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
         if (updateBillDTO.getFamilyId() != null) {
             bill.setFamilyId(updateBillDTO.getFamilyId());
         }
-        return this.updateById(bill);
+        boolean updated = this.updateById(bill);
+        // 预算预警检查（仅支出类型账单更新时触发）
+        if (updated && "expense".equals(bill.getType())) {
+            try {
+                budgetService.checkBudgetAlert(userId);
+            } catch (Exception ignored) {
+                // 预算检查失败不影响账单更新
+            }
+        }
+        return updated;
     }
 
     @Override
