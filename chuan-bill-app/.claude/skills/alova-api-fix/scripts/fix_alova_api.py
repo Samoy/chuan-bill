@@ -19,18 +19,20 @@ from datetime import datetime
 
 # 需要转换为 string 的金额字段名
 AMOUNT_FIELDS = [
-    'minAmount',     # 最小金额
-    'maxAmount',     # 最大金额
-    'amount',        # 金额
-    'balance',       # 余额
-    'income',        # 收入
-    'expense',       # 支出
-    'budget',        # 预算
-    'price',         # 价格
-    'money',         # 金额（通用）
-    'totalAmount',   # 总金额
-    'totalIncome',   # 总收入
-    'totalExpense',  # 总支出
+    'minAmount',      # 最小金额
+    'maxAmount',      # 最大金额
+    'amount',         # 金额
+    'balance',        # 余额
+    'income',         # 收入
+    'expense',        # 支出
+    'budget',         # 预算
+    'price',          # 价格
+    'money',          # 金额（通用）
+    'totalAmount',    # 总金额
+    'totalIncome',    # 总收入
+    'totalExpense',   # 总支出
+    'useAmount',      #已用金额
+    'remainingAmount' #剩余金额
 ]
 
 # DTO 接口名称模式

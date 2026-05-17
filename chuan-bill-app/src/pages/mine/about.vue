@@ -58,7 +58,7 @@ const openSourceLibs = [
             算法名称
           </text>
           <text class="mt-0.5 block text-sm">
-            阿里云百炼大模型服务
+            达摩院交互式多能型合成算法
           </text>
         </view>
         <view class="mb-2">
@@ -66,7 +66,7 @@ const openSourceLibs = [
             算法备案号
           </text>
           <text class="mt-0.5 block text-sm">
-            [待填写]
+            网信算备330110507206401230035号
           </text>
         </view>
         <view>
@@ -74,7 +74,7 @@ const openSourceLibs = [
             服务提供者
           </text>
           <text class="mt-0.5 block text-sm">
-            阿里云
+            阿里巴巴达摩院(杭州)科技有限公司
           </text>
         </view>
       </view>
@@ -114,7 +114,7 @@ const openSourceLibs = [
         <view class="flex items-center gap-2">
           <view class="i-lucide:mail h-4 w-4 text-gray-400" />
           <text class="text-sm">
-            chuanbill@samoy.site
+            feedback.chuanbill@samoy.site
           </text>
         </view>
       </view>

@@ -18,7 +18,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,7 +56,6 @@ public class BudgetServiceImpl extends ServiceImpl<BudgetMapper, Budget> impleme
             return convertToVO(existing, userId, currentMonth);
         } else {
             Budget budget = new Budget();
-            budget.setId(UUID.randomUUID().toString().replace("-", ""));
             budget.setUserId(userId);
             budget.setMonth(monthDate);
             budget.setAmount(dto.getAmount());
@@ -82,15 +80,15 @@ public class BudgetServiceImpl extends ServiceImpl<BudgetMapper, Budget> impleme
 
     @Override
     public void checkBudgetAlert(String userId) {
-        // 1. 检查通知总开关（null 视为默认开启）
+        // 1. 检查通知总开关（null 视为默认关闭）
         String masterEnabled = userPreferenceService.getValue(userId, "notification.master.enabled");
-        if (masterEnabled != null && "false".equals(masterEnabled)) {
+        if (!"true".equals(masterEnabled)) {
             return;
         }
 
-        // 2. 检查预算提醒开关（null 视为默认开启）
+        // 2. 检查预算提醒开关（null 视为默认关闭）
         String budgetEnabled = userPreferenceService.getValue(userId, "notification.budget.enabled");
-        if (budgetEnabled != null && "false".equals(budgetEnabled)) {
+        if (!"true".equals(budgetEnabled)) {
             return;
         }
 

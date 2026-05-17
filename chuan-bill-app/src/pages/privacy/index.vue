@@ -82,7 +82,7 @@ const baseContent = `
 
   <p style="font-size: 15px; font-weight: bold; margin-top: 20px;">九、联系方式</p>
   <p>如您对本隐私政策有任何疑问、意见或建议，或希望行使您的个人信息权利，可通过以下方式联系我们：</p>
-  <p style="padding-left: 16px;">邮箱：chuanbill@samoy.site</p>
+  <p style="padding-left: 16px;">邮箱：feedback.chuanbill@samoy.site</p>
   <p>我们将在收到您的请求后15个工作日内予以回复。</p>
 </div>
 `

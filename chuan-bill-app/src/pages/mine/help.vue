@@ -277,7 +277,7 @@ function goToAiChat() {
         还有其他问题？
       </text>
       <text class="mt-1 block text-sm text-primary">
-        反馈邮箱：chuanbill@samoy.site
+        反馈邮箱：feedback.chuanbill@samoy.site
       </text>
     </view>
   </view>

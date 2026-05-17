@@ -20,12 +20,15 @@ public class BudgetVO {
     private String month;
 
     @Schema(description = "预算金额")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
 
     @Schema(description = "已使用金额")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal useAmount;
 
     @Schema(description = "剩余金额")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remainingAmount;
 
     @Schema(description = "使用百分比")

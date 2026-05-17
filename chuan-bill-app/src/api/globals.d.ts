@@ -155,11 +155,11 @@ export interface BillListDTO {
   /**
    * 最小金额
    */
-  minAmount?: number;
+  minAmount?: string;
   /**
    * 最大金额
    */
-  maxAmount?: number;
+  maxAmount?: string;
   /**
    * 关键字模糊搜索，支持名称和备注
    */
@@ -349,7 +349,7 @@ export interface SetBudgetDTO {
   /**
    * 预算金额
    */
-  amount: number;
+  amount: string;
 }
 export interface UpdateBillDTO {
   /**
@@ -379,7 +379,7 @@ export interface UpdateBillDTO {
   /**
    * 账单金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 账单备注
    */
@@ -439,7 +439,7 @@ export interface AddBillDTO {
   /**
    * 账单金额
    */
-  amount: number;
+  amount: string;
   /**
    * 账单时间
    */
@@ -805,15 +805,15 @@ export interface BudgetVO {
   /**
    * 预算金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 已使用金额
    */
-  useAmount?: number;
+  useAmount?: string;
   /**
    * 剩余金额
    */
-  remainingAmount?: number;
+  remainingAmount?: string;
   /**
    * 使用百分比
    */
@@ -923,15 +923,15 @@ export interface BillMonthlyStatsVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
   /**
    * 结余金额
    */
-  balance?: number;
+  balance?: string;
 }
 export interface ResultBillMonthlyStatsVO {
   code?: number;
@@ -959,11 +959,11 @@ export interface FamilyMemberStatsVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
   /**
    * 支出占比(%)
    */
@@ -992,11 +992,11 @@ export interface DailyTrendVO {
   /**
    * 支出金额
    */
-  expense?: number;
+  expense?: string;
   /**
    * 收入金额
    */
-  income?: number;
+  income?: string;
 }
 export interface ResultListDailyTrendVO {
   code?: number;
@@ -1021,7 +1021,7 @@ export interface CategoryStatisticsVO {
   /**
    * 金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 占比百分比
    */
@@ -1204,7 +1204,7 @@ export interface BillVO {
   /**
    * 账单金额
    */
-  amount?: number;
+  amount?: string;
   /**
    * 账单时间
    */
@@ -2819,7 +2819,7 @@ declare global {
        * ```ts
        * type RequestBody = {
        *   // 预算金额
-       *   amount: number
+       *   amount: string
        * }
        * ```
        *
@@ -2839,11 +2839,11 @@ declare global {
        *     // 月份，格式 YYYY-MM
        *     month?: string
        *     // 预算金额
-       *     amount?: number
+       *     amount?: string
        *     // 已使用金额
-       *     useAmount?: number
+       *     useAmount?: string
        *     // 剩余金额
-       *     remainingAmount?: number
+       *     remainingAmount?: string
        *     // 使用百分比
        *     usagePercent?: number
        *     // 创建时间
@@ -2896,11 +2896,11 @@ declare global {
        *     // 月份，格式 YYYY-MM
        *     month?: string
        *     // 预算金额
-       *     amount?: number
+       *     amount?: string
        *     // 已使用金额
-       *     useAmount?: number
+       *     useAmount?: string
        *     // 剩余金额
-       *     remainingAmount?: number
+       *     remainingAmount?: string
        *     // 使用百分比
        *     usagePercent?: number
        *     // 创建时间
@@ -2975,7 +2975,7 @@ declare global {
        *   // 账单时间
        *   time?: string
        *   // 账单金额
-       *   amount?: number
+       *   amount?: string
        *   // 账单备注
        *   remark?: string
        *   // 家庭 ID，为空则属于个人账单
@@ -3040,12 +3040,12 @@ declare global {
        * ```
        */
       exportBill<
-        Config extends Alova2MethodConfig<null> & {
+        Config extends Alova2MethodConfig<ArrayBuffer> & {
           data: ExportBillDTO;
         }
       >(
         config: Config
-      ): Alova2Method<null, 'bill.exportBill', Config>;
+      ): Alova2Method<ArrayBuffer, 'bill.exportBill', Config>;
       /**
        * ---
        *
@@ -3114,7 +3114,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type: string
        *     // 账单金额
-       *     amount: number
+       *     amount: string
        *     // 账单时间
        *     time: string
        *     // 账单备注
@@ -3192,7 +3192,7 @@ declare global {
        *   // 账单类型：income-收入，expense-支出
        *   type: string
        *   // 账单金额
-       *   amount: number
+       *   amount: string
        *   // 账单时间
        *   time: string
        *   // 账单备注
@@ -3288,9 +3288,9 @@ declare global {
        *     // 支付方式 ID
        *     paymentMethodId?: string
        *     // 最小金额
-       *     minAmount?: number
+       *     minAmount?: string
        *     // 最大金额
-       *     maxAmount?: number
+       *     maxAmount?: string
        *     // 关键字模糊搜索，支持名称和备注
        *     keyword?: string
        *     // 页码
@@ -3305,8 +3305,8 @@ declare global {
        *   categoryId?: string
        *   type?: string
        *   paymentMethodId?: string
-       *   minAmount?: number
-       *   maxAmount?: number
+       *   minAmount?: string
+       *   maxAmount?: string
        *   keyword?: string
        *   page?: number
        *   size?: number
@@ -3366,7 +3366,7 @@ declare global {
        *       // 账单类型：income-收入，expense-支出
        *       type?: string
        *       // 账单金额
-       *       amount?: number
+       *       amount?: string
        *       // 账单时间
        *       time?: string
        *       // 账单备注
@@ -3400,14 +3400,14 @@ declare global {
             /**
              * 账单列表查询参数
              */
-            billListDTO?: BillListDTO;
+            
             startDate?: string;
             endDate?: string;
             categoryId?: string;
             type?: string;
             paymentMethodId?: string;
-            minAmount?: number;
-            maxAmount?: number;
+            minAmount?: string;
+            maxAmount?: string;
             keyword?: string;
             page?: number;
             size?: number;
@@ -3453,11 +3453,11 @@ declare global {
        *     // 月份，格式为YYYY-MM
        *     month?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *     // 结余金额
-       *     balance?: number
+       *     balance?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -3470,7 +3470,7 @@ declare global {
             /**
              * 账单月度统计参数
              */
-            billMonthlyStatsDTO?: BillMonthlyStatsDTO;
+            
             month?: string;
             familyId?: string;
           };
@@ -3543,7 +3543,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注
@@ -3924,11 +3924,11 @@ declare global {
        *     // 月份，格式为YYYY-MM
        *     month?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *     // 结余金额
-       *     balance?: number
+       *     balance?: string
        *   }
        *   timestamp?: number
        *   success?: boolean
@@ -3991,9 +3991,9 @@ declare global {
        *     // 用户头像
        *     avatar?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *     // 支出占比(%)
        *     expensePercentage?: number
        *     // 收入占比(%)
@@ -4058,9 +4058,9 @@ declare global {
        *     // 日期，格式为YYYY-MM-DD
        *     date?: string
        *     // 支出金额
-       *     expense?: number
+       *     expense?: string
        *     // 收入金额
-       *     income?: number
+       *     income?: string
        *   }>
        *   timestamp?: number
        *   success?: boolean
@@ -4126,7 +4126,7 @@ declare global {
        *     // 分类图标
        *     categoryIcon?: string
        *     // 金额
-       *     amount?: number
+       *     amount?: string
        *     // 占比百分比
        *     percentage?: number
        *   }>
@@ -4216,7 +4216,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注
@@ -4313,7 +4313,7 @@ declare global {
        *     // 账单类型：income-收入，expense-支出
        *     type?: string
        *     // 账单金额
-       *     amount?: number
+       *     amount?: string
        *     // 账单时间
        *     time?: string
        *     // 账单备注
