@@ -39,3 +39,4 @@ preference:
     - notification.billReminder.time
     - notification.family.enabled
     - notification.system.enabled
+    - notification.budget.enabled
