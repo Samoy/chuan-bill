@@ -39,6 +39,7 @@ export default {
   'family.handleJoinApply': ['POST', '/family/handle-apply'],
   'family.deleteFamily': ['POST', '/family/delete'],
   'family.createFamily': ['POST', '/family/create'],
+  'budget.setBudget': ['POST', '/budget/set'],
   'bill.updateBill': ['POST', '/bill/update'],
   'bill.exportBill': ['POST', '/bill/export'],
   'bill.deleteBill': ['POST', '/bill/delete'],
@@ -65,6 +66,7 @@ export default {
   'family.getMyFamilies': ['GET', '/family/my-families'],
   'family.getMembers': ['GET', '/family/members'],
   'family.getFamilyDetail': ['GET', '/family/detail'],
+  'budget.getCurrentBudget': ['GET', '/budget/current'],
   'bill.getPaymentMethods': ['GET', '/bill/payment-methods'],
   'bill.getPageBillList': ['GET', '/bill/page-list'],
   'bill.getMonthlyStats': ['GET', '/bill/monthly-stats'],
@@ -72,5 +74,6 @@ export default {
   'bill.getCategories': ['GET', '/bill/categories'],
   'ai.text': ['GET', '/ai/text'],
   'ai.ocr': ['GET', '/ai/ocr'],
-  'ai.analysis': ['GET', '/ai/analysis']
+  'ai.analysis': ['GET', '/ai/analysis'],
+  'budget.deleteBudget': ['DELETE', '/budget/delete']
 };
