@@ -73,6 +73,9 @@ public enum ResultEnum {
 
     // 消息相关错误码 4050+
     MESSAGE_NOT_FOUND(4051, "消息不存在"),
+
+    // 预算相关错误码 5000+
+    BUDGET_NOT_FOUND(5001, "预算不存在"),
     ;
 
     private final Integer code;
