@@ -169,7 +169,7 @@ watch(() => props.bill, (newVal) => {
     <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
     <text v-else-if="isLoggedIn" class="i-lucide:info absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
 
-    <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
+    <view class="pos-relative max-h-[82vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented
         ref="segmentedRef"
         v-model:value="source" :options="sourceOptions"
