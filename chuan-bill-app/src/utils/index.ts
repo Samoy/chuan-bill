@@ -1,5 +1,55 @@
-import { e } from '@unocss/core'
 import dayjs from 'dayjs'
+
+/** 转义特殊字符用于正则表达式 */
+/* eslint-disable */
+function escapeSelector(str: string) {
+  const length = str.length
+  let index = -1
+  let codeUnit
+  let result = ''
+  const firstCodeUnit = str.charCodeAt(0)
+  while (++index < length) {
+    codeUnit = str.charCodeAt(index)
+    if (codeUnit === 0) {
+      result += '\uFFFD'
+      continue
+    }
+    if (codeUnit === 37) {
+      result += '\\%'
+      continue
+    }
+    if (codeUnit === 44) {
+      result += '\\,'
+      continue
+    }
+    if (
+      // If the character is in the range [\1-\1F] (U+0001 to U+001F) or is
+      // U+007F, […]
+      codeUnit >= 1 && codeUnit <= 31 || codeUnit === 127 || index === 0 && codeUnit >= 48 && codeUnit <= 57 || index === 1 && codeUnit >= 48 && codeUnit <= 57 && firstCodeUnit === 45
+    ) {
+      result += `\\${codeUnit.toString(16)} `
+      continue
+    }
+    if (
+      // If the character is the first character and is a `-` (U+002D), and
+      // there is no second character, […]
+      index === 0 && length === 1 && codeUnit === 45
+    ) {
+      result += `\\${str.charAt(index)}`
+      continue
+    }
+    if (codeUnit >= 128 || codeUnit === 45 || codeUnit === 95 || codeUnit >= 48 && codeUnit <= 57 || codeUnit >= 65 && codeUnit <= 90 || codeUnit >= 97 && codeUnit <= 122) {
+      result += str.charAt(index)
+      continue
+    }
+    result += `\\${str.charAt(index)}`
+  }
+  return result
+}
+
+/* eslint-enable */
+const e = escapeSelector
+
 /**
  * 获取当前页面路径
  * @returns 当前页面路径

@@ -120,10 +120,10 @@ export async function handleAlovaResponse(
   const json = data as ApiResponse
 
   if (statusCode >= 400) {
-    handleError(statusCode, response.errMsg || '请求失败')
+    handleError(statusCode, '系统异常，请稍后再试')
   }
   if (json.code >= 400) {
-    handleError(json.code, json.message || '请求失败')
+    handleError(json.code, json.message || '系统异常，请稍后再试')
   }
 
   // Log response in development
@@ -178,7 +178,7 @@ export function handleAlovaError(error: any, method: Method) {
     globalToast.error('请求超时，请重试')
   }
   else if (error instanceof ApiError) {
-    globalToast.error(error.message || '请求失败')
+    globalToast.error(error.message || '系统异常，请稍后再试')
   }
   else {
     globalToast.error('发生意外错误')

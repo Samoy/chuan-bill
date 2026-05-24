@@ -70,10 +70,13 @@ function createLoadingManager() {
 
 const loadingManager = createLoadingManager()
 
+let apiBaseURL = '/api'
+// #ifndef H5
+apiBaseURL = `${import.meta.env.VITE_API_BASE_URL}/api`
+// #endif
+
 export const alovaInstance = createAlova({
-  // #ifndef H5
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  // #endif
+  baseURL: apiBaseURL,
   ...AdapterUniapp({
     mockRequest: mockAdapter,
   }),
@@ -96,9 +99,6 @@ export const alovaInstance = createAlova({
 
     // Log request in development
     if (import.meta.env.MODE === 'development') {
-      // #ifdef H5
-      method.baseURL = `${method.baseURL}/api`
-      // #endif
       console.log(`[Alova Request] ${method.type} ${method.url}`, method.data || method.config.params)
       console.log(`[API Base URL] ${import.meta.env.VITE_API_BASE_URL}`)
       console.log(`[Environment] ${import.meta.env.VITE_ENV_NAME}`)

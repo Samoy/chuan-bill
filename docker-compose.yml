@@ -5,28 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: chuan-bill-backend
     restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USERNAME=${MYSQL_USERNAME}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
-      - DASHSCOPE_BILL_RECOGNITION_APP_ID=${DASHSCOPE_BILL_RECOGNITION_APP_ID}
-      - DASHSCOPE_BILL_ANALYSIS_APP_ID=${DASHSCOPE_BILL_ANALYSIS_APP_ID}
-      - WX_MINIAPP_APPID=${WX_MINIAPP_APPID}
-      - WX_MINIAPP_SECRET=${WX_MINIAPP_SECRET}
-      - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
-      - QINIU_SECRET_KEY=${QINIU_SECRET_KEY}
-      - QINIU_BUCKET=${QINIU_BUCKET}
-      - QINIU_CDN_DOMAIN=${QINIU_CDN_DOMAIN}
-      - QINIU_ENDPOINT=${QINIU_ENDPOINT}
-      - ALIBABA_CLOUD_ACCESS_KEY_ID=${ALIBABA_CLOUD_ACCESS_KEY_ID}
-      - ALIBABA_CLOUD_ACCESS_KEY_SECRET=${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
+    env_file:
+      # 这里指定你的环境变量文件
+      - .env.docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s
@@ -76,11 +57,11 @@ services:
     image: redis:6-alpine
     container_name: chuan-bill-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -4,11 +4,11 @@ WORKDIR /app
 
 # 复制 pom.xml 并下载依赖
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B -Dspotless.check.skip=true
 
 # 复制源代码并构建
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+RUN mvn clean package -DskipTests -Dspotless.check.skip=true -B
 
 # 多阶段构建 - 运行阶段
 FROM eclipse-temurin:17-jre-alpine
@@ -27,4 +27,4 @@ USER app
 EXPOSE 8080
 
 # 启动应用，设置 JVM 容器感知参数
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-Dspring.profiles.active=prod", "-jar", "app.jar"]

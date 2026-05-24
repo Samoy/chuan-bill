@@ -12,6 +12,8 @@ unpackage/
 # IDE
 .idea
 .vscode
+.claude
+.cursor
 *.iml
 
 # Logs
@@ -23,9 +25,7 @@ npm-debug.log*
 Thumbs.db
 
 # Environment files
-.env
-.env.*
-!.env.example
+.env.*.local
 
 # Documentation
 *.md

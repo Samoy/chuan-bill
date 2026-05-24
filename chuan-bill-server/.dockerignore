@@ -24,3 +24,6 @@ Thumbs.db
 # Documentation
 *.md
 LICENSE
+
+# Secret Environment
+.env
