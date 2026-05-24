@@ -166,8 +166,8 @@ watch(() => props.bill, (newVal) => {
     v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
     :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
-    <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-5.5 box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
-    <text v-else-if="isLoggedIn" class="i-lucide:info absolute right-10 top-5.5 box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
+    <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
+    <text v-else-if="isLoggedIn" class="i-lucide:info absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />
 
     <view class="pos-relative max-h-[80vh] flex flex-col gap-3 px-4 pb-4">
       <wd-segmented

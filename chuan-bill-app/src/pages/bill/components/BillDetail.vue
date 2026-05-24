@@ -20,7 +20,7 @@ const { bill, customClass, customStyle } = defineProps<{
 <template>
   <view class="box-border w-full flex flex-col gap-2" :class="customClass" :style="customStyle">
     <!-- 头部：金额、名称 -->
-    <view class="mb-3 box-border w-full flex flex-col items-center">
+    <view class="box-border w-full flex flex-col items-center gap-2">
       <view class="h-12 w-12 flex items-center justify-center rounded-2xl" :class="bill.type === 'income' ? 'text-green-500 bg-green-100' : 'text-red-400 bg-red-50'">
         <text class="h-6 w-6 text-2xl" :class="transformUnoCSS(bill.category?.icon || '')" />
       </view>

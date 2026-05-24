@@ -9,6 +9,22 @@ definePage({
 
 const version = ref<string>('1.0.0')
 
+// ICP备案号（H5端和APP端不同）
+const icpNumber = ref('豫ICP备2024096491号-2')
+// #ifdef APP-PLUS
+icpNumber.value = '豫ICP备2024096491号-2'
+// #endif
+
+// 跳转到工信部备案网站
+function goToIcp() {
+  // #ifdef H5
+  window.open('https://beian.miit.gov.cn', '_blank')
+  // #endif
+  // #ifdef APP-PLUS
+  plus.runtime.openURL('https://beian.miit.gov.cn')
+  // #endif
+}
+
 onLoad(() => {
   // #ifdef APP-PLUS
   version.value = plus.runtime.version || '1.0.0'
@@ -121,8 +137,18 @@ const openSourceLibs = [
     </view>
 
     <!-- 版权信息 -->
-    <view class="py-4 text-center">
-      <text class="text-xs text-gray-400">
+    <view class="flex flex-col items-center gap-1 text-center text-xs">
+      <!-- #ifndef MP -->
+      <view class="flex items-center gap-2">
+        <text class="block text-gray-400">
+          备案号
+        </text>
+        <text class="mt-0.5 block text-primary" @click="goToIcp">
+          {{ icpNumber }}
+        </text>
+      </view>
+      <!-- #endif -->
+      <text class="text-gray-400">
         © 2025 小川记账 版权所有
       </text>
     </view>

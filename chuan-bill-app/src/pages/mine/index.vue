@@ -51,6 +51,7 @@ interface MenuItem {
   action: () => void
   badge?: ComputedRef<number>
   subtitle?: ComputedRef<string>
+  needLogin?: boolean
 }
 
 // 菜单动态数据
@@ -73,10 +74,11 @@ const darkModeLabel = computed(() => {
   return darkModeLabelMap[mode]
 })
 
-// 菜单分组（已登录状态）
-const menuGroups: { title: string, items: MenuItem[] }[] = [
+// 菜单分组
+const menuGroups: { title: string, items: MenuItem[], needLogin?: boolean }[] = [
   {
     title: '账户管理',
+    needLogin: true,
     items: [
       {
         icon: 'i-lucide:user',
@@ -114,12 +116,14 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
       {
         icon: 'i-lucide:bell-ring',
         title: '通知设置',
+        needLogin: true,
         action: () => user.requireAuth(() => showNotificationPopup.value = true),
       },
     ],
   },
   {
     title: '数据管理',
+    needLogin: true,
     items: [
       {
         icon: 'i-lucide:refresh-cw',
@@ -145,12 +149,14 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
       {
         icon: 'i-lucide:lock',
         title: '隐私政策',
-        action: () => router.push('/pages/privacy/index'),
-      },
-      {
-        icon: 'i-lucide:info',
-        title: '关于应用',
-        action: () => router.push('/pages/mine/about'),
+        action: () => {
+          // #ifdef MP-WEIXIN
+          wx.openPrivacyContract({})
+          // #endif
+          // #ifndef MP-WEIXIN
+          router.push('/pages/privacy/index')
+          // #endif
+        },
       },
       {
         icon: 'i-lucide:help-circle',
@@ -161,6 +167,11 @@ const menuGroups: { title: string, items: MenuItem[] }[] = [
         icon: 'i-lucide:download-cloud',
         title: '检查更新',
         action: () => checkUpdate(),
+      },
+      {
+        icon: 'i-lucide:info',
+        title: '关于应用',
+        action: () => router.push('/pages/mine/about'),
       },
     ],
   },
@@ -255,57 +266,27 @@ onShow(() => {
           </view>
         </view>
       </view>
-
-      <!-- 帮助与关于 -->
-      <view class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
-        <view
-          class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700"
-          @click="router.push('/pages/mine/help')"
-        >
-          <view class="flex items-center gap-3">
-            <view class="i-lucide:help-circle h-4 w-4" />
-            <text class="text-sm">
-              帮助与反馈
-            </text>
-          </view>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-        </view>
-        <view
-          class="flex items-center justify-between p-4"
-          @click="router.push('/pages/mine/about')"
-        >
-          <view class="flex items-center gap-3">
-            <view class="i-lucide:info h-4 w-4" />
-            <text class="text-sm">
-              关于应用
-            </text>
-          </view>
-          <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
-        </view>
-      </view>
     </template>
-
-    <!-- 已登录状态 -->
-    <template v-else>
-      <!-- 用户信息卡片 -->
-      <view class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
-        <view class="flex items-center gap-4">
-          <!-- 头像 -->
-          <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
-          <view v-else class="i-lucide:user h-12 w-12" />
-          <view class="flex-1">
-            <text class="block text-lg font-bold">
-              {{ user.nickname || '用户' }}
-            </text>
-            <text class="mt-1 block text-sm text-white/80">
-              {{ user.phone || '未绑定手机号' }}
-            </text>
-          </view>
+    <!-- 用户信息卡片 -->
+    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
+      <view class="flex items-center gap-4">
+        <!-- 头像 -->
+        <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
+        <view v-else class="i-lucide:user h-12 w-12" />
+        <view class="flex-1">
+          <text class="block text-lg font-bold">
+            {{ user.nickname || '用户' }}
+          </text>
+          <text class="mt-1 block text-sm text-white/80">
+            {{ user.phone || '未绑定手机号' }}
+          </text>
         </view>
       </view>
+    </view>
 
-      <!-- 菜单分组列表 -->
-      <view v-for="(group, groupIndex) in menuGroups" :key="groupIndex" class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+    <!-- 菜单分组列表 -->
+    <view v-for="(group, groupIndex) in menuGroups" :key="groupIndex" class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <template v-if="!group.needLogin || user.isLoggedIn">
         <!-- 分组标题 -->
         <view class="px-4 pb-2 pt-3 text-xs text-gray-400 font-medium">
           {{ group.title }}
@@ -313,6 +294,7 @@ onShow(() => {
         <!-- 菜单项 -->
         <view
           v-for="(item, itemIndex) in group.items"
+          v-show="user.isLoggedIn || !item.needLogin"
           :key="itemIndex"
           class="flex items-center justify-between px-4 py-3"
           :class="itemIndex < group.items.length - 1 && 'border-b border-gray-100 dark:border-gray-700'"
@@ -336,15 +318,15 @@ onShow(() => {
             <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
           </view>
         </view>
-      </view>
+      </template>
+    </view>
 
-      <!-- 退出登录 -->
-      <view class="mx-3 my-4">
-        <wd-button type="error" plain block @click="logout">
-          退出登录
-        </wd-button>
-      </view>
-    </template>
+    <!-- 退出登录 -->
+    <view v-if="user.isLoggedIn" class="mx-3 my-4">
+      <wd-button type="error" plain block @click="logout">
+        退出登录
+      </wd-button>
+    </view>
 
     <!-- 弹窗组件 -->
     <SyncStatusPopup v-model="showSyncPopup" />

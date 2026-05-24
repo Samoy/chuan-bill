@@ -36,6 +36,8 @@ export const useManualThemeStore = defineStore('manualTheme', {
       popupCloseColor: '#000000a6',
       popupCloseSize: '16px',
       dividerColor: '#dddddd',
+      actionSheetCloseRight: '15px',
+      actionSheetCloseTop: '25px',
     },
   }),
 

@@ -7,8 +7,8 @@ definePage({
   },
 })
 
-const userStore = useUserStore()
-const toast = useGlobalToast()
+// const userStore = useUserStore()
+// const toast = useGlobalToast()
 
 // FAQ 分类
 const faqCategories = [
@@ -68,7 +68,7 @@ const faqCategories = [
       },
       {
         question: 'AI 分析次数用完了？',
-        answer: '非VIP用户每天可使用5次AI分析，升级VIP后无限制。每天0点重置次数。',
+        answer: '用户每天可使用5次AI分析，每天0点重置次数。',
       },
       {
         question: '统计数据和实际不符？',
@@ -108,7 +108,7 @@ const faqCategories = [
     list: [
       {
         question: '怎么登录？',
-        answer: '支持三种方式：1. 验证码登录：输入手机号 → 获取验证码 → 输入验证码；2. 密码登录：输入手机号+密码；3. 微信登录：点击微信登录按钮。未注册的手机号会自动注册。',
+        answer: '支持三种方式：1. 验证码登录：输入手机号 → 获取验证码 → 输入验证码，未注册的手机号会自动注册；2. 密码登录：输入手机号+密码；3. 微信登录：点击微信登录按钮。首次登录请选择验证码登录。',
       },
       {
         question: '忘记密码怎么办？',
@@ -158,17 +158,18 @@ function toggleExpand(index: number) {
 }
 
 // AI客服入口
-function goToAiChat() {
-  toast.info('AI客服功能即将上线，敬请期待')
-  // TODO: 接入百炼平台AI客服
-  // router.push('/pages/mine/ai-chat/index')
-}
+// function goToAiChat() {
+//   toast.info('AI客服功能即将上线，敬请期待')
+//   // TODO: 接入百炼平台AI客服
+//   // router.push('/pages/mine/ai-chat/index')
+// }
 </script>
 
 <template>
   <view class="box-border flex flex-col gap-4 p-4">
+    <!-- TODO：本期暂不做智能客服 -->
     <!-- AI 客服入口（仅登录显示） -->
-    <view
+    <!-- <view
       v-if="userStore.isLoggedIn"
       class="rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-5 text-white shadow-lg"
       @click="goToAiChat"
@@ -187,10 +188,10 @@ function goToAiChat() {
         </view>
         <view class="i-lucide:chevron-right h-5 w-5" />
       </view>
-    </view>
+    </view> -->
 
     <!-- 未登录提示 -->
-    <view
+    <!-- <view
       v-else
       class="rounded-2xl bg-blue-50 p-5 dark:bg-blue-900/20"
       @click="userStore.showLoginPopup = true"
@@ -211,13 +212,13 @@ function goToAiChat() {
           去登录
         </wd-button>
       </view>
-    </view>
+    </view> -->
 
     <!-- 常见问题 -->
     <view>
-      <text class="mb-3 block text-sm text-gray-600 font-medium dark:text-gray-400">
+      <!-- <text class="mb-3 block text-sm text-gray-600 font-medium dark:text-gray-400">
         常见问题
-      </text>
+      </text> -->
       <!-- 分类标签 -->
       <scroll-view
         scroll-x

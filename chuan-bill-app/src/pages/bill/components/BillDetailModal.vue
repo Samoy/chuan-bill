@@ -20,7 +20,7 @@ const emit = defineEmits<{
   delete: []
 }>()
 
-const show = defineModel<boolean>()
+const show = defineModel<boolean>({ default: false })
 const message = useGlobalMessage()
 const userStore = useUserStore()
 const toast = useGlobalToast()
@@ -64,12 +64,9 @@ const showBtn = computed(() => {
 </script>
 
 <template>
-  <wd-popup v-model="show" :z-index="100" safe-area-inset-bottom position="bottom" closable custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" lock-scroll>
+  <wd-action-sheet v-model="show" title="账单详情" :z-index="100" safe-area-inset-bottom position="bottom" closable custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" lock-scroll>
     <view class="relative" :class="showBtn ? 'pb-12' : ''">
-      <view class="box-border h-10 w-full flex items-center justify-center text-center text-lg font-500">
-        <text>账单详情</text>
-      </view>
-      <view class="mt-2 box-border px-4">
+      <view class="box-border px-4">
         <BillDetail :bill="bill" />
       </view>
       <view v-if="showBtn" class="absolute bottom-0 left-4 right-4 box-border h-8 flex items-center justify-center gap-3">
@@ -81,5 +78,5 @@ const showBtn = computed(() => {
         </wd-button>
       </view>
     </view>
-  </wd-popup>
+  </wd-action-sheet>
 </template>

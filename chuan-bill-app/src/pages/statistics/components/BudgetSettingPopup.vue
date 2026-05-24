@@ -87,9 +87,9 @@ function onDelete() {
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     title="设置预算"
   >
-    <view class="p-4">
+    <view class="p-4 pt-0">
       <!-- 金额输入 -->
-      <view class="mb-4 flex flex-col items-center gap-2 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+      <view class="mb-4 flex flex-col items-center gap-2 rounded-xl bg-gray-50 p-4 dark:bg-[var(--wot-dark-background4)]">
         <view class="flex items-center gap-2 text-[32px]">
           <text class="text-2xl text-primary font-bold">
             ¥
@@ -104,7 +104,7 @@ function onDelete() {
           />
         </view>
         <text class="block text-xs text-gray-500">
-          预算金额
+          合理的预算能帮助您更好地控制开支，建议设置为月收入的60%。
         </text>
       </view>
 

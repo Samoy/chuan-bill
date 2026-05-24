@@ -91,7 +91,7 @@ watch(() => user.isLoggedIn, () => {
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 月份选择器 -->
     <wd-sticky :z-index="10">
-      <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc]">
+      <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc] dark:bg-[var(--wot-dark-background2)]">
         <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="prevMonth">
           <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
         </view>
