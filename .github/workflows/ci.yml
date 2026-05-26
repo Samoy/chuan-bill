@@ -83,7 +83,7 @@ jobs:
           retention-days: 7
 
   # ──────────────────────────────────────────────
-  # Docker 镜像构建 (仅 push 到 main 时)
+  # Docker 镜像构建
   # ──────────────────────────────────────────────
   docker:
     name: Docker Build
