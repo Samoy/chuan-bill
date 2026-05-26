@@ -5,9 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: chuan-bill-backend
     restart: unless-stopped
-    env_file:
-      # 这里指定你的环境变量文件
-      - .env.docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s

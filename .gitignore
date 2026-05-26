@@ -5,7 +5,6 @@ nul
 .env
 .env.local
 .env.*.local
-.env.docker
 temp/
 settings.local.json
 superpowers/
