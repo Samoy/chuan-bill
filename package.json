@@ -4,6 +4,7 @@
   "description": "小川记账",
   "main": "index.js",
   "scripts": {
+    "setup": "pnpm i && cd chuan-bill-app && pnpm i && cd ..",
     "prepare": "husky",
     "start:frontend": "cd chuan-bill-app && npm run dev && cd ..",
     "start:backend": "cd chuan-bill-server && mvn spring-boot:run && cd ..",
