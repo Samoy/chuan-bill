@@ -245,7 +245,7 @@ async function handleUpdateByCode() {
                 </text>
               </template>
             </wd-input>
-            <wd-input v-model="codeForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+            <wd-input v-model="codeForm.newPassword" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
               <template #prefix>
                 <view class="i-lucide:lock-keyhole text-gray-400" />
               </template>
@@ -258,7 +258,7 @@ async function handleUpdateByCode() {
                 {{ strengthText[passwordStrength - 1] || '弱' }}
               </text>
             </view>
-            <wd-input v-model="codeForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+            <wd-input v-model="codeForm.confirmPassword" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
               <template #prefix>
                 <view class="i-lucide:lock-keyhole text-gray-400" />
               </template>
@@ -283,12 +283,12 @@ async function handleUpdateByCode() {
                 </text>
               </view>
             </view>
-            <wd-input v-model="passwordForm.oldPassword" type="safe-password" show-password placeholder="旧密码" :maxlength="20" custom-class="login-input">
+            <wd-input v-model="passwordForm.oldPassword" show-password placeholder="旧密码" :maxlength="20" custom-class="login-input">
               <template #prefix>
                 <view class="i-lucide:lock text-gray-400" />
               </template>
             </wd-input>
-            <wd-input v-model="passwordForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+            <wd-input v-model="passwordForm.newPassword" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
               <template #prefix>
                 <view class="i-lucide:lock-keyhole text-gray-400" />
               </template>
@@ -301,7 +301,7 @@ async function handleUpdateByCode() {
                 {{ strengthText[passwordStrength - 1] || '弱' }}
               </text>
             </view>
-            <wd-input v-model="passwordForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+            <wd-input v-model="passwordForm.confirmPassword" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
               <template #prefix>
                 <view class="i-lucide:lock-keyhole text-gray-400" />
               </template>
@@ -337,7 +337,7 @@ async function handleUpdateByCode() {
             </text>
           </template>
         </wd-input>
-        <wd-input v-model="codeForm.newPassword" type="safe-password" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
+        <wd-input v-model="codeForm.newPassword" show-password placeholder="新密码" :maxlength="20" custom-class="login-input">
           <template #prefix>
             <view class="i-lucide-lock text-gray-400" />
           </template>
@@ -350,7 +350,7 @@ async function handleUpdateByCode() {
             {{ strengthText[passwordStrength - 1] || '弱' }}
           </text>
         </view>
-        <wd-input v-model="codeForm.confirmPassword" type="safe-password" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
+        <wd-input v-model="codeForm.confirmPassword" show-password placeholder="确认新密码" :maxlength="20" custom-class="login-input">
           <template #prefix>
             <view class="i-lucide-lock text-gray-400" />
           </template>

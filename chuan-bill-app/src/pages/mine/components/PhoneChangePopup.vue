@@ -385,7 +385,7 @@ async function handleUpdateByPassword() {
           </view>
         </view>
         <view class="pt-2">
-          <wd-input v-model="passwordForm.password" type="safe-password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
+          <wd-input v-model="passwordForm.password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
             <template #prefix>
               <view class="i-lucide-lock text-gray-400" />
             </template>
