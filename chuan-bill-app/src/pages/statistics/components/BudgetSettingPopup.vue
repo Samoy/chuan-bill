@@ -99,7 +99,7 @@ function onDelete() {
             type="number"
             placeholder="1000"
             custom-class="flex-1 rounded-xl px-1! py-0.5!"
-            custom-input-class="text-[32px]! font-bold! h-auto!"
+            custom-input-class="text-[32px]! font-bold! h-10!"
             no-border
           />
         </view>

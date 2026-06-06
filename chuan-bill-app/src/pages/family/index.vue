@@ -273,7 +273,7 @@ async function handleJoin() {
     </template>
 
     <!-- 加入家庭弹框 -->
-    <wd-popup v-model="showJoinPopup" position="bottom" :z-index="100" custom-class="rounded-2xl rounded-b-0 p-6" closable>
+    <wd-popup v-if="user.isLoggedIn" v-model="showJoinPopup" position="bottom" :z-index="100" custom-class="rounded-2xl rounded-b-0 p-6" closable>
       <view class="mb-4">
         <text class="block text-lg font-500">
           加入家庭
