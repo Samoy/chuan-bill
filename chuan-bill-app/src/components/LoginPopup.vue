@@ -26,6 +26,8 @@ let countdownTimer: ReturnType<typeof setInterval> | null = null
 
 // ========== 登录加载状态 ==========
 const isLoading = ref(false)
+// ========== 验证码发送中 ==========
+const isSending = ref(false)
 
 // ========== 清理倒计时 ==========
 function clearCountdown() {
@@ -71,7 +73,7 @@ function handleOpenPrivacy() {
 
 // ========== 发送验证码 ==========
 async function handleSendCode() {
-  if (isCountingDown.value)
+  if (isCountingDown.value || isSending.value)
     return
   if (!phone.value) {
     toast.warning('请输入手机号')
@@ -82,21 +84,15 @@ async function handleSendCode() {
     return
   }
 
-  try {
-    const response = await Apis.auth.sendCode({
-      data: { phone: phone.value },
-    })
-    if (response.code === 200) {
-      toast.success('验证码已发送')
-      startCountdown()
-    }
-    else {
-      toast.error(response.message || '发送失败')
-    }
+  isSending.value = true
+  const response = await Apis.auth.sendCode({
+    data: { phone: phone.value },
+  })
+  if (response.code === 200) {
+    toast.success('验证码已发送')
+    startCountdown()
   }
-  catch (error) {
-    console.error('发送验证码失败:', error)
-  }
+  isSending.value = false
 }
 
 // ========== 处理登录成功 ==========
@@ -137,26 +133,16 @@ async function handlePhoneLogin() {
   }
 
   isLoading.value = true
-  try {
-    const response = await Apis.auth.loginByPhone({
-      data: {
-        phone: phone.value,
-        code: code.value,
-      },
-    })
-    if (response.code === 200 && response.data) {
-      await handleLoginSuccess(response.data)
-    }
-    else {
-      toast.error(response.message || '登录失败')
-    }
+  const response = await Apis.auth.loginByPhone({
+    data: {
+      phone: phone.value,
+      code: code.value,
+    },
+  })
+  if (response.code === 200 && response.data) {
+    await handleLoginSuccess(response.data)
   }
-  catch (error) {
-    console.error('登录失败:', error)
-  }
-  finally {
-    isLoading.value = false
-  }
+  isLoading.value = false
 }
 
 // ========== 密码登录 ==========
@@ -293,9 +279,9 @@ export default {
                 <template #suffix>
                   <text
                     class="whitespace-nowrap text-sm"
-                    :class="isCountingDown || !phone ? 'text-gray-400' : 'text-blue-500'" @click.stop="handleSendCode"
+                    :class="isCountingDown || isSending || !phone ? 'text-gray-400' : 'text-blue-500'" @click.stop="handleSendCode"
                   >
-                    {{ isCountingDown ? `${countdown}s` : '获取验证码' }}
+                    {{ isCountingDown ? `${countdown}s` : isSending ? '发送中...' : '获取验证码' }}
                   </text>
                 </template>
               </wd-input>
