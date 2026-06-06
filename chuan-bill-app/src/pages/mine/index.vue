@@ -32,9 +32,9 @@ const loginFeatures = [
 const loginTip = computed(() => {
   const count = billStore.localBillList.length
   if (count === 0) {
-    return '登录后享受云端同步、多设备访问等功能'
+    return { prefix: '登录后享受云端同步、多设备访问等功能', count: null, suffix: '' }
   }
-  return `您已记账${count}笔，登录后可同步到云端，永不丢失`
+  return { prefix: '您已记账', count, suffix: '笔，登录后可同步到云端，永不丢失' }
 })
 
 // 弹窗状态
@@ -163,11 +163,13 @@ const menuGroups: { title: string, items: MenuItem[], needLogin?: boolean }[] = 
         title: '帮助与反馈',
         action: () => router.push('/pages/mine/help'),
       },
+      // #ifndef MP
       {
         icon: 'i-lucide:download-cloud',
         title: '检查更新',
         action: () => checkUpdate(),
       },
+      // #endif
       {
         icon: 'i-lucide:info',
         title: '关于应用',
@@ -243,7 +245,11 @@ onShow(() => {
               点击登录
             </text>
             <text class="mt-1 block text-sm text-gray-500">
-              {{ loginTip }}
+              {{ loginTip.prefix }}
+              <text v-if="loginTip.count !== null" class="text-orange-500 font-600">
+                {{ loginTip.count }}
+              </text>
+              {{ loginTip.suffix }}
             </text>
           </view>
           <view class="i-lucide:chevron-right h-4 w-4" />
@@ -329,10 +335,10 @@ onShow(() => {
     </view>
 
     <!-- 弹窗组件 -->
-    <SyncStatusPopup v-model="showSyncPopup" />
+    <SyncStatusPopup v-if="user.isLoggedIn" v-model="showSyncPopup" />
     <ThemePickerPopup v-model="showThemePopup" />
-    <NotificationSettingsPopup v-model="showNotificationPopup" />
-    <ExportFilterPopup v-model="showExportPopup" />
+    <NotificationSettingsPopup v-if="user.isLoggedIn" v-model="showNotificationPopup" />
+    <ExportFilterPopup v-if="user.isLoggedIn" v-model="showExportPopup" />
     <wd-action-sheet
       v-model="showDarkModePopup"
       :actions="darkModeActions"
@@ -340,5 +346,8 @@ onShow(() => {
       cancel-text="取消"
       @select="selectDarkMode"
     />
+
+    <!-- 底部间距（给 tabbar 留空间） -->
+    <view class="h-10" />
   </view>
 </template>

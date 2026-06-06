@@ -266,7 +266,7 @@ export default {
         </view>
         <!-- 标题 -->
         <view class="mt-5 text-center">
-          <text class="text-xl text-gray-800 font-bold">
+          <text class="text-xl text-gray-800 font-bold dark:text-primary">
             欢迎使用小川记账
           </text>
         </view>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import BudgetSettingPopup from './BudgetSettingPopup.vue'
 
 defineOptions({
   name: 'BudgetCard',
@@ -11,9 +10,12 @@ const props = defineProps<{
   month: string
 }>()
 
+const emit = defineEmits<{
+  openSetting: []
+}>()
+
 const user = useUserStore()
 const budgetStore = useBudgetStore()
-const showSettingPopup = ref(false)
 
 const budget = computed(() => budgetStore.currentBudget)
 
@@ -61,7 +63,7 @@ const isCurrentMonth = computed(() => {
 function openSetting() {
   if (!isCurrentMonth.value)
     return
-  showSettingPopup.value = true
+  emit('openSetting')
 }
 
 // 月份变化时获取预算
@@ -80,7 +82,7 @@ watch(() => user.isLoggedIn, (loggedIn) => {
 </script>
 
 <template>
-  <view v-if="user.isLoggedIn" class="mx-3">
+  <view class="mx-3">
     <!-- 有预算 -->
     <view
       v-if="budget"
@@ -153,8 +155,5 @@ watch(() => user.isLoggedIn, (loggedIn) => {
         </text>
       </view>
     </view>
-
-    <!-- 设置弹窗 -->
-    <BudgetSettingPopup v-model="showSettingPopup" />
   </view>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { LocalBillVO } from '@/store/billStore.js'
+import type { BillVO } from '@/api/globals'
+import type { LocalBillVO } from '@/store/billStore'
 import BillDetail from './BillDetail.vue'
 
 defineOptions({
@@ -12,11 +13,11 @@ defineOptions({
 
 const { bill, type = 'user' } = defineProps<{
   type?: 'user' | 'family'
-  bill: LocalBillVO
+  bill: LocalBillVO | BillVO
 }>()
 
 const emit = defineEmits<{
-  update: [item: LocalBillVO]
+  update: [item: LocalBillVO | BillVO]
   delete: []
 }>()
 
@@ -59,7 +60,7 @@ const isFamilyBill = computed(() => {
 })
 
 const showBtn = computed(() => {
-  if (bill.local) {
+  if ((bill as LocalBillVO).local) {
     return true
   }
   return bill.userId === userStore.userId && !isFamilyBill.value
