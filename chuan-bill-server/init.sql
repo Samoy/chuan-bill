@@ -8,6 +8,7 @@ SET
   utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE `chuan_bill`;
+SET NAMES utf8mb4;
 
 -- ===============================
 -- 用户表(t_user)
