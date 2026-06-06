@@ -95,9 +95,6 @@ importers:
       uni-echarts:
         specifier: ^2.2.5
         version: 2.2.5(echarts@6.0.0)(vue@3.4.38(typescript@5.5.4))
-      uuid:
-        specifier: ^13.0.0
-        version: 13.0.0
       vue:
         specifier: ~3.4.38
         version: 3.4.38(typescript@5.5.4)
@@ -7612,10 +7609,6 @@ packages:
   utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
-
-  uuid@13.0.0:
-    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
-    hasBin: true
 
   v8-to-istanbul@9.3.0:
     resolution: {integrity: sha512-kiGUalWN+rgBJ/1OHZsBtU4rXZOfj/7rKQxULKlIzwzQSvMJUUNgPwJEEh7gU6xEVxC0ahoOBvN2YI8GH6FNgA==}
@@ -17430,8 +17423,6 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   utils-merge@1.0.1: {}
-
-  uuid@13.0.0: {}
 
   v8-to-istanbul@9.3.0:
     dependencies:
