@@ -4,6 +4,7 @@ import { AiSuggestionType } from '@/constant/ai'
 import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import BudgetCard from './components/BudgetCard.vue'
+import BudgetSettingPopup from './components/BudgetSettingPopup.vue'
 import CategoryChart from './components/CategoryChart.vue'
 import DailyTrendChart from './components/DailyTrendChart.vue'
 
@@ -20,6 +21,7 @@ setupEcharts()
 const statisticsStore = useStatisticsStore()
 const budgetStore = useBudgetStore()
 const user = useUserStore()
+const showSettingPopup = ref(false)
 
 // 当前选中的月份
 const currentMonth = ref(dayjs().format('YYYY-MM'))
@@ -149,7 +151,7 @@ watch(() => user.isLoggedIn, () => {
     </view>
 
     <!-- 预算卡片 -->
-    <BudgetCard :month="currentMonth" />
+    <BudgetCard v-if="user.isLoggedIn" :month="currentMonth" @open-setting="showSettingPopup = true" />
 
     <!-- 分类饼图 -->
     <view class="mx-3">
@@ -162,9 +164,12 @@ watch(() => user.isLoggedIn, () => {
     </view>
 
     <!-- AI 消费建议 -->
-    <view class="mx-3">
+    <view class="mx-3 mb-3">
       <AiSuggestionCard :month="currentMonth" />
     </view>
+
+    <!-- 预算弹窗 -->
+    <BudgetSettingPopup v-model="showSettingPopup" />
 
     <!-- 底部间距（给 tabbar 留空间） -->
     <view class="h-10" />

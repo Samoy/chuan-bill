@@ -1,12 +1,17 @@
 import type { AddBillDTO, BillMonthlyStatsVO, BillVO, CategoryVO, PaymentMethodVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
 import { add, subtract } from 'mathjs'
-import { v4 as uuid } from 'uuid'
 import { LOCAL_PAY_CATEGORY_LIST, LOCAL_PAYMENT_METHOD_LIST } from '@/constant/bill'
 
+let _localIdCounter = 0
+function generateLocalId() {
+  return `${Date.now().toString(36)}_${(++_localIdCounter).toString(36)}`
+}
+
 // 扩展 BillVO 类型，添加同步状态
-interface LocalBillVO extends BillVO {
+export interface LocalBillVO extends BillVO {
   syncStatus: 'init' | 'success' | 'failed'
+  local: boolean
 }
 
 export const useBillStore = defineStore('bill', () => {
@@ -100,10 +105,11 @@ export const useBillStore = defineStore('bill', () => {
       ...bill,
       amount: Number(bill.amount || 0).toFixed(2),
       time: dayjs(bill.time).format('YYYY-MM-DD HH:mm'),
-      id: uuid(),
+      id: generateLocalId(),
       paymentMethod,
       category,
       syncStatus: 'init',
+      local: true,
     })
   }
 

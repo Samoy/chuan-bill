@@ -129,12 +129,6 @@ async function sendCodeToOldPhone() {
         }
       }, 1000)
     }
-    else {
-      toast.error(res.message || '发送失败')
-    }
-  }
-  catch {
-    toast.error('发送失败，请重试')
   }
   finally {
     oldPhoneSending.value = false
@@ -164,12 +158,6 @@ async function sendCodeToNewPhone(phone: string) {
         }
       }, 1000)
     }
-    else {
-      toast.error(res.message || '发送失败')
-    }
-  }
-  catch {
-    toast.error('发送失败，请重试')
   }
   finally {
     newPhoneSending.value = false
@@ -205,12 +193,6 @@ async function handleBindPhone() {
       // 刷新用户信息
       userStore.getProfile()
     }
-    else {
-      toast.error(res.message || '绑定失败')
-    }
-  }
-  catch {
-    toast.error('绑定失败，请重试')
   }
   finally {
     loading.value = false
@@ -250,12 +232,6 @@ async function handleUpdateByCode() {
       modelValue.value = false
       userStore.getProfile()
     }
-    else {
-      toast.error(res.message || '更换失败')
-    }
-  }
-  catch {
-    toast.error('更换失败，请重试')
   }
   finally {
     loading.value = false
@@ -295,12 +271,6 @@ async function handleUpdateByPassword() {
       modelValue.value = false
       userStore.getProfile()
     }
-    else {
-      toast.error(res.message || '更换失败')
-    }
-  }
-  catch {
-    toast.error('更换失败，请重试')
   }
   finally {
     loading.value = false
@@ -338,10 +308,10 @@ async function handleUpdateByPassword() {
             <template #suffix>
               <text
                 class="whitespace-nowrap text-sm"
-                :class="newPhoneCountdown > 0 || !isValidPhone(bindForm.phone) ? 'text-gray-400' : 'text-blue-500'"
+                :class="newPhoneCountdown > 0 || newPhoneSending || !isValidPhone(bindForm.phone) ? 'text-gray-400' : 'text-blue-500'"
                 @click.stop="sendCodeToNewPhone(bindForm.phone)"
               >
-                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : newPhoneSending ? '发送中...' : '获取验证码' }}
               </text>
             </template>
           </wd-input>
@@ -366,10 +336,10 @@ async function handleUpdateByPassword() {
             <template #suffix>
               <text
                 class="whitespace-nowrap text-sm"
-                :class="oldPhoneCountdown > 0 ? 'text-gray-400' : 'text-blue-500'"
+                :class="oldPhoneCountdown > 0 || oldPhoneSending ? 'text-gray-400' : 'text-blue-500'"
                 @click.stop="sendCodeToOldPhone"
               >
-                {{ oldPhoneCountdown > 0 ? `${oldPhoneCountdown}s` : '获取验证码' }}
+                {{ oldPhoneCountdown > 0 ? `${oldPhoneCountdown}s` : oldPhoneSending ? '发送中...' : '获取验证码' }}
               </text>
             </template>
           </wd-input>
@@ -385,10 +355,10 @@ async function handleUpdateByPassword() {
             <template #suffix>
               <text
                 class="whitespace-nowrap text-sm"
-                :class="newPhoneCountdown > 0 || !isValidPhone(codeForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
+                :class="newPhoneCountdown > 0 || newPhoneSending || !isValidPhone(codeForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
                 @click.stop="sendCodeToNewPhone(codeForm.newPhone)"
               >
-                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : newPhoneSending ? '发送中...' : '获取验证码' }}
               </text>
             </template>
           </wd-input>
@@ -415,7 +385,7 @@ async function handleUpdateByPassword() {
           </view>
         </view>
         <view class="pt-2">
-          <wd-input v-model="passwordForm.password" type="safe-password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
+          <wd-input v-model="passwordForm.password" show-password placeholder="登录密码" :maxlength="20" custom-class="login-input">
             <template #prefix>
               <view class="i-lucide-lock text-gray-400" />
             </template>
@@ -432,10 +402,10 @@ async function handleUpdateByPassword() {
             <template #suffix>
               <text
                 class="whitespace-nowrap text-sm"
-                :class="newPhoneCountdown > 0 || !isValidPhone(passwordForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
+                :class="newPhoneCountdown > 0 || newPhoneSending || !isValidPhone(passwordForm.newPhone) ? 'text-gray-400' : 'text-blue-500'"
                 @click.stop="sendCodeToNewPhone(passwordForm.newPhone)"
               >
-                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : '获取验证码' }}
+                {{ newPhoneCountdown > 0 ? `${newPhoneCountdown}s` : newPhoneSending ? '发送中...' : '获取验证码' }}
               </text>
             </template>
           </wd-input>

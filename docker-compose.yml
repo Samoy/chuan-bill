@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: chuan-bill-backend
     restart: unless-stopped
+    env_file:
+      - .env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -36,6 +38,9 @@ services:
     image: mysql:8.0
     container_name: chuan-bill-mysql
     restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DATABASE=chuan_bill
@@ -54,7 +59,7 @@ services:
     image: redis:6-alpine
     container_name: chuan-bill-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     healthcheck:

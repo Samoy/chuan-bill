@@ -26,6 +26,8 @@ let countdownTimer: ReturnType<typeof setInterval> | null = null
 
 // ========== 登录加载状态 ==========
 const isLoading = ref(false)
+// ========== 验证码发送中 ==========
+const isSending = ref(false)
 
 // ========== 清理倒计时 ==========
 function clearCountdown() {
@@ -71,7 +73,7 @@ function handleOpenPrivacy() {
 
 // ========== 发送验证码 ==========
 async function handleSendCode() {
-  if (isCountingDown.value)
+  if (isCountingDown.value || isSending.value)
     return
   if (!phone.value) {
     toast.warning('请输入手机号')
@@ -82,6 +84,7 @@ async function handleSendCode() {
     return
   }
 
+  isSending.value = true
   try {
     const response = await Apis.auth.sendCode({
       data: { phone: phone.value },
@@ -90,12 +93,9 @@ async function handleSendCode() {
       toast.success('验证码已发送')
       startCountdown()
     }
-    else {
-      toast.error(response.message || '发送失败')
-    }
   }
-  catch (error) {
-    console.error('发送验证码失败:', error)
+  finally {
+    isSending.value = false
   }
 }
 
@@ -147,12 +147,6 @@ async function handlePhoneLogin() {
     if (response.code === 200 && response.data) {
       await handleLoginSuccess(response.data)
     }
-    else {
-      toast.error(response.message || '登录失败')
-    }
-  }
-  catch (error) {
-    console.error('登录失败:', error)
   }
   finally {
     isLoading.value = false
@@ -183,12 +177,6 @@ async function handlePasswordLogin() {
     if (response.code === 200 && response.data) {
       await handleLoginSuccess(response.data)
     }
-    else {
-      toast.error(response.message || '登录失败')
-    }
-  }
-  catch (error) {
-    console.error('登录失败:', error)
   }
   finally {
     isLoading.value = false
@@ -266,7 +254,7 @@ export default {
         </view>
         <!-- 标题 -->
         <view class="mt-5 text-center">
-          <text class="text-xl text-gray-800 font-bold">
+          <text class="text-xl text-gray-800 font-bold dark:text-primary">
             欢迎使用小川记账
           </text>
         </view>
@@ -293,9 +281,9 @@ export default {
                 <template #suffix>
                   <text
                     class="whitespace-nowrap text-sm"
-                    :class="isCountingDown || !phone ? 'text-gray-400' : 'text-blue-500'" @click.stop="handleSendCode"
+                    :class="isCountingDown || isSending || !phone ? 'text-gray-400' : 'text-blue-500'" @click.stop="handleSendCode"
                   >
-                    {{ isCountingDown ? `${countdown}s` : '获取验证码' }}
+                    {{ isCountingDown ? `${countdown}s` : isSending ? '发送中...' : '获取验证码' }}
                   </text>
                 </template>
               </wd-input>
@@ -316,7 +304,7 @@ export default {
                   <view class="i-lucide-phone text-gray-400" />
                 </template>
               </wd-input>
-              <wd-input v-model="password" type="safe-password" show-password placeholder="登录密码" custom-class="login-input">
+              <wd-input v-model="password" show-password placeholder="登录密码" custom-class="login-input">
                 <template #prefix>
                   <view class="i-lucide-lock text-gray-400" />
                 </template>
