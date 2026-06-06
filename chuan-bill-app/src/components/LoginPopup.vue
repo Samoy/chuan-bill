@@ -85,14 +85,18 @@ async function handleSendCode() {
   }
 
   isSending.value = true
-  const response = await Apis.auth.sendCode({
-    data: { phone: phone.value },
-  })
-  if (response.code === 200) {
-    toast.success('验证码已发送')
-    startCountdown()
+  try {
+    const response = await Apis.auth.sendCode({
+      data: { phone: phone.value },
+    })
+    if (response.code === 200) {
+      toast.success('验证码已发送')
+      startCountdown()
+    }
   }
-  isSending.value = false
+  finally {
+    isSending.value = false
+  }
 }
 
 // ========== 处理登录成功 ==========
@@ -133,16 +137,20 @@ async function handlePhoneLogin() {
   }
 
   isLoading.value = true
-  const response = await Apis.auth.loginByPhone({
-    data: {
-      phone: phone.value,
-      code: code.value,
-    },
-  })
-  if (response.code === 200 && response.data) {
-    await handleLoginSuccess(response.data)
+  try {
+    const response = await Apis.auth.loginByPhone({
+      data: {
+        phone: phone.value,
+        code: code.value,
+      },
+    })
+    if (response.code === 200 && response.data) {
+      await handleLoginSuccess(response.data)
+    }
   }
-  isLoading.value = false
+  finally {
+    isLoading.value = false
+  }
 }
 
 // ========== 密码登录 ==========
@@ -169,12 +177,6 @@ async function handlePasswordLogin() {
     if (response.code === 200 && response.data) {
       await handleLoginSuccess(response.data)
     }
-    else {
-      toast.error(response.message || '登录失败')
-    }
-  }
-  catch (error) {
-    console.error('登录失败:', error)
   }
   finally {
     isLoading.value = false

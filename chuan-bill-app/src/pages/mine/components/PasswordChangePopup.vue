@@ -122,12 +122,6 @@ async function sendCodeToCurrentPhone() {
         }
       }, 1000)
     }
-    else {
-      toast.error(res.message || '发送失败')
-    }
-  }
-  catch {
-    toast.error('发送失败，请重试')
   }
   finally {
     sending.value = false
@@ -170,12 +164,6 @@ async function handleUpdateByPassword() {
         router.pushTab('/pages/mine/index')
       }, 1500)
     }
-    else {
-      toast.error(res.message || '修改失败')
-    }
-  }
-  catch {
-    toast.error('修改失败，请重试')
   }
   finally {
     loading.value = false
@@ -217,12 +205,6 @@ async function handleUpdateByCode() {
         router.pushTab('/pages/mine/index')
       }, 1500)
     }
-    else {
-      toast.error(res.message || '修改失败')
-    }
-  }
-  catch {
-    toast.error('修改失败，请重试')
   }
   finally {
     loading.value = false
@@ -256,10 +238,10 @@ async function handleUpdateByCode() {
               <template #suffix>
                 <text
                   class="whitespace-nowrap text-sm"
-                  :class="countdown > 0 || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
+                  :class="countdown > 0 || sending || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
                   @click.stop="sendCodeToCurrentPhone"
                 >
-                  {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+                  {{ countdown > 0 ? `${countdown}s` : sending ? '发送中...' : '获取验证码' }}
                 </text>
               </template>
             </wd-input>
@@ -348,10 +330,10 @@ async function handleUpdateByCode() {
           <template #suffix>
             <text
               class="whitespace-nowrap text-sm"
-              :class="countdown > 0 || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
+              :class="countdown > 0 || sending || !userStore.phone ? 'text-gray-400' : 'text-blue-500'"
               @click.stop="sendCodeToCurrentPhone"
             >
-              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+              {{ countdown > 0 ? `${countdown}s` : sending ? '发送中...' : '获取验证码' }}
             </text>
           </template>
         </wd-input>
