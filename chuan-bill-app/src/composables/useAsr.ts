@@ -334,7 +334,36 @@ export function useAsr() {
     })
   }
 
-  function startRecording(config?: {
+  async function checkMicrophonePermission(): Promise<boolean> {
+    // #ifdef H5
+    return true
+    // #endif
+    // #ifndef H5
+    const setting = uni.getAppAuthorizeSetting()
+    const status = setting.microphoneAuthorized
+    if (status === 'authorized') {
+      return true
+    }
+    if (status === 'denied') {
+      toast.show('麦克风权限被拒绝，请在设置中开启')
+      uni.openSetting()
+      return false
+    }
+    // status === 'not determined'
+    return new Promise<boolean>((resolve) => {
+      uni.authorize({
+        scope: 'scope.record',
+        success: () => resolve(true),
+        fail: () => {
+          toast.show('需要麦克风权限才能录音')
+          resolve(false)
+        },
+      })
+    })
+    // #endif
+  }
+
+  async function startRecording(config?: {
     duration?: number
     sampleRate?: number
     numberOfChannels?: number
@@ -343,6 +372,10 @@ export function useAsr() {
   }) {
     if (!client) {
       toast.show('语音识别服务未初始化')
+      return
+    }
+    const hasPermission = await checkMicrophonePermission()
+    if (!hasPermission) {
       return
     }
     client.setRecording(true)
@@ -403,9 +436,6 @@ export function useAsr() {
   }
 
   function stopRecording() {
-    if (!isRecording) {
-      return
-    }
     isRecording = false
     client?.setRecording(false)
     // #ifndef H5
