@@ -403,6 +403,9 @@ export function useAsr() {
   }
 
   function stopRecording() {
+    if (!isRecording) {
+      return
+    }
     isRecording = false
     client?.setRecording(false)
     // #ifndef H5
