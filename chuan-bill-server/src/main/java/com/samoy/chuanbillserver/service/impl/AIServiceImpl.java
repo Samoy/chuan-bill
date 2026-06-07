@@ -80,8 +80,11 @@ public class AIServiceImpl implements IAIService {
             String output = result.getOutput().getText();
             JSON json = JSONUtil.parse(output);
             BillVO billVO = json.getByPath("ocrResult", BillVO.class);
-            // 4. 识别成功删除临时文件
+            // 4. 识别后删除临时文件
             PathUtil.del(tempFile);
+            if (billVO == null || billVO.getAmount() == null) {
+                throw new BusinessException(ResultEnum.BILL_OCR_FAILED);
+            }
             // 5. 返回识别结果
             return billVO;
         } catch (NoApiKeyException | InputRequiredException e) {
@@ -96,7 +99,11 @@ public class AIServiceImpl implements IAIService {
                     agentUtil.callAgent(recognitionAppId, String.format("[%s]，从上述文本中帮我提取账单信息", text));
             String output = result.getOutput().getText();
             JSON json = JSONUtil.parse(output);
-            return json.getByPath("nlpResult", BillVO.class);
+            BillVO billVO = json.getByPath("nlpResult", BillVO.class);
+            if (billVO == null || billVO.getAmount() == null) {
+                throw new BusinessException(ResultEnum.BILL_TEXT_FAILED);
+            }
+            return billVO;
         } catch (NoApiKeyException | InputRequiredException e) {
             throw new BusinessException(ResultEnum.BILL_TEXT_FAILED);
         }
