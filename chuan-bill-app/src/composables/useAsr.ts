@@ -222,15 +222,7 @@ export class AsrClient {
       this.bufferAudio(audioData)
       return
     }
-    this.socketTask!.send({
-      data: audioData,
-      success: () => {
-        console.log('[ASR] 音频数据发送成功')
-      },
-      fail: (error) => {
-        console.log('[ASR] 音频数据发送失败', error)
-      },
-    })
+    this.socketTask!.send({ data: audioData })
   }
 
   stopRecognition() {
@@ -317,7 +309,6 @@ export function useAsr() {
       })
 
       recorderManager.onFrameRecorded((res) => {
-        console.log('[ASR] 录音数据', res)
         if (res.frameBuffer) {
           client?.sendAudioData(res.frameBuffer)
         }
