@@ -60,7 +60,7 @@
       "name": "family-edit",
       "layout": "default",
       "style": {
-        "navigationBarTitleText": "编辑家庭"
+        "navigationBarTitleText": "创建家庭"
       }
     },
     {
