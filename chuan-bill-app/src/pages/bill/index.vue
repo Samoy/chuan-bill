@@ -224,12 +224,12 @@ watch(() => user.isLoggedIn, (newVal) => {
         <view class="flex items-center gap-2">
           <wd-search
             v-model="searchValue" placeholder="账单名称或备注" hide-cancel
-            custom-class="flex-1 rounded-xl border border-solid border-[var(--wot-color-border)] dark:border-gray-600"
+            custom-class="flex-1 rounded-xl border border-solid border-[var(--wot-color-border)] dark:border-none"
             @search="refresh"
             @clear="refresh"
           />
           <view
-            class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
+            class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-none dark:bg-[var(--wot-dark-background4)]"
             :class="isFiltered && 'text-primary'"
             @click="showFilterModal = true"
           >

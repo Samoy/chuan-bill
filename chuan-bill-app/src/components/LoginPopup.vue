@@ -58,7 +58,7 @@ function validateAgreement(): boolean {
   return true
 }
 
-// ========== 协议链接（占位） ==========
+// ========== 协议链接 ==========
 function handleOpenAgreement() {
   router.push('/pages/agreement/index?from=login')
 }
@@ -83,6 +83,8 @@ async function handleSendCode() {
     toast.warning('请输入正确的手机号')
     return
   }
+  if (!validateAgreement())
+    return
 
   isSending.value = true
   try {

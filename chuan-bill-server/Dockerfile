@@ -1,4 +1,4 @@
-# 多阶段构建 - 构建阶段
+﻿# 多阶段构建 - 构建阶段
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 
@@ -16,6 +16,9 @@ WORKDIR /app
 
 # 创建非 root 用户
 RUN addgroup -S app && adduser -S app -G app
+
+# 创建临时文件目录并设置权限
+RUN mkdir -p /app/temp/upload && chown -R app:app /app/temp
 
 # 从构建阶段复制 JAR 文件
 COPY --from=builder /app/target/*.jar app.jar
