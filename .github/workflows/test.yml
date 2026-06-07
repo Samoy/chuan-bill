@@ -1,0 +1,65 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ──────────────────────────────────────────────
+  # 前端检查
+  # ──────────────────────────────────────────────
+  frontend:
+    name: Frontend Lint & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chuan-bill-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: chuan-bill-app/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm type-check
+
+  # ──────────────────────────────────────────────
+  # 后端检查
+  # ──────────────────────────────────────────────
+  backend:
+    name: Backend Spotless & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chuan-bill-server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Spotless check
+        run: mvn spotless:check -B
+
+      - name: Test
+        run: mvn test -B
