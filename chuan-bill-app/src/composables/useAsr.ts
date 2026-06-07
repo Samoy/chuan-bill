@@ -43,6 +43,10 @@ export class AsrClient {
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null
   private isManualDisconnect = false
   private serviceUrl: string
+  private audioBuffer: ArrayBuffer[] = []
+  private maxBufferFrames = 1500 // 30s x 50fps (20ms frameSize, 16kHz, 16bit, mono)
+  private isRecordingActive = false
+  private lastAsrConfig?: AsrConfig
 
   constructor(token: string) {
     this.serviceUrl = `${import.meta.env.VITE_WS_BASE_URL}/asr?token=${token}`
@@ -50,6 +54,38 @@ export class AsrClient {
 
   setCallbacks(callbacks: AsrCallbacks) {
     this.callbacks = { ...this.callbacks, ...callbacks }
+  }
+
+  setRecording(active: boolean) {
+    this.isRecordingActive = active
+    if (!active) {
+      this.audioBuffer = []
+    }
+  }
+
+  private bufferAudio(data: ArrayBuffer) {
+    if (this.audioBuffer.length >= this.maxBufferFrames) {
+      this.audioBuffer.shift()
+      console.warn('[ASR] 缓冲区已满，丢弃最早帧')
+    }
+    this.audioBuffer.push(data)
+    console.log('[ASR] 音频数据已缓存，缓冲帧数:', this.audioBuffer.length)
+  }
+
+  private flushAudioBuffer() {
+    const total = this.audioBuffer.length
+    let sent = 0
+    console.log(`[ASR] 开始刷新缓冲区，共 ${total} 帧`)
+    while (this.audioBuffer.length > 0) {
+      if (!this.isConnected) {
+        console.warn(`[ASR] flush 过程中连接断开，已发送 ${sent}/${total} 帧，剩余帧保留`)
+        return
+      }
+      const frame = this.audioBuffer.shift()!
+      this.socketTask!.send({ data: frame })
+      sent++
+    }
+    console.log(`[ASR] 缓冲区已刷新，共发送 ${sent} 帧`)
   }
 
   connect() {
@@ -79,6 +115,12 @@ export class AsrClient {
         this.isManualDisconnect = false
         this.status = WebSocketStatus.CONNECTED
         this.callbacks.onConnected?.()
+        if (this.isRecordingActive) {
+          this.startRecognition(this.lastAsrConfig)
+          if (this.audioBuffer.length > 0) {
+            this.flushAudioBuffer()
+          }
+        }
         resolve()
       })
 
@@ -157,6 +199,7 @@ export class AsrClient {
   }
 
   startRecognition(config?: AsrConfig) {
+    this.lastAsrConfig = config || this.lastAsrConfig
     if (!this.isConnected) {
       toast.show('语音服务未连接')
       return
@@ -172,18 +215,22 @@ export class AsrClient {
 
   sendAudioData(audioData: ArrayBuffer) {
     if (!this.isConnected) {
-      console.warn('[ASR] WebSocket未连接，无法发送音频数据')
+      this.bufferAudio(audioData)
       return
     }
     if (this.status !== WebSocketStatus.RECOGNIZING) {
-      console.warn('[ASR] 语音识别服务未开始')
+      this.bufferAudio(audioData)
       return
     }
-    this.socketTask!.send({ data: audioData, success: () => {
-      console.log('[ASR] 音频数据发送成功')
-    }, fail: (error) => {
-      console.log('[ASR] 音频数据发送失败', error)
-    } })
+    this.socketTask!.send({
+      data: audioData,
+      success: () => {
+        console.log('[ASR] 音频数据发送成功')
+      },
+      fail: (error) => {
+        console.log('[ASR] 音频数据发送失败', error)
+      },
+    })
   }
 
   stopRecognition() {
@@ -198,6 +245,8 @@ export class AsrClient {
 
   disconnect() {
     this.isManualDisconnect = true
+    this.isRecordingActive = false
+    this.audioBuffer = []
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout)
       this.reconnectTimeout = null
@@ -296,6 +345,7 @@ export function useAsr() {
       toast.show('语音识别服务未初始化')
       return
     }
+    client.setRecording(true)
     client.startRecognition({
       format: config?.format || 'pcm',
       languageHints: ['zh'],
@@ -309,7 +359,7 @@ export function useAsr() {
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
         format: config?.format || 'pcm',
-        frameSize: 16,
+        frameSize: 20,
       })
     }
     // #endif
@@ -354,6 +404,7 @@ export function useAsr() {
 
   function stopRecording() {
     isRecording = false
+    client?.setRecording(false)
     // #ifndef H5
     recorderManager?.stop()
     // #endif
