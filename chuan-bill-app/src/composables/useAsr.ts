@@ -44,7 +44,7 @@ export class AsrClient {
   private isManualDisconnect = false
   private serviceUrl: string
   private audioBuffer: ArrayBuffer[] = []
-  private maxBufferFrames = 1500 // 30s x 50fps (20ms frameSize, 16kHz, 16bit, mono)
+  private maxBufferFrames = 1000 // 30s x ~31fps (frameSize: 1KB, 16kHz, 16bit, mono)
   private isRecordingActive = false
   private lastAsrConfig?: AsrConfig
 
@@ -347,7 +347,7 @@ export function useAsr() {
     }
     client.setRecording(true)
     client.startRecognition({
-      format: config?.format || 'mp3',
+      format: config?.format || 'pcm',
       languageHints: ['zh'],
       sampleRate: config?.sampleRate || 16000,
     })
@@ -358,7 +358,8 @@ export function useAsr() {
         sampleRate: config?.sampleRate || 16000,
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
-        format: 'mp3',
+        format: 'PCM',
+        frameSize: 1,
       })
     }
     // #endif

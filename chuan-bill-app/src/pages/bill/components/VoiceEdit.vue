@@ -66,7 +66,7 @@ async function touchStart(event: UniHelper.TouchEvent) {
   asrClient.startRecording({
     duration: 60000,
     sampleRate: 16000,
-    format: 'mp3',
+    format: 'pcm',
   })
 }
 
