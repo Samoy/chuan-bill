@@ -358,7 +358,7 @@ export function useAsr() {
         sampleRate: config?.sampleRate || 16000,
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
-        format: config?.format || 'pcm',
+        format: 'PCM',
         frameSize: 20,
       })
     }
