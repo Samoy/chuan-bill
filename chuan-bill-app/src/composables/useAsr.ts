@@ -347,7 +347,7 @@ export function useAsr() {
     }
     client.setRecording(true)
     client.startRecognition({
-      format: config?.format || 'pcm',
+      format: config?.format || 'mp3',
       languageHints: ['zh'],
       sampleRate: config?.sampleRate || 16000,
     })
@@ -358,8 +358,7 @@ export function useAsr() {
         sampleRate: config?.sampleRate || 16000,
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
-        format: 'PCM',
-        frameSize: 20,
+        format: 'mp3',
       })
     }
     // #endif
