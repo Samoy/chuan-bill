@@ -5,6 +5,11 @@ services:
       dockerfile: Dockerfile
     container_name: chuan-bill-backend
     restart: unless-stopped
+<<<<<<< Updated upstream
+=======
+    ports:
+      - "8080:8080"
+>>>>>>> Stashed changes
     env_file:
       - .env
     healthcheck:
