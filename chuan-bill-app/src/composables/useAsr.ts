@@ -34,13 +34,14 @@ export interface AsrCallbacks {
 }
 
 export class AsrClient {
-  private ws: WebSocket | null = null
+  private socketTask: UniApp.SocketTask | null = null
+  private isConnected = false
   private status: WebSocketStatus = WebSocketStatus.DISCONNECTED
   private callbacks: AsrCallbacks = {}
-  private reconnectAttempts: number = 0
-  private maxReconnectAttempts: number = 3
-  private reconnectTimeout: number | null = null
-  private isManualDisconnect: boolean = false
+  private reconnectAttempts = 0
+  private maxReconnectAttempts = 3
+  private reconnectTimeout: ReturnType<typeof setTimeout> | null = null
+  private isManualDisconnect = false
   private serviceUrl: string
 
   constructor(token: string) {
@@ -53,48 +54,55 @@ export class AsrClient {
 
   connect() {
     return new Promise<void>((resolve, reject) => {
-      if (this.ws?.readyState === WebSocket.OPEN) {
+      if (this.isConnected) {
         resolve()
         return
       }
       this.status = WebSocketStatus.CONNECTING
-      try {
-        this.ws = new WebSocket(this.serviceUrl)
-        this.ws.onopen = () => {
-          console.log('[ASR] WebSocket 连接成功')
-          this.reconnectAttempts = 0
-          this.isManualDisconnect = false
-          this.status = WebSocketStatus.CONNECTED
-          this.callbacks.onConnected?.()
-          resolve()
-        }
 
-        this.ws.onmessage = (event) => {
-          this.handleMessage(event.data)
-        }
-
-        this.ws.onclose = () => {
-          console.log('[ASR] WebSocket 连接关闭')
-          this.status = WebSocketStatus.DISCONNECTED
-          this.callbacks.onDisconnected?.()
-          // 非手动断开才尝试重连
-          if (!this.isManualDisconnect) {
-            this.attemptReconnect()
-          }
-        }
-
-        this.ws.onerror = (error) => {
-          console.error('[ASR] WebSocket连接错误', error)
+      this.socketTask = uni.connectSocket({
+        url: this.serviceUrl,
+        success: () => {
+          console.log('[ASR] WebSocket 连接请求已发送')
+        },
+        fail: (err) => {
+          console.error('[ASR] WebSocket 连接失败', err)
           this.status = WebSocketStatus.ERROR
-          this.callbacks.onError?.('WebSocket连接错误')
-          reject(error)
+          reject(err)
+        },
+      })
+
+      this.socketTask.onOpen(() => {
+        console.log('[ASR] WebSocket 连接成功')
+        this.isConnected = true
+        this.reconnectAttempts = 0
+        this.isManualDisconnect = false
+        this.status = WebSocketStatus.CONNECTED
+        this.callbacks.onConnected?.()
+        resolve()
+      })
+
+      this.socketTask.onMessage((res) => {
+        this.handleMessage(res.data as string)
+      })
+
+      this.socketTask.onClose(() => {
+        console.log('[ASR] WebSocket 连接关闭')
+        this.isConnected = false
+        this.status = WebSocketStatus.DISCONNECTED
+        this.callbacks.onDisconnected?.()
+        if (!this.isManualDisconnect) {
+          this.attemptReconnect()
         }
-      }
-      catch (error) {
-        console.error('[ASR] WebSocket连接失败', error)
+      })
+
+      this.socketTask.onError((err) => {
+        console.error('[ASR] WebSocket 连接错误', err)
+        this.isConnected = false
         this.status = WebSocketStatus.ERROR
-        reject(error)
-      }
+        this.callbacks.onError?.('WebSocket连接错误')
+        reject(err)
+      })
     })
   }
 
@@ -141,16 +149,15 @@ export class AsrClient {
       return
     }
     this.reconnectAttempts++
-    // 指数退避：1s, 2s, 4s...
     const delay = 2 ** (this.reconnectAttempts - 1) * 1000
     console.log(`[ASR] 尝试重新连接：${this.reconnectAttempts}/${this.maxReconnectAttempts}，延迟 ${delay}ms`)
-    this.reconnectTimeout = window.setTimeout(() => {
+    this.reconnectTimeout = setTimeout(() => {
       this.connect()
     }, delay)
   }
 
   startRecognition(config?: AsrConfig) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    if (!this.isConnected) {
       toast.show('语音服务未连接')
       return
     }
@@ -160,11 +167,11 @@ export class AsrClient {
       sampleRate: config?.sampleRate || 16000,
       languageHints: config?.languageHints || ['zh'],
     }
-    this.ws.send(JSON.stringify(command))
+    this.socketTask!.send({ data: JSON.stringify(command) })
   }
 
   sendAudioData(audioData: ArrayBuffer) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    if (!this.isConnected) {
       console.warn('[ASR] WebSocket未连接，无法发送音频数据')
       return
     }
@@ -172,29 +179,34 @@ export class AsrClient {
       console.warn('[ASR] 语音识别服务未开始')
       return
     }
-    this.ws.send(audioData)
+    this.socketTask!.send({ data: audioData, success: () => {
+      console.log('[ASR] 音频数据发送成功')
+    }, fail: (error) => {
+      console.log('[ASR] 音频数据发送失败', error)
+    } })
   }
 
   stopRecognition() {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+    if (!this.isConnected) {
       return
     }
     const command = {
       action: 'stop',
     }
-    this.ws.send(JSON.stringify(command))
+    this.socketTask!.send({ data: JSON.stringify(command) })
   }
 
   disconnect() {
     this.isManualDisconnect = true
     if (this.reconnectTimeout) {
-      window.clearTimeout(this.reconnectTimeout)
+      clearTimeout(this.reconnectTimeout)
       this.reconnectTimeout = null
     }
-    if (this.ws) {
-      this.ws.close()
-      this.ws = null
+    if (this.socketTask) {
+      this.socketTask.close({})
+      this.socketTask = null
     }
+    this.isConnected = false
     this.status = WebSocketStatus.DISCONNECTED
   }
 }
@@ -256,11 +268,13 @@ export function useAsr() {
       })
 
       recorderManager.onFrameRecorded((res) => {
+        console.log('[ASR] 录音数据', res)
         if (res.frameBuffer) {
           client?.sendAudioData(res.frameBuffer)
         }
       })
       // #endif
+
       client.connect()
         .then(resolve)
         .catch((error) => {
@@ -295,6 +309,7 @@ export function useAsr() {
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
         format: config?.format || 'pcm',
+        frameSize: 16,
       })
     }
     // #endif

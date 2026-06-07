@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BillVO } from '@/api/globals'
+import BillCard from './BillCard.vue'
 
 defineOptions({
   name: 'VoiceEdit',
