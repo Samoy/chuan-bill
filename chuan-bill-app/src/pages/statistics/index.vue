@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { AiSuggestionType } from '@/constant/ai'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import BudgetCard from './components/BudgetCard.vue'
@@ -59,15 +61,14 @@ function onMonthSelect({ value }: { value: string }) {
   showMonthPicker.value = false
 }
 
-onShow(() => {
-  nextTick(() => {
-    statisticsStore.setAnalysisContext(AiSuggestionType.USER)
-    statisticsStore.fetchAll(currentMonth.value)
-    statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
-    if (user.isLoggedIn) {
-      budgetStore.fetchBudget(currentMonth.value)
-    }
-  })
+// 首次加载时获取数据
+onLoad(() => {
+  statisticsStore.setAnalysisContext(AiSuggestionType.USER)
+  statisticsStore.fetchAll(currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  if (user.isLoggedIn) {
+    budgetStore.fetchBudget(currentMonth.value)
+  }
 })
 
 // 监听月份变化，获取统计数据
@@ -86,6 +87,25 @@ watch(() => user.isLoggedIn, () => {
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(currentMonth.value)
   }
+})
+
+// 监听账单和家庭数据变化事件
+function handleDataUpdated() {
+  statisticsStore.fetchAll(currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  if (user.isLoggedIn) {
+    budgetStore.fetchBudget(currentMonth.value)
+  }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.BILL.UPDATED, handleDataUpdated)
+  eventBus.on(EVENTS.FAMILY.UPDATED, handleDataUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
+  eventBus.off(EVENTS.FAMILY.UPDATED, handleDataUpdated)
 })
 </script>
 
