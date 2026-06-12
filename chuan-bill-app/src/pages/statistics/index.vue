@@ -78,7 +78,7 @@ watch(currentMonth, (month) => {
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(month)
   }
-}, { immediate: true })
+})
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
