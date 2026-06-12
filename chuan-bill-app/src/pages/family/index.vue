@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
+
 definePage({
   name: 'family',
   layout: 'tabbar',
@@ -19,12 +22,30 @@ const joinForm = ref({ inviteCode: '', remark: '' })
 const joinLoading = ref(false)
 const showKeyboard = ref(false)
 
-// 页面加载时获取数据
-onShow(async () => {
+// 页面加载时获取数据（仅首次）
+onLoad(() => {
   if (user.isLoggedIn) {
-    await familyStore.fetchFamilyList()
-    await messageStore.fetchUnreadCount()
+    familyStore.fetchFamilyList()
+    messageStore.fetchUnreadCount()
   }
+})
+
+// 监听家庭数据变化事件
+function handleFamilyUpdated() {
+  if (user.isLoggedIn) {
+    familyStore.fetchFamilyList()
+    messageStore.fetchUnreadCount()
+  }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
+  eventBus.on(EVENTS.FAMILY.MEMBER_CHANGED, handleFamilyUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
+  eventBus.off(EVENTS.FAMILY.MEMBER_CHANGED, handleFamilyUpdated)
 })
 
 // 加入家庭
