@@ -2,6 +2,11 @@
 import type { FamilyMemberStatsVO } from '@/api/globals'
 import WdProgress from 'wot-design-uni/components/wd-progress/wd-progress.vue'
 
+defineOptions({
+  name: 'CategoryChart',
+  options: { virtualHost: true, styleIsolation: 'shared' },
+})
+
 const props = defineProps<{
   familyId?: string
   month: string
@@ -87,7 +92,10 @@ async function fetchMemberStats() {
 }
 
 watch(() => [props.month, props.familyId], () => {
-  fetchMemberStats()
+  console.log('Fetching member stats for month:', props.month, 'familyId:', props.familyId)
+  if (props.familyId && props.month) {
+    fetchMemberStats()
+  }
 }, { immediate: true })
 </script>
 

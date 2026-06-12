@@ -99,6 +99,8 @@ export default defineManifestConfig({
     appid: 'wx67e283815fae178d',
     setting: {
       urlCheck: false,
+      minified: true,
+      swc: true,
     },
     usingComponents: true,
     darkmode: true,
