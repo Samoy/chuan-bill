@@ -232,9 +232,9 @@ export const useStatisticsStore = defineStore('statistics', () => {
   async function fetchAll(month: string, familyId?: string) {
     const fid = familyId || currentFamilyId.value
     await Promise.all([
-      fetchOverview(month),
+      fetchOverview(month, fid),
       fetchCategoryBreakdown(month, 'expense', fid),
-      fetchDailyTrend(month),
+      fetchDailyTrend(month, fid),
     ])
   }
 

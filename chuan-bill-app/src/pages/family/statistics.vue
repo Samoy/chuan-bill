@@ -137,7 +137,7 @@ watch(currentMonth, (month) => {
       </view>
     </view>
 
-    <!-- 成员收支饼图 -->
+    <!-- 类别支出占比饼图 -->
     <view class="mx-3">
       <CategoryChart :month="currentMonth" :family-id="familyId" />
     </view>
