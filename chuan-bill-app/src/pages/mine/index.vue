@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import ExportFilterPopup from './components/ExportFilterPopup.vue'
 import NotificationSettingsPopup from './components/NotificationSettingsPopup.vue'
 import SyncStatusPopup from './components/SyncStatusPopup.vue'
@@ -221,11 +223,28 @@ function selectDarkMode({ item }: { item: { name: string, value: DarkModeValue }
   }
 }
 
-// 页面显示时获取未读消息数
-onShow(() => {
+// 首次加载时获取未读消息数
+onLoad(() => {
   if (user.isLoggedIn) {
     messageStore.fetchUnreadCount()
   }
+})
+
+// 监听用户和账单数据变化事件
+function handleDataUpdated() {
+  if (user.isLoggedIn) {
+    messageStore.fetchUnreadCount()
+  }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.USER.UPDATED, handleDataUpdated)
+  eventBus.on(EVENTS.BILL.UPDATED, handleDataUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.USER.UPDATED, handleDataUpdated)
+  eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
 })
 </script>
 
