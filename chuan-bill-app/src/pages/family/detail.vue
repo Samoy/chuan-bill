@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
+
 definePage({
   name: 'family-detail',
   layout: 'default',
@@ -55,6 +58,9 @@ async function handleApply(applyId: string, approved: boolean) {
   const success = await familyStore.handleJoinApply(applyId, familyId.value, approved)
   if (success) {
     toast.success(approved ? '已同意加入申请' : '已拒绝加入申请')
+    if (approved) {
+      eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
+    }
   }
 }
 
@@ -68,6 +74,7 @@ async function removeMember(familyId: string, userId: string, nickname: string) 
       if (success) {
         resolve(true)
         toast.success('已移除成员')
+        eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
       }
       showRemoveConfirm.value = false
       removeTarget.value = null
@@ -85,6 +92,7 @@ function handleLeave() {
       if (success) {
         resolve(true)
         toast.success('已退出家庭')
+        eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
         router.back()
       }
     },
