@@ -1,6 +1,8 @@
 package com.samoy.chuanbillserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.samoy.chuanbillserver.dto.AddCategoryDTO;
+import com.samoy.chuanbillserver.dto.UpdateCategoryDTO;
 import com.samoy.chuanbillserver.entity.Category;
 import com.samoy.chuanbillserver.vo.CategoryVO;
 import java.util.List;
@@ -22,4 +24,24 @@ public interface ICategoryService extends IService<Category> {
      * @return 类目列表
      */
     List<CategoryVO> getCategoryList(String userId, String type);
+
+    /**
+     * 新增自定义类目
+     */
+    CategoryVO addCategory(String userId, AddCategoryDTO dto);
+
+    /**
+     * 更新自定义类目
+     */
+    CategoryVO updateCategory(String userId, String id, UpdateCategoryDTO dto);
+
+    /**
+     * 删除自定义类目
+     */
+    void deleteCategory(String userId, String id);
+
+    /**
+     * 批量更新类目排序
+     */
+    void sortCategories(String userId, List<String> ids);
 }
