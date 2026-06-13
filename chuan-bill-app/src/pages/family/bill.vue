@@ -16,8 +16,6 @@ definePage({
   layout: 'default',
   style: {
     navigationBarTitleText: '家庭账单',
-    enablePullDownRefresh: true,
-    onReachBottomDistance: 50,
   },
 })
 
@@ -61,13 +59,13 @@ async function getBillList() {
           filtered = filtered && Number(item.amount) >= Number(minAmount)
         }
         if (maxAmount) {
-          filtered = filtered && Number(item.amount) >= Number(maxAmount)
+          filtered = filtered && Number(item.amount) <= Number(maxAmount)
         }
         if (categoryId) {
-          filtered = filtered && item.category!.id === categoryId
+          filtered = filtered && item.category?.id === categoryId
         }
         if (paymentMethodId) {
-          filtered = filtered && item.category!.id === paymentMethodId
+          filtered = filtered && item.paymentMethod?.id === paymentMethodId
         }
         if (startDate) {
           filtered = filtered && dayjs(item.time).isSameOrAfter(dayjs(startDate).startOf('D'))
@@ -175,7 +173,7 @@ watch(() => user.isLoggedIn, (newVal) => {
             @clear="refresh"
           />
           <view
-            class="relative flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white p-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
+            class="relative h-5 flex items-center justify-center border border-[var(--wot-color-border)] rounded-xl border-solid bg-white px-2.5 py-2 text-gray-600 transition-all active:scale-95 dark:border-gray-600 dark:bg-[var(--wot-dark-background2)]"
             :class="isFiltered && 'text-primary'"
             @click="showFilterModal = true"
           >

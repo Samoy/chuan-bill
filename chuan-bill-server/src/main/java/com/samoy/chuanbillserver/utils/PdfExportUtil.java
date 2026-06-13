@@ -62,10 +62,9 @@ public class PdfExportUtil {
 
     private static Font createChineseFont(float size, int style) {
         try {
-            BaseFont bf = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            BaseFont bf = BaseFont.createFont("/fonts/MiSans-Regular.ttf", "Identity-H", BaseFont.EMBEDDED);
             return new Font(bf, size, style);
         } catch (Exception e) {
-            // fallback to default font
             return FontFactory.getFont(FontFactory.HELVETICA, size, style);
         }
     }

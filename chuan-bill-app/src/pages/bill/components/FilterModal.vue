@@ -98,13 +98,13 @@ watch(() => formData.value, (newVal) => {
 
 <template>
   <wd-popup v-model="show" :z-index="100" safe-area-inset-bottom position="bottom" closable custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" lock-scroll>
-    <view class="relative max-h-80vh min-h-60vh pb-12">
+    <view class="relative max-h-82vh min-h-60vh flex flex-col pb-12">
       <!-- 标题，需要固定 -->
       <view class="box-border h-10 w-full flex items-center justify-center text-center text-lg font-500">
         <text>账单筛选</text>
       </view>
       <!-- 筛选区域 -->
-      <view class="box-border flex flex-col gap-4 px-4">
+      <view class="box-border flex flex-col gap-4 overflow-y-auto px-4">
         <!-- 账单类型 -->
         <view class="flex flex-col gap-1">
           <view class="flex items-center gap-2 font-500">
