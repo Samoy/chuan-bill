@@ -94,6 +94,94 @@ export const useBillStore = defineStore('bill', () => {
     return paymentMethodList.value
   }
 
+  // ==================== 类目 CRUD ====================
+
+  async function addCategory(data: { name: string, icon: string, type: string }) {
+    const res = await Apis.bill.addCategory({ data })
+    if (res.success) {
+      await fetchCategoryList()
+    }
+    return res
+  }
+
+  async function updateCategory(id: string, data: { name?: string, icon?: string }) {
+    const res = await Apis.bill.updateCategory({ pathParams: { id }, data })
+    if (res.success) {
+      await fetchCategoryList()
+    }
+    return res
+  }
+
+  async function deleteCategory(id: string) {
+    const res = await Apis.bill.deleteCategory({ pathParams: { id } })
+    if (res.success) {
+      await fetchCategoryList()
+    }
+    return res
+  }
+
+  async function sortCategories(ids: string[]) {
+    const res = await Apis.bill.sortCategories({ data: { ids } })
+    if (res.success) {
+      await fetchCategoryList()
+    }
+    return res
+  }
+
+  // ==================== 支付方式 CRUD ====================
+
+  async function addPaymentMethod(data: { name: string, icon: string }) {
+    const res = await Apis.bill.addPaymentMethod({ data })
+    if (res.success) {
+      await fetchPaymentMethodList()
+    }
+    return res
+  }
+
+  async function updatePaymentMethod(id: string, data: { name?: string, icon?: string }) {
+    const res = await Apis.bill.updatePaymentMethod({ pathParams: { id }, data })
+    if (res.success) {
+      await fetchPaymentMethodList()
+    }
+    return res
+  }
+
+  async function deletePaymentMethod(id: string) {
+    const res = await Apis.bill.deletePaymentMethod({ pathParams: { id } })
+    if (res.success) {
+      await fetchPaymentMethodList()
+    }
+    return res
+  }
+
+  async function sortPaymentMethods(ids: string[]) {
+    const res = await Apis.bill.sortPaymentMethods({ data: { ids } })
+    if (res.success) {
+      await fetchPaymentMethodList()
+    }
+    return res
+  }
+
+  // ==================== Filter 排序 Getter ====================
+
+  function isOtherItem(item: { name?: string, isDefault?: boolean }) {
+    return item.isDefault && item.name?.includes('其他')
+  }
+
+  function getCategoryListForFilter(type?: string) {
+    const list = getCategoryList(type)
+    const others = list.filter(item => isOtherItem(item))
+    const nonOthers = list.filter(item => !isOtherItem(item))
+    return [...nonOthers, ...others]
+  }
+
+  function getPaymentMethodListForFilter() {
+    const list = paymentMethodList.value
+    const others = list.filter(item => isOtherItem(item))
+    const nonOthers = list.filter(item => !isOtherItem(item))
+    return [...nonOthers, ...others]
+  }
+
   /**
    * 添加本地账单
    * @param bill
@@ -260,5 +348,18 @@ export const useBillStore = defineStore('bill', () => {
     initBillData,
     getCategoryList,
     getPaymentMethodList,
+    // 类目 CRUD
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    sortCategories,
+    // 支付方式 CRUD
+    addPaymentMethod,
+    updatePaymentMethod,
+    deletePaymentMethod,
+    sortPaymentMethods,
+    // Filter getter
+    getCategoryListForFilter,
+    getPaymentMethodListForFilter,
   }
 })
