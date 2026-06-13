@@ -62,7 +62,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Transactional
     public CategoryVO addCategory(String userId, AddCategoryDTO dto) {
         LambdaQueryWrapper<Category> maxQuery = new LambdaQueryWrapper<>();
-        maxQuery.eq(Category::getUserId, userId).eq(Category::getType, dto.getType());
+        maxQuery.eq(Category::getType, dto.getType())
+                .and(i -> i.eq(Category::getUserId, userId).or(j -> j.eq(Category::getIsDefault, true)));
         List<Category> existing = this.list(maxQuery);
         int maxSortOrder =
                 existing.stream().mapToInt(Category::getSortOrder).max().orElse(0);

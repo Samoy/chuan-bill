@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CategoryVO, PaymentMethodVO } from '@/api/globals'
-import { ICON_LIST } from '@/constant/icons'
 
 defineOptions({
   name: 'GridPickerPopup',
@@ -9,6 +8,7 @@ defineOptions({
     styleIsolation: 'shared',
   },
 })
+
 const props = withDefaults(defineProps<{
   modelValue?: string
   title: string
@@ -16,30 +16,29 @@ const props = withDefaults(defineProps<{
   type?: 'expense' | 'income'
   entity: 'category' | 'paymentMethod'
   showOthers?: boolean
+  customClass?: string
+  customStyle?: string
 }>(), {
   showOthers: false,
   modelValue: '',
 })
+
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'change': [value: string]
   'itemsUpdated': []
 }>()
-const globalToast = useGlobalToast()
-const globalMessage = useGlobalMessage()
 
 type GridPickerItem = CategoryVO | PaymentMethodVO
+
+const globalToast = useGlobalToast()
+const globalMessage = useGlobalMessage()
 
 const billStore = useBillStore()
 const user = useUserStore()
 
 const visible = defineModel<boolean>('visible', { default: false })
 const editMode = ref(false)
-const showForm = ref(false)
-const editingItem = ref<GridPickerItem | null>(null)
-const formName = ref('')
-const formIcon = ref('')
-const saving = ref(false)
 
 // 过滤后的列表（隐藏"其他"）
 const filteredItems = computed(() => {
@@ -49,7 +48,7 @@ const filteredItems = computed(() => {
   return props.items.filter(item => !(item.isDefault && item.name?.includes('其他')))
 })
 
-// 分组：预设 + 自定义
+// 预设项和自定义项
 const presetItems = computed(() => filteredItems.value.filter(item => item.isDefault))
 const customItems = computed(() => filteredItems.value.filter(item => !item.isDefault))
 
@@ -58,6 +57,14 @@ const displayText = computed(() => {
   const selected = props.items.find(item => item.id === props.modelValue)
   return selected?.name || '请选择'
 })
+
+// 自定义项的默认图标
+function getDefaultIcon() {
+  if (props.entity === 'paymentMethod') {
+    return 'i-icon-park-outline:payment-method'
+  }
+  return props.type === 'income' ? 'i-icon-park-outline:income' : 'i-icon-park-outline:expenses'
+}
 
 function handleSelect(id: string) {
   if (editMode.value)
@@ -75,77 +82,28 @@ function exitEditMode() {
   editMode.value = false
 }
 
-function openAddForm() {
-  editingItem.value = null
-  formName.value = ''
-  formIcon.value = ''
-  showForm.value = true
-}
-
-function openEditForm(item: GridPickerItem) {
-  editingItem.value = item
-  formName.value = item.name || ''
-  formIcon.value = item.icon || ''
-  showForm.value = true
-}
-
-function closeForm() {
-  showForm.value = false
-  editingItem.value = null
-  formName.value = ''
-  formIcon.value = ''
-}
-
-async function handleSave() {
-  if (!formName.value.trim()) {
-    globalToast.show('请输入名称')
+async function handleTagConfirm({ value }: { value: string }) {
+  const name = value.trim()
+  if (!name)
     return
-  }
-  if (!formIcon.value) {
-    globalToast.show('请选择图标')
+  if (name.length > 4) {
+    globalToast.show('最多4个字符')
     return
   }
 
-  saving.value = true
   try {
+    const icon = getDefaultIcon()
     if (props.entity === 'category') {
-      if (editingItem.value) {
-        await billStore.updateCategory(editingItem.value.id!, {
-          name: formName.value.trim(),
-          icon: formIcon.value,
-        })
-      }
-      else {
-        await billStore.addCategory({
-          name: formName.value.trim(),
-          icon: formIcon.value,
-          type: props.type || 'expense',
-        })
-      }
+      await billStore.addCategory({ name, icon, type: props.type || 'expense' })
     }
     else {
-      if (editingItem.value) {
-        await billStore.updatePaymentMethod(editingItem.value.id!, {
-          name: formName.value.trim(),
-          icon: formIcon.value,
-        })
-      }
-      else {
-        await billStore.addPaymentMethod({
-          name: formName.value.trim(),
-          icon: formIcon.value,
-        })
-      }
+      await billStore.addPaymentMethod({ name, icon })
     }
     emit('itemsUpdated')
-    closeForm()
-    globalToast.success(editingItem.value ? '修改成功' : '添加成功')
+    globalToast.success('添加成功')
   }
   catch (error: any) {
-    globalMessage.alert(error.message || '操作失败')
-  }
-  finally {
-    saving.value = false
+    globalMessage.alert(error.message || '添加失败')
   }
 }
 
@@ -157,7 +115,6 @@ async function handleDelete(item: GridPickerItem) {
     else {
       await billStore.deletePaymentMethod(item.id!)
     }
-    // 如果删除的是当前选中项，清除选中
     if (props.modelValue === item.id) {
       emit('update:modelValue', '')
       emit('change', '')
@@ -171,11 +128,16 @@ async function handleDelete(item: GridPickerItem) {
 }
 
 function confirmDelete(item: GridPickerItem) {
-  uni.showModal({
+  globalMessage.confirm({
     title: '确认删除',
-    content: `确定要删除"${item.name}"吗？`,
+    msg: `确定要删除【${item.name}】吗？`,
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    confirmButtonProps: {
+      type: 'error',
+    },
     success: (res) => {
-      if (res.confirm) {
+      if (res.action === 'confirm') {
         handleDelete(item)
       }
     },
@@ -188,22 +150,17 @@ function handleClose() {
   }
   visible.value = false
 }
-
-// 获取选中项的图标
-const selectedIcon = computed(() => {
-  const selected = props.items.find(item => item.id === props.modelValue)
-  return selected?.icon || ''
-})
 </script>
 
 <template>
   <!-- 触发器 -->
   <view
     class="flex items-center justify-between rounded-xl bg-gray-50/80 px-3 py-2 dark:bg-black/30"
+    :class="customClass"
+    :style="customStyle"
     @click="visible = true"
   >
     <view class="flex items-center gap-2 overflow-hidden">
-      <text v-if="selectedIcon" :class="selectedIcon" class="text-lg" />
       <text class="truncate text-sm" :class="modelValue ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'">
         {{ displayText }}
       </text>
@@ -214,170 +171,122 @@ const selectedIcon = computed(() => {
   <!-- ActionSheet -->
   <wd-action-sheet
     v-model="visible"
-    :title="showForm ? (editingItem ? `编辑${title.replace('选择', '')}` : `新增${title.replace('选择', '')}`) : (editMode ? `编辑${title.replace('选择', '')}` : title)"
+    :title="editMode ? `编辑${title.replace('选择', '')}` : title"
     position="bottom"
-    :closable="!showForm"
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     :z-index="999"
     @close="handleClose"
   >
-    <view class="min-h-[40vh] px-4 pb-4">
-      <!-- 网格视图 -->
-      <view v-if="!showForm">
-        <!-- 标题栏操作按钮 -->
-        <view v-if="user.isLoggedIn" class="mb-3 flex items-center justify-end gap-3">
-          <view
-            v-if="!editMode"
-            class="flex items-center gap-1 text-sm text-primary"
-            @click="enterEditMode"
-          >
-            <text class="i-lucide:pencil" />
-            <text>编辑</text>
-          </view>
-          <view
-            v-else
-            class="flex items-center gap-1 text-sm text-primary"
-            @click="exitEditMode"
-          >
-            <text class="i-lucide:check" />
-            <text>完成</text>
-          </view>
-        </view>
-
-        <!-- 预设项 -->
-        <view v-if="presetItems.length > 0" class="grid grid-cols-4 gap-3">
-          <view
-            v-for="item in presetItems"
+    <!-- 编辑/完成图标按钮（关闭按钮左侧） -->
+    <text
+      v-if="user.isLoggedIn"
+      :class="editMode ? 'i-lucide:check' : 'i-lucide:square-pen'"
+      class="absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]"
+      @click="editMode ? exitEditMode() : enterEditMode()"
+    />
+    <view class="min-h-[30vh] px-4 pb-4">
+      <!-- 普通模式：radio-group 选择 -->
+      <view v-if="!editMode" class="grid grid-cols-3 gap-2">
+        <wd-radio-group
+          :model-value="modelValue"
+          shape="button"
+          custom-class="contents"
+          @update:model-value="handleSelect"
+        >
+          <wd-radio
+            v-for="item in filteredItems"
             :key="item.id"
-            class="flex flex-col items-center justify-center rounded-xl py-3 transition-colors"
-            :class="[
-              modelValue === item.id && !editMode ? 'bg-primary/10 text-primary' : 'bg-gray-50 dark:bg-white/5',
-            ]"
-            @click="handleSelect(item.id!)"
+            :value="item.id!"
+            custom-class="normal-radio"
           >
-            <view class="relative">
-              <text :class="item.icon" class="text-2xl" />
-              <text
-                v-if="editMode"
-                class="i-lucide:lock absolute text-xs text-gray-400 -right-1 -top-1"
-              />
+            <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
+          </wd-radio>
+        </wd-radio-group>
+
+        <!-- 新增标签（行内末尾） -->
+        <wd-tag
+          v-if="user.isLoggedIn"
+          type="primary"
+          round
+          dynamic
+          custom-class="!flex !justify-center !items-center mr-10px ![width:calc(100%-10px)] !h-8"
+          @confirm="handleTagConfirm"
+        >
+          <template #add>
+            <view class="h-full flex items-center gap-1">
+              <text class="i-lucide:plus" />
+              <text>新增</text>
             </view>
-            <text class="mt-1 max-w-full truncate text-xs">
-              {{ item.name }}
-            </text>
-          </view>
-        </view>
-
-        <!-- 自定义项分隔线 -->
-        <view v-if="customItems.length > 0 || (user.isLoggedIn && !editMode)" class="my-3 flex items-center gap-2">
-          <view class="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-          <text class="text-xs text-gray-400">
-            自定义{{ title.replace('选择', '') }}
-          </text>
-          <view class="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-        </view>
-
-        <!-- 自定义项 -->
-        <view class="grid grid-cols-4 gap-3">
-          <view
-            v-for="item in customItems"
-            :key="item.id"
-            class="flex flex-col items-center justify-center rounded-xl py-3 transition-colors"
-            :class="[
-              modelValue === item.id && !editMode ? 'bg-primary/10 text-primary' : 'bg-gray-50 dark:bg-white/5',
-            ]"
-            @click="editMode ? undefined : handleSelect(item.id!)"
-          >
-            <view class="relative">
-              <text :class="item.icon" class="text-2xl" />
-              <!-- 编辑/删除按钮 -->
-              <view v-if="editMode" class="absolute flex gap-0.5 -right-2 -top-2">
-                <view
-                  class="h-4 w-4 flex items-center justify-center rounded-full bg-blue-500"
-                  @click.stop="openEditForm(item)"
-                >
-                  <text class="i-lucide:pencil text-[10px] text-white" />
-                </view>
-                <view
-                  class="h-4 w-4 flex items-center justify-center rounded-full bg-red-500"
-                  @click.stop="confirmDelete(item)"
-                >
-                  <text class="i-lucide:x text-[10px] text-white" />
-                </view>
-              </view>
-            </view>
-            <text class="mt-1 max-w-full truncate text-xs">
-              {{ item.name }}
-            </text>
-          </view>
-
-          <!-- 新增按钮 -->
-          <view
-            v-if="user.isLoggedIn"
-            class="flex flex-col items-center justify-center border-2 border-gray-300 rounded-xl border-dashed py-3 dark:border-gray-600"
-            @click="openAddForm"
-          >
-            <text class="i-lucide:plus text-2xl text-gray-400" />
-            <text class="mt-1 text-xs text-gray-400">
-              新增
-            </text>
-          </view>
-        </view>
-
-        <!-- 未登录提示 -->
-        <view v-if="!user.isLoggedIn" class="mt-4 text-center text-xs text-gray-400">
-          登录后可自定义{{ title.replace('选择', '') }}
-        </view>
+          </template>
+        </wd-tag>
       </view>
 
-      <!-- 表单视图 -->
-      <view v-else>
-        <!-- 名称输入 -->
-        <view class="mb-4">
-          <text class="mb-2 block text-sm text-gray-600 dark:text-gray-400">
-            名称
-          </text>
-          <wd-input
-            v-model="formName"
-            :maxlength="8"
-            placeholder="请输入名称（最多8个字）"
-            show-word-limit
-            no-border
-            custom-class="bg-gray-50 rounded-xl dark:bg-black/30"
-          />
+      <!-- 编辑模式：预设项不可操作 + 自定义项可删除 -->
+      <view v-else class="grid grid-cols-3 gap-2">
+        <!-- 预设项（不可操作） -->
+        <view
+          v-for="item in presetItems"
+          :key="item.id"
+          class="h-8 inline-flex items-center justify-center rounded-xl bg-gray-100 px-3 text-sm text-gray-300 dark:bg-white/10"
+        >
+          <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
         </view>
 
-        <!-- 图标选择 -->
-        <view class="mb-4">
-          <text class="mb-2 block text-sm text-gray-600 dark:text-gray-400">
-            图标
-          </text>
-          <scroll-view scroll-y class="h-[30vh]">
-            <view class="grid grid-cols-6 gap-3">
-              <view
-                v-for="icon in ICON_LIST"
-                :key="icon"
-                class="h-10 w-10 flex items-center justify-center rounded-lg transition-colors"
-                :class="formIcon === icon ? 'bg-primary/10 text-primary' : 'bg-gray-50 dark:bg-white/5'"
-                @click="formIcon = icon"
-              >
-                <text :class="icon" class="text-xl" />
-              </view>
+        <!-- 自定义项（可删除） -->
+        <wd-tag
+          v-for="item in customItems"
+          :key="item.id"
+          type="primary"
+          round
+          closable
+          custom-class="!flex !justify-center !items-center !w-auto"
+          @close="confirmDelete(item)"
+        >
+          {{ item.name }}
+          <template #icon>
+            <text :class="transformUnoCSS(item.icon || '')" />
+          </template>
+        </wd-tag>
+
+        <!-- 新增标签（行内末尾） -->
+        <wd-tag
+          v-if="user.isLoggedIn"
+          type="primary"
+          round
+          dynamic
+          custom-class="!flex !justify-center !items-center !h-8 !w-auto"
+          @confirm="handleTagConfirm"
+        >
+          <template #add>
+            <view class="flex items-center gap-1">
+              <text class="i-lucide:plus" />
+              <text>新增</text>
             </view>
-          </scroll-view>
-        </view>
+          </template>
+        </wd-tag>
+      </view>
 
-        <!-- 操作按钮 -->
-        <view class="flex gap-3">
-          <wd-button plain block @click="closeForm">
-            取消
-          </wd-button>
-          <wd-button type="primary" block :loading="saving" @click="handleSave">
-            保存
-          </wd-button>
-        </view>
+      <!-- 未登录提示 -->
+      <view v-if="!user.isLoggedIn" class="mt-4 text-center text-xs text-gray-400">
+        登录后可自定义{{ title.replace('选择', '') }}
       </view>
     </view>
   </wd-action-sheet>
 </template>
+
+<style lang="scss" scoped>
+:deep(.wd-radio.is-button .wd-radio__label) {
+  max-width: none !important;
+  width: 100%;
+  border: none !important;
+  @apply h-8 items-center flex justify-center py-0;
+}
+.normal-radio {
+  &.is-checked {
+    :deep(.wd-radio__label) {
+      @apply border-primary! bg-primary! text-white! shadow-primary/20 shadow-lg;
+    }
+  }
+}
+</style>

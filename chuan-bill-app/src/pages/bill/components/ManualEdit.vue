@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AddBillDTO } from '@/api/globals'
+import GridPickerPopup from './GridPickerPopup.vue'
 
 defineOptions({
   name: 'ManualEdit',
@@ -18,6 +19,8 @@ interface PickerOption {
   value?: string | number
   disabled?: boolean
 }
+
+type BillType = 'expense' | 'income'
 
 const form = ref()
 const isShared = ref(false)
@@ -112,7 +115,8 @@ function sumbit() {
           :items="categoryItems"
           title="选择类目"
           entity="category"
-          :type="formData.type"
+          custom-class="mt-2"
+          :type="formData.type as BillType"
         />
       </view>
       <view class="flex-1">
@@ -124,6 +128,7 @@ function sumbit() {
           :items="paymentMethodItems"
           title="选择支付方式"
           entity="paymentMethod"
+          custom-class="mt-2"
         />
       </view>
     </view>

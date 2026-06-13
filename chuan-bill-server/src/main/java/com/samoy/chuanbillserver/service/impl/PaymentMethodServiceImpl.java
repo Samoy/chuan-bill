@@ -59,7 +59,7 @@ public class PaymentMethodServiceImpl extends ServiceImpl<PaymentMethodMapper, P
     @Transactional
     public PaymentMethodVO addPaymentMethod(String userId, AddPaymentMethodDTO dto) {
         LambdaQueryWrapper<PaymentMethod> maxQuery = new LambdaQueryWrapper<>();
-        maxQuery.eq(PaymentMethod::getUserId, userId);
+        maxQuery.and(i -> i.eq(PaymentMethod::getUserId, userId).or(j -> j.eq(PaymentMethod::getIsDefault, true)));
         List<PaymentMethod> existing = this.list(maxQuery);
         int maxSortOrder =
                 existing.stream().mapToInt(PaymentMethod::getSortOrder).max().orElse(0);

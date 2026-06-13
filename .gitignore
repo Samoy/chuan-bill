@@ -9,3 +9,4 @@ temp/
 settings.local.json
 superpowers/
 .qoder/
+.worktrees/
