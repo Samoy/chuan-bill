@@ -45,8 +45,8 @@ const dateRange = ref<DateRange>()
 
 let startDate = dayjs().startOf('d').valueOf()
 let endDate = dayjs().endOf('d').valueOf()
-const categoryList = computed(() => billStore.getCategoryList(formData.value.type))
-const paymentMethodList = computed(() => billStore.getPaymentMethodList())
+const categoryList = computed(() => billStore.getCategoryListForFilter(formData.value.type))
+const paymentMethodList = computed(() => billStore.getPaymentMethodListForFilter())
 const familyList = computed(() => familyStore.familyList)
 const dateTime = ref<[number, number]>([startDate, endDate])
 
