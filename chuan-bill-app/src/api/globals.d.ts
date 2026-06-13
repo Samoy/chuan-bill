@@ -463,6 +463,56 @@ export interface BatchCreateBillDTO {
    */
   bills: AddBillDTO[];
 }
+export interface AddCategoryDTO {
+  /**
+   * 类目名称
+   */
+  name: string;
+  /**
+   * 类目图标
+   */
+  icon: string;
+  /**
+   * 类目类型：income-收入，expense-支出
+   */
+  type: string;
+}
+export interface UpdateCategoryDTO {
+  /**
+   * 类目名称
+   */
+  name?: string;
+  /**
+   * 类目图标
+   */
+  icon?: string;
+}
+export interface AddPaymentMethodDTO {
+  /**
+   * 支付方式名称
+   */
+  name: string;
+  /**
+   * 支付方式图标
+   */
+  icon: string;
+}
+export interface UpdatePaymentMethodDTO {
+  /**
+   * 支付方式名称
+   */
+  name?: string;
+  /**
+   * 支付方式图标
+   */
+  icon?: string;
+}
+export interface SortDTO {
+  /**
+   * 排序后的ID列表
+   */
+  ids: string[];
+}
 export interface SendCodeDTO {
   /**
    * 手机号
@@ -685,6 +735,13 @@ export interface ResultListPaymentMethodVO {
   code?: number;
   message?: string;
   data?: PaymentMethodVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultPaymentMethodVO {
+  code?: number;
+  message?: string;
+  data?: PaymentMethodVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -1269,6 +1326,13 @@ export interface ResultListCategoryVO {
   code?: number;
   message?: string;
   data?: CategoryVO[];
+  timestamp?: number;
+  success?: boolean;
+}
+export interface ResultCategoryVO {
+  code?: number;
+  message?: string;
+  data?: CategoryVO;
   timestamp?: number;
   success?: boolean;
 }
@@ -3263,6 +3327,39 @@ declare global {
       getPaymentMethods<Config extends Alova2MethodConfig<ResultListPaymentMethodVO>>(
         config?: Config
       ): Alova2Method<ResultListPaymentMethodVO, 'bill.getPaymentMethods', Config>;
+      addPaymentMethod<
+        Config extends Alova2MethodConfig<ResultPaymentMethodVO> & {
+          data: AddPaymentMethodDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultPaymentMethodVO, 'bill.addPaymentMethod', Config>;
+      updatePaymentMethod<
+        Config extends Alova2MethodConfig<ResultPaymentMethodVO> & {
+          pathParams: {
+            id: string;
+          };
+          data: UpdatePaymentMethodDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultPaymentMethodVO, 'bill.updatePaymentMethod', Config>;
+      deletePaymentMethod<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          pathParams: {
+            id: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'bill.deletePaymentMethod', Config>;
+      sortPaymentMethods<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: SortDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'bill.sortPaymentMethods', Config>;
       /**
        * ---
        *
@@ -3638,6 +3735,39 @@ declare global {
       >(
         config: Config
       ): Alova2Method<ResultListCategoryVO, 'bill.getCategories', Config>;
+      addCategory<
+        Config extends Alova2MethodConfig<ResultCategoryVO> & {
+          data: AddCategoryDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultCategoryVO, 'bill.addCategory', Config>;
+      updateCategory<
+        Config extends Alova2MethodConfig<ResultCategoryVO> & {
+          pathParams: {
+            id: string;
+          };
+          data: UpdateCategoryDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultCategoryVO, 'bill.updateCategory', Config>;
+      deleteCategory<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          pathParams: {
+            id: string;
+          };
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'bill.deleteCategory', Config>;
+      sortCategories<
+        Config extends Alova2MethodConfig<ResultBoolean> & {
+          data: SortDTO;
+        }
+      >(
+        config: Config
+      ): Alova2Method<ResultBoolean, 'bill.sortCategories', Config>;
     };
     auth: {
       /**
