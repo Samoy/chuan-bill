@@ -1,5 +1,7 @@
 package com.samoy.chuanbillserver.dto;
 
+import com.samoy.chuanbillserver.enums.ModerationScene;
+import com.samoy.chuanbillserver.validation.TextModeration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +13,7 @@ import lombok.Data;
 public class AddCategoryDTO {
 
     @NotBlank(message = "类目名称不能为空") @Size(max = 8, message = "名称最多8个字符") @Schema(description = "类目名称", example = "餐饮", requiredMode = Schema.RequiredMode.REQUIRED)
+    @TextModeration(scene = ModerationScene.TITLE, message = "类目名称包含违规内容，请重新输入")
     private String name;
 
     @NotBlank(message = "类目图标不能为空") @Schema(description = "类目图标", example = "icon-food", requiredMode = Schema.RequiredMode.REQUIRED)

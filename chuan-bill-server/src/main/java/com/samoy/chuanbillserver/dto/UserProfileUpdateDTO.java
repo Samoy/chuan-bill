@@ -1,5 +1,7 @@
 package com.samoy.chuanbillserver.dto;
 
+import com.samoy.chuanbillserver.enums.ModerationScene;
+import com.samoy.chuanbillserver.validation.TextModeration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -11,7 +13,8 @@ public class UserProfileUpdateDTO {
     @Schema(description = "用户 ID")
     private String userId;
 
-    @Size(max = 50, message = "昵称长度不能超过 50 个字符") @Schema(description = "昵称", example = "张三")
+    @Size(max = 50, message = "昵称长度不能超过 50 个字符") @TextModeration(scene = ModerationScene.NICKNAME, message = "昵称包含违规内容，请重新输入")
+    @Schema(description = "昵称", example = "张三")
     private String nickname;
 
     @Schema(description = "头像 URL", example = "https://example.com/avatar.jpg")

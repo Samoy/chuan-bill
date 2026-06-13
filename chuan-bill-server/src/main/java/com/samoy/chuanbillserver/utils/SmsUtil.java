@@ -9,6 +9,8 @@ import com.aliyun.sdk.service.dypnsapi20170525.models.SendSmsVerifyCodeResponse;
 import com.google.gson.Gson;
 import com.samoy.chuanbillserver.enums.SmsScene;
 import darabonba.core.client.ClientOverrideConfiguration;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.springframework.stereotype.Component;
@@ -24,30 +26,41 @@ import org.springframework.stereotype.Component;
 @Component
 public class SmsUtil {
 
-    public void sendSms(SmsScene smsScene, String phone, String code) throws ExecutionException, InterruptedException {
+    private AsyncClient client;
+
+    @PostConstruct
+    public void init() {
         DefaultCredentialProvider provider = DefaultCredentialProvider.builder()
                 .customizeProviders(
                         SystemPropertiesCredentialProvider.create(), EnvironmentVariableCredentialProvider.create())
                 .build();
 
-        try (AsyncClient client = AsyncClient.builder()
+        this.client = AsyncClient.builder()
                 .region("cn-hangzhou")
                 .credentialsProvider(provider)
                 .overrideConfiguration(
                         ClientOverrideConfiguration.create().setEndpointOverride("dypnsapi.aliyuncs.com"))
-                .build()) {
+                .build();
+    }
 
-            SendSmsVerifyCodeRequest sendSmsVerifyCodeRequest = SendSmsVerifyCodeRequest.builder()
-                    .phoneNumber(phone)
-                    .signName("速通互联验证码")
-                    .templateCode(smsScene.getTemplateCode())
-                    .templateParam("{\"code\":\"" + code + "\",\"min\":\"5\"}")
-                    .codeLength((long) code.length())
-                    .build();
+    public void sendSms(SmsScene smsScene, String phone, String code) throws ExecutionException, InterruptedException {
+        SendSmsVerifyCodeRequest sendSmsVerifyCodeRequest = SendSmsVerifyCodeRequest.builder()
+                .phoneNumber(phone)
+                .signName("速通互联验证码")
+                .templateCode(smsScene.getTemplateCode())
+                .templateParam("{\"code\":\"" + code + "\",\"min\":\"5\"}")
+                .codeLength((long) code.length())
+                .build();
 
-            CompletableFuture<SendSmsVerifyCodeResponse> response = client.sendSmsVerifyCode(sendSmsVerifyCodeRequest);
-            SendSmsVerifyCodeResponse resp = response.get();
-            System.out.println(new Gson().toJson(resp));
+        CompletableFuture<SendSmsVerifyCodeResponse> response = client.sendSmsVerifyCode(sendSmsVerifyCodeRequest);
+        SendSmsVerifyCodeResponse resp = response.get();
+        System.out.println(new Gson().toJson(resp));
+    }
+
+    @PreDestroy
+    public void destroy() {
+        if (client != null) {
+            client.close();
         }
     }
 }
