@@ -3,11 +3,16 @@ package com.samoy.chuanbillserver.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
+import com.samoy.chuanbillserver.dto.AddCategoryDTO;
+import com.samoy.chuanbillserver.dto.AddPaymentMethodDTO;
 import com.samoy.chuanbillserver.dto.BatchCreateBillDTO;
 import com.samoy.chuanbillserver.dto.BillListDTO;
 import com.samoy.chuanbillserver.dto.BillMonthlyStatsDTO;
 import com.samoy.chuanbillserver.dto.ExportBillDTO;
+import com.samoy.chuanbillserver.dto.SortDTO;
 import com.samoy.chuanbillserver.dto.UpdateBillDTO;
+import com.samoy.chuanbillserver.dto.UpdateCategoryDTO;
+import com.samoy.chuanbillserver.dto.UpdatePaymentMethodDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IBillService;
 import com.samoy.chuanbillserver.service.ICategoryService;
@@ -93,12 +98,77 @@ public class BillController {
         return Result.success(categoryService.getCategoryList(userId, type));
     }
 
+    @PostMapping("/categories")
+    @Operation(summary = "新增自定义类目", description = "用户新增自定义类目")
+    public Result<CategoryVO> addCategory(@Validated @RequestBody AddCategoryDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(categoryService.addCategory(userId, dto));
+    }
+
+    @PutMapping("/categories/{id}")
+    @Operation(summary = "更新自定义类目", description = "用户更新自定义类目名称和图标")
+    public Result<CategoryVO> updateCategory(
+            @Parameter(description = "类目 ID", required = true) @PathVariable String id,
+            @Validated @RequestBody UpdateCategoryDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(categoryService.updateCategory(userId, id, dto));
+    }
+
+    @DeleteMapping("/categories/{id}")
+    @Operation(summary = "删除自定义类目", description = "用户删除自定义类目，有关联账单时不可删除")
+    public Result<Boolean> deleteCategory(@Parameter(description = "类目 ID", required = true) @PathVariable String id) {
+        String userId = StpUtil.getLoginIdAsString();
+        categoryService.deleteCategory(userId, id);
+        return Result.success(true);
+    }
+
+    @PutMapping("/categories/sort")
+    @Operation(summary = "批量更新类目排序", description = "用户批量更新自定义类目的排序")
+    public Result<Boolean> sortCategories(@Validated @RequestBody SortDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        categoryService.sortCategories(userId, dto.getIds());
+        return Result.success(true);
+    }
+
     @GetMapping("/payment-methods")
     @Operation(summary = "获取支付方式列表", description = "获取用户可用的支付方式列表")
     public Result<List<PaymentMethodVO>> getPaymentMethods() {
         String userId = StpUtil.getLoginIdAsString();
         List<PaymentMethodVO> result = paymentMethodService.getPaymentMethods(userId);
         return Result.success(result);
+    }
+
+    @PostMapping("/payment-methods")
+    @Operation(summary = "新增自定义支付方式", description = "用户新增自定义支付方式")
+    public Result<PaymentMethodVO> addPaymentMethod(@Validated @RequestBody AddPaymentMethodDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(paymentMethodService.addPaymentMethod(userId, dto));
+    }
+
+    @PutMapping("/payment-methods/{id}")
+    @Operation(summary = "更新自定义支付方式", description = "用户更新自定义支付方式名称和图标")
+    public Result<PaymentMethodVO> updatePaymentMethod(
+            @Parameter(description = "支付方式 ID", required = true) @PathVariable String id,
+            @Validated @RequestBody UpdatePaymentMethodDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        return Result.success(paymentMethodService.updatePaymentMethod(userId, id, dto));
+    }
+
+    @DeleteMapping("/payment-methods/{id}")
+    @Operation(summary = "删除自定义支付方式", description = "用户删除自定义支付方式，有关联账单时不可删除")
+    public Result<Boolean> deletePaymentMethod(
+            @Parameter(description = "支付方式 ID", required = true) @PathVariable String id) {
+        String userId = StpUtil.getLoginIdAsString();
+        paymentMethodService.deletePaymentMethod(userId, id);
+        return Result.success(true);
+    }
+
+    @PutMapping("/payment-methods/sort")
+    @Operation(summary = "批量更新支付方式排序", description = "用户批量更新自定义支付方式的排序")
+    public Result<Boolean> sortPaymentMethods(@Validated @RequestBody SortDTO dto) {
+        String userId = StpUtil.getLoginIdAsString();
+        paymentMethodService.sortPaymentMethods(userId, dto.getIds());
+        return Result.success(true);
     }
 
     @GetMapping("/monthly-stats")
