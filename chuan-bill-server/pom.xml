@@ -173,6 +173,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.aliyun</groupId>
+      <artifactId>alibabacloud-green20220302</artifactId>
+      <version>3.0.9</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>

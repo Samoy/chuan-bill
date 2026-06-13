@@ -73,9 +73,6 @@ async function handleSave() {
     eventBus.emit(EVENTS.USER.UPDATED)
     router.back()
   }
-  else {
-    toast.error('更新失败，请重试')
-  }
 }
 </script>
 
