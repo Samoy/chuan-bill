@@ -2,8 +2,8 @@
 import dayjs from 'dayjs'
 import { AiSuggestionType } from '@/constant/ai'
 import { EVENTS } from '@/constant/events'
+import { setupEcharts } from '@/utils/echarts-setup'
 import { eventBus } from '@/utils/eventBus'
-import { setupEcharts } from '../../utils/echarts-setup'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import BudgetCard from './components/BudgetCard.vue'
 import BudgetSettingPopup from './components/BudgetSettingPopup.vue'
@@ -27,6 +27,10 @@ const showSettingPopup = ref(false)
 
 // 当前选中的月份
 const currentMonth = ref(dayjs().format('YYYY-MM'))
+
+// 页面可见性（用于避免后台更新导致 echarts 渲染空白）
+const pageVisible = ref(true)
+const needsRefresh = ref(false)
 
 // 月份选择器显示状态
 const showMonthPicker = ref(false)
@@ -71,6 +75,19 @@ onLoad(() => {
   }
 })
 
+// 页面可见性管理：切回前台时，如果有待刷新的数据则立即获取
+onShow(() => {
+  pageVisible.value = true
+  if (needsRefresh.value) {
+    needsRefresh.value = false
+    handleDataUpdated()
+  }
+})
+
+onHide(() => {
+  pageVisible.value = false
+})
+
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
@@ -89,8 +106,12 @@ watch(() => user.isLoggedIn, () => {
   }
 })
 
-// 监听账单和家庭数据变化事件
+// 监听账单和家庭数据变化事件（页面不可见时延迟到 onShow 再刷新，避免 echarts 渲染空白）
 function handleDataUpdated() {
+  if (!pageVisible.value) {
+    needsRefresh.value = true
+    return
+  }
   statisticsStore.fetchAll(currentMonth.value)
   statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
   if (user.isLoggedIn) {
