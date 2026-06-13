@@ -26,8 +26,8 @@ const user = useUserStore()
 const familyStore = useFamilyStore()
 
 const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'manual', type: 'expense' } })
-const categoryOptions = computed<PickerOption[]>(() => billStore.getCategoryList(formData.value.type).map(category => ({ label: category.name, value: category.id })))
-const paymentMethodOptions = computed<PickerOption[]>(() => billStore.getPaymentMethodList().map(paymentMethod => ({ label: paymentMethod.name, value: paymentMethod.id })))
+const categoryItems = computed(() => billStore.getCategoryList(formData.value.type))
+const paymentMethodItems = computed(() => billStore.getPaymentMethodList())
 const familyOptions = computed<PickerOption[]>(() => familyStore.familyList.map(f => ({ label: f.name, value: f.id })))
 
 onLoad(async () => {
@@ -107,18 +107,23 @@ function sumbit() {
         <view class="text-xs text-gray-500">
           <text class="i-lucide:tag mr-2" />类目
         </view>
-        <wd-picker
-          v-model="formData.categoryId" :columns="categoryOptions" title="请选择账单类目" placeholder="请选择" custom-class="mt-2" prop="categoryId"
-          :rules="[{ required: true, message: '请选择账单类目' }]"
+        <GridPickerPopup
+          v-model="formData.categoryId"
+          :items="categoryItems"
+          title="选择类目"
+          entity="category"
+          :type="formData.type"
         />
       </view>
       <view class="flex-1">
         <view class="text-xs text-gray-500">
           <text class="i-lucide:credit-card mr-2" />支付方式
         </view>
-        <wd-picker
-          v-model="formData.paymentMethodId" :columns="paymentMethodOptions" title="请选择支付方式" placeholder="请选择" custom-class="mt-2" prop="paymentMethodId"
-          :rules="[{ required: true, message: '请选择支付方式' }]"
+        <GridPickerPopup
+          v-model="formData.paymentMethodId"
+          :items="paymentMethodItems"
+          title="选择支付方式"
+          entity="paymentMethod"
         />
       </view>
     </view>
