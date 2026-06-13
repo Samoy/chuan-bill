@@ -76,6 +76,14 @@ public enum ResultEnum {
 
     // 预算相关错误码 5000+
     BUDGET_NOT_FOUND(5001, "预算不存在"),
+
+    // 类目/支付方式相关错误码 6000+
+    CATEGORY_NOT_FOUND(6001, "类目不存在"),
+    CATEGORY_HAS_BILLS(6002, "该类目下存在账单，无法删除"),
+    CANNOT_MODIFY_DEFAULT_CATEGORY(6003, "系统预设类目不可修改"),
+    PAYMENT_METHOD_NOT_FOUND(6004, "支付方式不存在"),
+    PAYMENT_METHOD_HAS_BILLS(6005, "该支付方式下存在账单，无法删除"),
+    CANNOT_MODIFY_DEFAULT_PAYMENT_METHOD(6006, "系统预设支付方式不可修改"),
     ;
 
     private final Integer code;
