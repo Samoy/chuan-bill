@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { FamilyVO } from '@/api/globals'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 
 definePage({
   name: 'family-edit',
@@ -73,6 +75,7 @@ async function addSave() {
   })
   if (result) {
     toast.success('创建成功')
+    eventBus.emit(EVENTS.FAMILY.UPDATED)
     router.back()
   }
 }
@@ -90,6 +93,7 @@ async function editSave() {
   })
   if (result) {
     toast.success('家庭信息已更新')
+    eventBus.emit(EVENTS.FAMILY.UPDATED)
     router.back()
   }
 }
@@ -103,6 +107,7 @@ function handleDelete() {
       if (success) {
         resolve(true)
         toast.success('家庭已删除')
+        eventBus.emit(EVENTS.FAMILY.UPDATED)
         router.back()
       }
     },

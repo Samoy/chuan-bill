@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { BillVO } from '@/api/globals'
 import type { LocalBillVO } from '@/store/billStore'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import BillDetail from './BillDetail.vue'
 
 defineOptions({
@@ -45,6 +47,7 @@ function deleteBill() {
           resolve(true)
           toast.show('删除成功')
           emit('delete')
+          eventBus.emit(EVENTS.BILL.UPDATED)
           show.value = false
         }
       }

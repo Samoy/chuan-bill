@@ -1,4 +1,4 @@
-﻿# 多阶段构建 - 构建阶段
+# 多阶段构建 - 构建阶段
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 

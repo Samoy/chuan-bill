@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AddBillDTO, BillVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import ManualEdit from './ManualEdit.vue'
 import OcrEdit from './OcrEdit.vue'
 import VoiceEdit from './VoiceEdit.vue'
@@ -116,6 +118,7 @@ function addBillSuccess(billDTO: AddBillDTO) {
   show.value = false
   resetBillForm()
   emit('success', billDTO)
+  eventBus.emit(EVENTS.BILL.UPDATED)
 }
 
 async function updateBill(billDTO: UpdateBillDTO) {
@@ -140,6 +143,7 @@ function updateBillSuccess(billDTO: UpdateBillDTO) {
   show.value = false
   resetBillForm()
   emit('success', billDTO)
+  eventBus.emit(EVENTS.BILL.UPDATED)
 }
 
 function showInfo() {

@@ -45,6 +45,7 @@ declare global {
   const defineStore: typeof import('pinia')['defineStore']
   const eagerComputed: typeof import('@vueuse/core')['eagerComputed']
   const effectScope: typeof import('vue')['effectScope']
+  const eventBus: typeof import('./utils/eventBus')['eventBus']
   const extendRef: typeof import('@vueuse/core')['extendRef']
   const friendlyTime: typeof import('./utils/index')['friendlyTime']
   const getActivePinia: typeof import('pinia')['getActivePinia']
@@ -417,6 +418,7 @@ declare module 'vue' {
     readonly defineStore: UnwrapRef<typeof import('pinia')['defineStore']>
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
+    readonly eventBus: UnwrapRef<typeof import('./utils/eventBus')['eventBus']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
     readonly friendlyTime: UnwrapRef<typeof import('./utils/index')['friendlyTime']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
