@@ -185,7 +185,7 @@ async function handleRefreshInviteCode() {
           <!-- 家庭账单 -->
           <view
             class="flex items-center gap-3"
-            @click="router.push(`/pages/family/bill?familyId=${familyId}`)"
+            @click="router.push(`/pages/family/bill?familyId=${familyId}&familyName=${encodeURIComponent(currentFamily.name || '')}`)"
           >
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:receipt h-5 w-5 text-primary" />
@@ -202,7 +202,7 @@ async function handleRefreshInviteCode() {
           <!-- 家庭统计 -->
           <view
             class="flex items-center gap-3"
-            @click="router.push(`/pages/family/statistics?familyId=${familyId}`)"
+            @click="router.push(`/pages/family/statistics?familyId=${familyId}&familyName=${encodeURIComponent(currentFamily.name || '')}`)"
           >
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:bar-chart-3 h-5 w-5 text-primary" />
