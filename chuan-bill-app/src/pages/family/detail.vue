@@ -44,14 +44,40 @@ const members = computed(() => familyStore.memberList)
 const pendingApplies = computed(() => familyStore.pendingApplies)
 const isOwner = computed(() => currentFamily.value?.isOwner || false)
 
-// 复制邀请码
-function copyInviteCode() {
-  if (currentFamily.value?.inviteCode) {
-    uni.setClipboardData({
-      data: currentFamily.value.inviteCode,
-    })
-  }
+// 分享家庭
+function shareFamily() {
+  const inviteCode = currentFamily.value?.inviteCode
+  const familyName = currentFamily.value?.name || '我的家庭'
+  if (!inviteCode)
+    return
+
+  // #ifdef MP-WEIXIN
+  uni.share({
+    title: `邀请你加入「${familyName}」`,
+    path: `/pages/family/index?inviteCode=${inviteCode}`,
+  })
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  const shareUrl = `https://chuan-bill.example.com/pages/family/index?inviteCode=${inviteCode}`
+  const shareText = `邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
+  uni.setClipboardData({
+    data: shareText,
+    success: () => {
+      toast.success('分享链接已复制到剪贴板')
+    },
+  })
+  // #endif
 }
+
+// #ifdef MP-WEIXIN
+onShareAppMessage(() => {
+  return {
+    title: `邀请你加入「${currentFamily.value?.name || '我的家庭'}」`,
+    path: `/pages/family/index?inviteCode=${currentFamily.value?.inviteCode}`,
+  }
+})
+// #endif
 
 // 处理加入申请
 async function handleApply(applyId: string, approved: boolean) {
@@ -202,8 +228,8 @@ async function handleRefreshInviteCode() {
         </view>
       </view>
 
-      <!-- 邀请码区域（仅户主可见） -->
-      <view v-if="isOwner" class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <!-- 邀请码区域 -->
+      <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view class="flex items-center justify-between">
           <view>
             <text class="block text-sm font-500">
@@ -214,10 +240,10 @@ async function handleRefreshInviteCode() {
             <text class="mr-2 text-lg font-bold tracking-widest font-mono">
               {{ currentFamily.inviteCode }}
             </text>
-            <wd-button size="small" plain @click="copyInviteCode">
-              复制
+            <wd-button size="small" type="primary" @click="shareFamily">
+              分享
             </wd-button>
-            <wd-button size="small" plain @click="handleRefreshInviteCode">
+            <wd-button v-if="isOwner" size="small" plain @click="handleRefreshInviteCode">
               刷新
             </wd-button>
           </view>
