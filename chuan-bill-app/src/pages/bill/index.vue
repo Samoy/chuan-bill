@@ -20,6 +20,7 @@ definePage({
   type: 'home',
   style: {
     navigationBarTitleText: '我的账单',
+    enablePullDownRefresh: true,
   },
 })
 

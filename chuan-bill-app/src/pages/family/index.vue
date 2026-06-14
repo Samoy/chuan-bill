@@ -7,6 +7,7 @@ definePage({
   layout: 'tabbar',
   style: {
     navigationBarTitleText: '家庭',
+    enablePullDownRefresh: true,
   },
 })
 
@@ -24,17 +25,19 @@ const showKeyboard = ref(false)
 
 // 页面加载时获取数据（仅首次）
 onLoad(() => {
-  if (user.isLoggedIn) {
-    familyStore.fetchFamilyList()
-    messageStore.fetchUnreadCount()
-  }
+  handleFamilyUpdated()
+})
+
+onPullDownRefresh(() => {
+  handleFamilyUpdated()
+    .finally(() => uni.stopPullDownRefresh())
 })
 
 // 监听家庭数据变化事件
-function handleFamilyUpdated() {
+async function handleFamilyUpdated() {
   if (user.isLoggedIn) {
-    familyStore.fetchFamilyList()
-    messageStore.fetchUnreadCount()
+    await familyStore.fetchFamilyList()
+    await messageStore.fetchUnreadCount()
   }
 }
 
