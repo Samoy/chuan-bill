@@ -131,8 +131,10 @@ public class PaymentMethodServiceImpl extends ServiceImpl<PaymentMethodMapper, P
         LambdaQueryWrapper<PaymentMethod> presetQuery = new LambdaQueryWrapper<>();
         presetQuery.eq(PaymentMethod::getIsDefault, true);
         List<PaymentMethod> presetMethods = this.list(presetQuery);
-        int maxPresetSortOrder =
-                presetMethods.stream().mapToInt(PaymentMethod::getSortOrder).max().orElse(0);
+        int maxPresetSortOrder = presetMethods.stream()
+                .mapToInt(PaymentMethod::getSortOrder)
+                .max()
+                .orElse(0);
 
         int sortOrder = maxPresetSortOrder + 1;
         for (String id : ids) {

@@ -40,6 +40,7 @@ const user = useUserStore()
 const visible = defineModel<boolean>('visible', { default: false })
 const editMode = ref(false)
 
+// 过滤后的列表（隐藏"其他"）
 const filteredItems = computed(() => {
   if (props.showOthers) {
     return props.items
@@ -47,14 +48,17 @@ const filteredItems = computed(() => {
   return props.items.filter(item => !(item.isDefault && item.name?.includes('其他')))
 })
 
+// 预设项和自定义项
 const presetItems = computed(() => filteredItems.value.filter(item => item.isDefault))
 const customItems = computed(() => filteredItems.value.filter(item => !item.isDefault))
 
+// 显示文本
 const displayText = computed(() => {
   const selected = props.items.find(item => item.id === props.modelValue)
   return selected?.name || '请选择'
 })
 
+// 自定义项的默认图标
 function getDefaultIcon() {
   if (props.entity === 'paymentMethod') {
     return 'i-icon-park-outline:payment-method'
@@ -146,111 +150,6 @@ function handleClose() {
   }
   visible.value = false
 }
-
-// ==================== movable-view 拖拽排序 ====================
-
-const COLS = 3
-const ITEM_H = 32
-const GAP = 8
-
-const editingCustomItems = ref<GridPickerItem[]>([])
-const movableX = ref<number[]>([])
-const movableY = ref<number[]>([])
-
-function calcPos(index: number) {
-  const col = index % COLS
-  const row = Math.floor(index / COLS)
-  return {
-    x: col * (100 + GAP),
-    y: row * (ITEM_H + GAP),
-  }
-}
-
-function syncPositions() {
-  movableX.value = editingCustomItems.value.map((_, i) => calcPos(i).x)
-  movableY.value = editingCustomItems.value.map((_, i) => calcPos(i).y)
-}
-
-watch(editMode, (val) => {
-  if (val) {
-    editingCustomItems.value = [...customItems.value]
-    syncPositions()
-  }
-})
-
-watch(() => props.items, () => {
-  if (editMode.value) {
-    editingCustomItems.value = [...customItems.value]
-    syncPositions()
-  }
-})
-
-function onDragChange(index: number, e: any) {
-  if (e.detail.source !== 'touch')
-    return
-
-  const x = e.detail.x
-  const y = e.detail.y
-
-  const col = Math.round(x / (100 + GAP))
-  const row = Math.round(y / (ITEM_H + GAP))
-  const maxIndex = editingCustomItems.value.length - 1
-  const newIndex = Math.max(0, Math.min(row * COLS + col, maxIndex))
-
-  if (newIndex !== index) {
-    const items = [...editingCustomItems.value]
-    const [moved] = items.splice(index, 1)
-    items.splice(newIndex, 0, moved)
-    editingCustomItems.value = items
-    syncPositions()
-  }
-  else {
-    movableX.value[index] = calcPos(index).x
-    movableY.value[index] = calcPos(index).y
-  }
-}
-
-function onDragTouchEnd() {
-  const finalIds = editingCustomItems.value.map(item => item.id!)
-  saveSortOrder(finalIds)
-}
-
-async function saveSortOrder(ids: string[]) {
-  try {
-    if (props.entity === 'category') {
-      await billStore.sortCategories(ids)
-    }
-    else {
-      await billStore.sortPaymentMethods(ids)
-    }
-    emit('itemsUpdated')
-  }
-  catch (error: any) {
-    globalMessage.alert(error.message || '排序失败')
-    emit('itemsUpdated')
-  }
-}
-
-const presetRows = computed(() => Math.ceil(presetItems.value.length / COLS))
-const customRows = computed(() => Math.ceil(editingCustomItems.value.length / COLS))
-const totalRows = computed(() => presetRows.value + customRows.value)
-const movableAreaHeight = computed(() => totalRows.value * (ITEM_H + GAP) + 10)
-
-function getPresetStyle(index: number) {
-  const col = index % COLS
-  const row = Math.floor(index / COLS)
-  return {
-    position: 'absolute' as const,
-    left: `${col * (100 + GAP)}px`,
-    top: `${row * (ITEM_H + GAP)}px`,
-    width: '100px',
-    height: '32px',
-  }
-}
-
-function getCustomY(index: number) {
-  return (presetRows.value * (ITEM_H + GAP)) + calcPos(index).y
-}
 </script>
 
 <template>
@@ -279,6 +178,7 @@ function getCustomY(index: number) {
     :z-index="999"
     @close="handleClose"
   >
+    <!-- 编辑/完成图标按钮（关闭按钮左侧） -->
     <text
       v-if="user.isLoggedIn"
       :class="editMode ? 'i-lucide:check' : 'i-lucide:square-pen'"
@@ -286,7 +186,7 @@ function getCustomY(index: number) {
       @click="editMode ? exitEditMode() : enterEditMode()"
     />
     <view class="min-h-[30vh] px-4 pb-4">
-      <!-- 普通模式 -->
+      <!-- 普通模式：radio-group 选择 -->
       <view v-if="!editMode" class="grid grid-cols-3 gap-2">
         <wd-radio-group
           :model-value="modelValue"
@@ -304,6 +204,7 @@ function getCustomY(index: number) {
           </wd-radio>
         </wd-radio-group>
 
+        <!-- 新增标签（行内末尾） -->
         <wd-tag
           v-if="user.isLoggedIn"
           type="primary"
@@ -321,71 +222,49 @@ function getCustomY(index: number) {
         </wd-tag>
       </view>
 
-      <!-- 编辑模式 -->
-      <view v-else>
-        <view class="mb-2 text-center text-xs text-gray-400">
-          拖拽自定义项可排序
-        </view>
-
-        <!-- 合并 movable-area：覆盖所有项 -->
-        <movable-area
-          class="w-full"
-          :style="{ height: `${movableAreaHeight}px` }"
+      <!-- 编辑模式：预设项不可操作 + 自定义项可删除 -->
+      <view v-else class="grid grid-cols-3 gap-2">
+        <!-- 预设项（不可操作） -->
+        <view
+          v-for="item in presetItems"
+          :key="item.id"
+          class="h-8 inline-flex items-center justify-center rounded-xl bg-gray-100 px-3 text-sm text-gray-300 dark:bg-white/10"
         >
-          <!-- 预设项（不可拖拽，置灰） -->
-          <view
-            v-for="(item, index) in presetItems"
-            :key="item.id"
-            class="preset-item"
-            :style="getPresetStyle(index)"
-          >
-            <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
-          </view>
-
-          <!-- 自定义项（可拖拽） -->
-          <movable-view
-            v-for="(item, index) in editingCustomItems"
-            :key="item.id"
-            :x="movableX[index]"
-            :y="getCustomY(index)"
-            direction="all"
-            :damping="30"
-            :friction="3"
-            :animation="true"
-            class="drag-movable-item"
-            @change="onDragChange(index, $event)"
-            @touchend="onDragTouchEnd"
-          >
-            <view class="h-8 inline-flex items-center justify-center rounded-xl bg-primary/10 px-3 text-sm text-primary">
-              <text :class="transformUnoCSS(item.icon || '')" class="mr-1" />
-              <text>{{ item.name }}</text>
-              <text class="i-lucide:grip-vertical ml-1 text-xs opacity-50" />
-              <text
-                class="i-lucide:x ml-1 text-xs opacity-60"
-                @click.stop="confirmDelete(item)"
-              />
-            </view>
-          </movable-view>
-        </movable-area>
-
-        <!-- 新增标签 -->
-        <view class="mt-2">
-          <wd-tag
-            v-if="user.isLoggedIn"
-            type="primary"
-            round
-            dynamic
-            custom-class="!flex !justify-center !items-center !h-8 !w-auto"
-            @confirm="handleTagConfirm"
-          >
-            <template #add>
-              <view class="flex items-center gap-1">
-                <text class="i-lucide:plus" />
-                <text>新增</text>
-              </view>
-            </template>
-          </wd-tag>
+          <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
         </view>
+
+        <!-- 自定义项（可删除） -->
+        <wd-tag
+          v-for="item in customItems"
+          :key="item.id"
+          type="primary"
+          round
+          closable
+          custom-class="!flex !justify-center !items-center !w-auto"
+          @close="confirmDelete(item)"
+        >
+          {{ item.name }}
+          <template #icon>
+            <text :class="transformUnoCSS(item.icon || '')" />
+          </template>
+        </wd-tag>
+
+        <!-- 新增标签（行内末尾） -->
+        <wd-tag
+          v-if="user.isLoggedIn"
+          type="primary"
+          round
+          dynamic
+          custom-class="!flex !justify-center !items-center !h-8 !w-auto"
+          @confirm="handleTagConfirm"
+        >
+          <template #add>
+            <view class="flex items-center gap-1">
+              <text class="i-lucide:plus" />
+              <text>新增</text>
+            </view>
+          </template>
+        </wd-tag>
       </view>
 
       <!-- 未登录提示 -->
@@ -409,19 +288,5 @@ function getCustomY(index: number) {
       @apply border-primary! bg-primary! text-white! shadow-primary/20 shadow-lg;
     }
   }
-}
-.preset-item {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.75rem;
-  background: rgb(243 244 246);
-  padding: 0 0.75rem;
-  font-size: 0.875rem;
-  color: rgb(209 213 219);
-}
-.drag-movable-item {
-  width: 100px;
-  height: 32px;
 }
 </style>
