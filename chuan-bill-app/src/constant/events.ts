@@ -13,5 +13,6 @@ export const EVENTS = {
   },
   USER: {
     UPDATED: 'user:updated',
+    LOGOUT: 'user:logout',
   },
 } as const

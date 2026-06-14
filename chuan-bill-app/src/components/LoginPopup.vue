@@ -5,6 +5,7 @@ const router = useRouter()
 
 // ========== 状态管理 ==========
 const userStore = useUserStore()
+const billStore = useBillStore()
 const toast = useGlobalToast()
 const loading = useGlobalLoading()
 
@@ -110,6 +111,8 @@ async function handleLoginSuccess(tokenVO: TokenVO) {
     nickname: tokenVO.nickname || '',
   })
   userStore.onLoginSuccess()
+  // 登录后刷新账单数据（类目、支付方式）
+  await billStore.refreshBillData()
   toast.success('登录成功')
   resetForm()
 }

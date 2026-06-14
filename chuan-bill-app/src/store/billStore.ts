@@ -2,6 +2,7 @@ import type { AddBillDTO, BillMonthlyStatsVO, BillVO, CategoryVO, PaymentMethodV
 import dayjs from 'dayjs'
 import { add, subtract } from 'mathjs'
 import { LOCAL_PAY_CATEGORY_LIST, LOCAL_PAYMENT_METHOD_LIST } from '@/constant/bill'
+import { EVENTS } from '@/constant/events'
 
 let _localIdCounter = 0
 function generateLocalId() {
@@ -54,6 +55,34 @@ export const useBillStore = defineStore('bill', () => {
       console.error('Failed to initialize bill data:', error)
     }
   }
+
+  async function refreshBillData() {
+    try {
+      await Promise.all([fetchCategoryList(), fetchPaymentMethodList()])
+    }
+    catch (error) {
+      console.error('Failed to refresh bill data:', error)
+    }
+  }
+
+  /**
+   * 清空服务器数据，切换回本地数据
+   * 在用户退出登录时调用
+   */
+  function clearServerData() {
+    isInitialzed.value = false
+    // 重新获取本地数据
+    categoryListMap.value = {
+      expense: LOCAL_PAY_CATEGORY_LIST.filter(item => item.type === 'expense'),
+      income: LOCAL_PAY_CATEGORY_LIST.filter(item => item.type === 'income'),
+    }
+    paymentMethodList.value = LOCAL_PAYMENT_METHOD_LIST
+  }
+
+  // 监听用户退出登录事件
+  eventBus.on(EVENTS.USER.LOGOUT, () => {
+    clearServerData()
+  })
 
   async function fetchPaymentMethodList() {
     if (user.isLoggedIn) {
@@ -346,6 +375,8 @@ export const useBillStore = defineStore('bill', () => {
     paymentMethodList,
     isInitialzed,
     initBillData,
+    refreshBillData,
+    clearServerData,
     getCategoryList,
     getPaymentMethodList,
     // 类目 CRUD
