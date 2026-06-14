@@ -24,9 +24,24 @@ const joinLoading = ref(false)
 const showKeyboard = ref(false)
 
 // 页面加载时获取数据（仅首次）
-onLoad(() => {
+onLoad((options) => {
+  if (options?.inviteCode) {
+    uni.setStorageSync('pendingInviteCode', options.inviteCode)
+  }
   handleFamilyUpdated()
 })
+
+// 监听登录状态变化，自动弹出邀请码弹框
+watch(() => user.isLoggedIn, (loggedIn) => {
+  if (loggedIn) {
+    const pendingCode = uni.getStorageSync('pendingInviteCode')
+    if (pendingCode) {
+      joinForm.value.inviteCode = pendingCode
+      showJoinPopup.value = true
+      uni.removeStorageSync('pendingInviteCode')
+    }
+  }
+}, { immediate: true })
 
 onPullDownRefresh(() => {
   handleFamilyUpdated()
