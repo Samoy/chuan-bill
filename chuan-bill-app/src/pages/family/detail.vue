@@ -59,7 +59,7 @@ function shareFamily() {
   // #endif
 
   // #ifndef MP-WEIXIN
-  const shareUrl = `https://chuan-bill.example.com/pages/family/index?inviteCode=${inviteCode}`
+  const shareUrl = `${import.meta.env.VITE_SHARE_BASE_URL || window.location.origin}/pages/family/index?inviteCode=${inviteCode}`
   const shareText = `邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
   uni.setClipboardData({
     data: shareText,
