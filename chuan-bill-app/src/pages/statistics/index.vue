@@ -75,6 +75,11 @@ onLoad(() => {
   }
 })
 
+onPullDownRefresh(() => {
+  handleDataUpdated()
+    .finally(() => uni.stopPullDownRefresh())
+})
+
 // 页面可见性管理：切回前台时，如果有待刷新的数据则立即获取
 onShow(() => {
   pageVisible.value = true
@@ -107,15 +112,15 @@ watch(() => user.isLoggedIn, () => {
 })
 
 // 监听账单和家庭数据变化事件（页面不可见时延迟到 onShow 再刷新，避免 echarts 渲染空白）
-function handleDataUpdated() {
+async function handleDataUpdated() {
   if (!pageVisible.value) {
     needsRefresh.value = true
     return
   }
-  statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  await statisticsStore.fetchAll(currentMonth.value)
+  await statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
   if (user.isLoggedIn) {
-    budgetStore.fetchBudget(currentMonth.value)
+    await budgetStore.fetchBudget(currentMonth.value)
   }
 }
 

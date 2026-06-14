@@ -20,7 +20,8 @@
       "name": "bill",
       "layout": "tabbar",
       "style": {
-        "navigationBarTitleText": "我的账单"
+        "navigationBarTitleText": "我的账单",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -38,7 +39,8 @@
       "name": "bill",
       "layout": "default",
       "style": {
-        "navigationBarTitleText": "家庭账单"
+        "navigationBarTitleText": "家庭账单",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -65,7 +67,8 @@
       "name": "family",
       "layout": "tabbar",
       "style": {
-        "navigationBarTitleText": "家庭"
+        "navigationBarTitleText": "家庭",
+        "enablePullDownRefresh": true
       }
     },
     {

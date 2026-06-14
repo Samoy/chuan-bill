@@ -16,6 +16,7 @@ definePage({
   layout: 'default',
   style: {
     navigationBarTitleText: '家庭账单',
+    enablePullDownRefresh: true,
   },
 })
 
