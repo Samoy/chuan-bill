@@ -7,6 +7,6 @@ nul
 .env.*.local
 temp/
 settings.local.json
-superpowers/
 .qoder/
 .worktrees/
+.superpowers/

@@ -1,4 +1,5 @@
 import type { TokenVO } from '@/api/globals'
+import { EVENTS } from '@/constant/events'
 
 type PendingCallback = (() => void) | null
 
@@ -52,6 +53,8 @@ export const useUserStore = defineStore('user', () => {
     avatar.value = ''
     gender.value = '0'
     expireTime.value = 0
+    // 通知其他 store 清空数据
+    eventBus.emit(EVENTS.USER.LOGOUT)
   }
 
   /**

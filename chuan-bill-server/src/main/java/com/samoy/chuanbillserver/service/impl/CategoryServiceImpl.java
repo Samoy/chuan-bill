@@ -133,7 +133,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     @Transactional
     public void sortCategories(String userId, List<String> ids) {
-        int sortOrder = 1;
+        LambdaQueryWrapper<Category> presetQuery = new LambdaQueryWrapper<>();
+        presetQuery.eq(Category::getIsDefault, true);
+        List<Category> presetCategories = this.list(presetQuery);
+        int maxPresetSortOrder =
+                presetCategories.stream().mapToInt(Category::getSortOrder).max().orElse(0);
+
+        int sortOrder = maxPresetSortOrder + 1;
         for (String id : ids) {
             Category category = this.getById(id);
             if (category != null

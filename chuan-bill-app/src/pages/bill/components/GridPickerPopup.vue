@@ -39,6 +39,8 @@ const user = useUserStore()
 
 const visible = defineModel<boolean>('visible', { default: false })
 const editMode = ref(false)
+const isAddInputMode = ref(false)
+const newItemName = ref('')
 
 // 过滤后的列表（隐藏"其他"）
 const filteredItems = computed(() => {
@@ -60,10 +62,11 @@ const displayText = computed(() => {
 
 // 自定义项的默认图标
 function getDefaultIcon() {
+  // 防止自动转义，使用encodeURIComponent编码, 在提交后台时解码
   if (props.entity === 'paymentMethod') {
-    return 'i-icon-park-outline:payment-method'
+    return 'i-icon-park-outline%3Apayment-method%20text-primary'
   }
-  return props.type === 'income' ? 'i-icon-park-outline:income' : 'i-icon-park-outline:expenses'
+  return props.type === 'income' ? 'i-icon-park-outline%3Aincome' : 'i-icon-park-outline%3Aexpenses'
 }
 
 function handleSelect(id: string) {
@@ -82,17 +85,28 @@ function exitEditMode() {
   editMode.value = false
 }
 
-async function handleTagConfirm({ value }: { value: string }) {
-  const name = value.trim()
-  if (!name)
+function startAddMode() {
+  if (!user.isLoggedIn) {
+    globalToast.warning('登录后即可新增条目')
     return
+  }
+  isAddInputMode.value = true
+  newItemName.value = ''
+}
+
+async function saveNewItem() {
+  const name = newItemName.value.trim()
+  if (!name) {
+    isAddInputMode.value = false
+    return
+  }
   if (name.length > 4) {
     globalToast.show('最多4个字符')
     return
   }
 
   try {
-    const icon = getDefaultIcon()
+    const icon = decodeURIComponent(getDefaultIcon())
     if (props.entity === 'category') {
       await billStore.addCategory({ name, icon, type: props.type || 'expense' })
     }
@@ -101,10 +115,15 @@ async function handleTagConfirm({ value }: { value: string }) {
     }
     emit('itemsUpdated')
     globalToast.success('添加成功')
+    isAddInputMode.value = false
   }
   catch (error: any) {
     globalMessage.alert(error.message || '添加失败')
   }
+}
+
+function cancelAddMode() {
+  isAddInputMode.value = false
 }
 
 async function handleDelete(item: GridPickerItem) {
@@ -165,7 +184,7 @@ function handleClose() {
         {{ displayText }}
       </text>
     </view>
-    <text class="i-lucide:chevron-right text-gray-400" />
+    <wd-icon name="arrow-right" custom-class="text-black/25" />
   </view>
 
   <!-- ActionSheet -->
@@ -185,7 +204,7 @@ function handleClose() {
       class="absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]"
       @click="editMode ? exitEditMode() : enterEditMode()"
     />
-    <view class="min-h-[30vh] px-4 pb-4">
+    <view class="px-4 pb-4">
       <!-- 普通模式：radio-group 选择 -->
       <view v-if="!editMode" class="grid grid-cols-3 gap-2">
         <wd-radio-group
@@ -204,72 +223,74 @@ function handleClose() {
           </wd-radio>
         </wd-radio-group>
 
-        <!-- 新增标签（行内末尾） -->
-        <wd-tag
-          v-if="user.isLoggedIn"
-          type="primary"
-          round
-          dynamic
-          custom-class="!flex !justify-center !items-center mr-10px ![width:calc(100%-10px)] !h-8"
-          @confirm="handleTagConfirm"
+        <!-- 新增按钮（普通模式） -->
+        <input
+          v-if="isAddInputMode"
+          v-model="newItemName"
+          type="text"
+          :maxlength="4"
+          placeholder="输入名称"
+          confirm-type="done"
+          class="mr-[10px] box-border h-8 border-1 border-primary/40 rounded-xl border-dashed bg-white px-3 text-sm dark:bg-gray-800"
+          :focus="true"
+          @blur="cancelAddMode"
+          @confirm="saveNewItem"
         >
-          <template #add>
-            <view class="h-full flex items-center gap-1">
-              <text class="i-lucide:plus" />
-              <text>新增</text>
-            </view>
-          </template>
-        </wd-tag>
+        <view
+          v-else
+          class="mr-[10px] box-border h-8 flex items-center justify-center border border-primary/40 rounded-xl border-dashed px-3 text-sm text-primary"
+          @click="startAddMode"
+        >
+          <text class="i-lucide:plus mr-1" />
+          新增
+        </view>
       </view>
 
-      <!-- 编辑模式：预设项不可操作 + 自定义项可删除 -->
+      <!-- 编辑模式 -->
       <view v-else class="grid grid-cols-3 gap-2">
-        <!-- 预设项（不可操作） -->
+        <!-- 预设项（不可操作，灰色） -->
         <view
           v-for="item in presetItems"
           :key="item.id"
-          class="h-8 inline-flex items-center justify-center rounded-xl bg-gray-100 px-3 text-sm text-gray-300 dark:bg-white/10"
+          class="mr-[10px] h-8 inline-flex items-center justify-center rounded-xl bg-gray-100 px-3 text-sm text-gray-300 dark:bg-white/10"
         >
           <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
         </view>
 
         <!-- 自定义项（可删除） -->
-        <wd-tag
+        <view
           v-for="item in customItems"
           :key="item.id"
-          type="primary"
-          round
-          closable
-          custom-class="!flex !justify-center !items-center !w-auto"
-          @close="confirmDelete(item)"
+          class="relative mr-[10px] h-8 inline-flex items-center justify-center rounded-xl bg-primary/10 px-3 text-sm text-primary dark:bg-primary/20"
         >
-          {{ item.name }}
-          <template #icon>
-            <text :class="transformUnoCSS(item.icon || '')" />
-          </template>
-        </wd-tag>
+          <text :class="transformUnoCSS(item.icon || '')" class="mr-1" /> {{ item.name }}
+          <text
+            class="i-mingcute:close-circle-fill absolute h-4 w-4 text-red-500 -right-1 -top-1"
+            @click.stop="confirmDelete(item)"
+          />
+        </view>
 
-        <!-- 新增标签（行内末尾） -->
-        <wd-tag
-          v-if="user.isLoggedIn"
-          type="primary"
-          round
-          dynamic
-          custom-class="!flex !justify-center !items-center !h-8 !w-auto"
-          @confirm="handleTagConfirm"
+        <!-- 新增按钮/输入框 -->
+        <input
+          v-if="isAddInputMode"
+          v-model="newItemName"
+          type="text"
+          :maxlength="4"
+          placeholder="输入名称"
+          confirm-type="done"
+          class="mr-[10px] box-border h-8 border-1 border-primary rounded-xl border-dashed bg-white px-3 text-sm dark:bg-gray-800"
+          :focus="true"
+          @blur="cancelAddMode"
+          @confirm="saveNewItem"
         >
-          <template #add>
-            <view class="flex items-center gap-1">
-              <text class="i-lucide:plus" />
-              <text>新增</text>
-            </view>
-          </template>
-        </wd-tag>
-      </view>
-
-      <!-- 未登录提示 -->
-      <view v-if="!user.isLoggedIn" class="mt-4 text-center text-xs text-gray-400">
-        登录后可自定义{{ title.replace('选择', '') }}
+        <view
+          v-else
+          class="mr-[10px] box-border h-8 flex items-center justify-center border-1 border-primary/40 rounded-xl border-dashed px-3 text-sm text-primary"
+          @click="startAddMode"
+        >
+          <text class="i-lucide:plus mr-1" />
+          新增
+        </view>
       </view>
     </view>
   </wd-action-sheet>
@@ -280,7 +301,7 @@ function handleClose() {
   max-width: none !important;
   width: 100%;
   border: none !important;
-  @apply h-8 items-center flex justify-center py-0;
+  @apply h-8! items-center flex justify-center py-0 text-sm!;
 }
 .normal-radio {
   &.is-checked {

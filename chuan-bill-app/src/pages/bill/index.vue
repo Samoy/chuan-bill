@@ -209,11 +209,8 @@ onReachBottom(() => {
 })
 
 // 监听登录状态变化
-watch(() => user.isLoggedIn, (newVal) => {
-  if (newVal) {
-    // 登录后刷新数据
-    refresh()
-  }
+watch(() => user.isLoggedIn, () => {
+  refresh()
 })
 
 // 监听家庭数据变化事件（家庭账单相关）
