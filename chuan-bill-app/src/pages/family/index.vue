@@ -282,7 +282,7 @@ async function handleJoin() {
               class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary/5 py-2 text-primary transition-all active:scale-95"
               @click.stop="router.push(`/pages/family/bill?familyId=${family.id}&familyName=${encodeURIComponent(family.name || '')}`)"
             >
-              <view class="i-lucide:clipboard-list h-4 w-4" />
+              <view class="i-lucide:receipt h-4 w-4" />
               <view class="text-xs font-500">
                 账单列表
               </view>

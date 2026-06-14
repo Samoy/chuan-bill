@@ -20,21 +20,19 @@ const familyId = ref('')
 const showRemoveConfirm = ref(false)
 const removeTarget = ref<{ id: string, nickname: string } | null>(null)
 
-onLoad((options) => {
+onLoad(async (options) => {
   if (options?.familyId) {
     familyId.value = options.familyId
-  }
-})
-
-onShow(async () => {
-  if (familyId.value) {
-    await Promise.all([
-      familyStore.fetchFamilyDetail(familyId.value),
-      familyStore.fetchMembers(familyId.value),
-    ])
-    // 如果是户主，也获取待处理申请
-    if (familyStore.currentFamily?.isOwner) {
-      await familyStore.fetchPendingApplies(familyId.value)
+    if (familyId.value) {
+      uni.showShareMenu()
+      await Promise.all([
+        familyStore.fetchFamilyDetail(familyId.value),
+        familyStore.fetchMembers(familyId.value),
+      ])
+      // 如果是户主，也获取待处理申请
+      if (familyStore.currentFamily?.isOwner) {
+        await familyStore.fetchPendingApplies(familyId.value)
+      }
     }
   }
 })
@@ -46,21 +44,13 @@ const isOwner = computed(() => currentFamily.value?.isOwner || false)
 
 // 分享家庭
 function shareFamily() {
+  // #ifndef MP-WEIXIN
   const inviteCode = currentFamily.value?.inviteCode
   const familyName = currentFamily.value?.name || '我的家庭'
   if (!inviteCode)
     return
-
-  // #ifdef MP-WEIXIN
-  uni.share({
-    title: `邀请你加入「${familyName}」`,
-    path: `/pages/family/index?inviteCode=${inviteCode}`,
-  })
-  // #endif
-
-  // #ifndef MP-WEIXIN
   const shareUrl = `${import.meta.env.VITE_SHARE_BASE_URL}/pages/family/index?inviteCode=${inviteCode}`
-  const shareText = `邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
+  const shareText = `${userStore.nickname || '您的好友'}邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
   uni.setClipboardData({
     data: shareText,
     success: () => {
@@ -73,8 +63,9 @@ function shareFamily() {
 // #ifdef MP-WEIXIN
 onShareAppMessage(() => {
   return {
-    title: `邀请你加入「${currentFamily.value?.name || '我的家庭'}」`,
+    title: `${userStore.nickname || '您的好友'}邀请你加入「${currentFamily.value?.name || '我的家庭'}」`,
     path: `/pages/family/index?inviteCode=${currentFamily.value?.inviteCode}`,
+    imageUrl: currentFamily.value?.avatar,
   }
 })
 // #endif
@@ -194,7 +185,7 @@ async function handleRefreshInviteCode() {
           <!-- 家庭账单 -->
           <view
             class="flex items-center gap-3"
-            @click="router.push(`/pages/family/bills?familyId=${familyId}`)"
+            @click="router.push(`/pages/family/bill?familyId=${familyId}`)"
           >
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:receipt h-5 w-5 text-primary" />
@@ -213,8 +204,8 @@ async function handleRefreshInviteCode() {
             class="flex items-center gap-3"
             @click="router.push(`/pages/family/statistics?familyId=${familyId}`)"
           >
-            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
-              <view class="i-lucide:bar-chart-3 h-5 w-5 text-green-600" />
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:bar-chart-3 h-5 w-5 text-primary" />
             </view>
             <view>
               <text class="block text-sm font-500">
@@ -240,7 +231,7 @@ async function handleRefreshInviteCode() {
             <text class="mr-2 text-lg font-bold tracking-widest font-mono">
               {{ currentFamily.inviteCode }}
             </text>
-            <wd-button size="small" type="primary" @click="shareFamily">
+            <wd-button size="small" plain open-type="share" @click="shareFamily">
               分享
             </wd-button>
             <wd-button v-if="isOwner" size="small" plain @click="handleRefreshInviteCode">
