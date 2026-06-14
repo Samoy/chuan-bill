@@ -27,6 +27,11 @@ const showKeyboard = ref(false)
 onLoad((options) => {
   if (options?.inviteCode) {
     uni.setStorageSync('pendingInviteCode', options.inviteCode)
+    if (user.isLoggedIn) {
+      joinForm.value.inviteCode = options.inviteCode
+      showJoinPopup.value = true
+      uni.removeStorageSync('pendingInviteCode')
+    }
   }
   handleFamilyUpdated()
 })
