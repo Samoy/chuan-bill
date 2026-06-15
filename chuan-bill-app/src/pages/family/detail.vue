@@ -24,7 +24,9 @@ onLoad(async (options) => {
   if (options?.familyId) {
     familyId.value = options.familyId
     if (familyId.value) {
-      uni.showShareMenu()
+      // #ifdef MP-WEIXIN
+      uni.showShareMenu({ menus: ['shareAppMessage'] })
+      // #endif
       await Promise.all([
         familyStore.fetchFamilyDetail(familyId.value),
         familyStore.fetchMembers(familyId.value),
@@ -49,7 +51,7 @@ function shareFamily() {
   const familyName = currentFamily.value?.name || '我的家庭'
   if (!inviteCode)
     return
-  const shareUrl = `${import.meta.env.VITE_SHARE_BASE_URL}/pages/family/index?inviteCode=${inviteCode}`
+  const shareUrl = `${import.meta.env.VITE_SHARE_BASE_URL}/#/pages/family/index?inviteCode=${inviteCode}`
   const shareText = `${userStore.nickname || '您的好友'}邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
   uni.setClipboardData({
     data: shareText,

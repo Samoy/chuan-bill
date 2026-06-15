@@ -44,7 +44,7 @@ function toggleFriendlyTime(e: UniHelper.TouchEvent, time?: string) {
     <view class="flex flex-1 gap-4">
       <!-- 左侧：图标 -->
       <view
-        class="h-5 w-5 flex items-center justify-center border-[1px] border-white/30 rounded-2xl border-solid bg-[rgba(255,255,255,0.2)] p-3 shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-[16px] backdrop-saturate-[180%]"
+        class="h-5 w-5 flex items-center justify-center border-[1px] border-white/30 rounded-2xl border-solid bg-white/20 p-3 shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-[16px] backdrop-saturate-[180%] dark:border-none dark:bg-gray-800"
         :class="bill.type === 'expense' ? 'text-red-400' : 'text-green-500'"
       >
         <text class="h-4 w-4" :class="transformUnoCSS(bill.category?.icon || '')" />
