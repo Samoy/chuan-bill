@@ -165,7 +165,7 @@ const menuGroups: { title: string, items: MenuItem[], needLogin?: boolean }[] = 
         title: '帮助与反馈',
         action: () => router.push('/pages/mine/help'),
       },
-      // #ifndef MP
+      // #ifdef APP-PLUS
       {
         icon: 'i-lucide:download-cloud',
         title: '检查更新',
@@ -347,7 +347,7 @@ onUnmounted(() => {
     </view>
 
     <!-- 退出登录 -->
-    <view v-if="user.isLoggedIn" class="mx-3 my-4">
+    <view v-if="user.isLoggedIn" class="mx-3 mt-4 -mb-10">
       <wd-button type="error" plain block @click="logout">
         退出登录
       </wd-button>

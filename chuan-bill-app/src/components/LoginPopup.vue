@@ -325,7 +325,7 @@ export default {
         </wd-tabs>
 
         <!-- 自动注册提示 -->
-        <view class="mt-4 text-center">
+        <view class="mt-4 text-center" :class="activeTab === 0 ? 'visible' : 'invisible'">
           <text class="text-xs text-gray-400">
             未注册手机号验证通过后将自动注册
           </text>
