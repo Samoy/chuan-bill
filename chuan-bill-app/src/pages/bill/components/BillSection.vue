@@ -9,8 +9,9 @@ defineOptions({
   },
 })
 
-const { month, customClass, customStyle } = defineProps<{
+const { month, familyId, customClass, customStyle } = defineProps<{
   month: string
+  familyId?: string
   customClass?: string
   customStyle?: string
 }>()
@@ -19,7 +20,7 @@ const statistics = ref<BillMonthlyStatsVO>()
 const billStore = useBillStore()
 
 onMounted(async () => {
-  const res = await billStore.getMonthlyBillStats(month)
+  const res = await billStore.getMonthlyBillStats(month, familyId)
   if (res) {
     statistics.value = res
   }
