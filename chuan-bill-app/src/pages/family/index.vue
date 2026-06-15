@@ -26,12 +26,31 @@ const showKeyboard = ref(false)
 // 页面加载时获取数据（仅首次）
 onLoad((options) => {
   if (options?.inviteCode) {
+    // #ifdef MP-WEIXIN
+    // 微信小程序通过 scene 判断是否为邀请入口
+    const launchOptions = wx.getLaunchOptionsSync()
+    const INVITE_SCENES = [1007, 1008]
+    const isInviteScene = INVITE_SCENES.includes(launchOptions.scene)
+    if (isInviteScene) {
+      uni.setStorageSync('pendingInviteCode', options.inviteCode)
+      if (user.isLoggedIn) {
+        joinForm.value.inviteCode = options.inviteCode
+        showJoinPopup.value = true
+        uni.removeStorageSync('pendingInviteCode')
+      }
+    }
+    // #endif
+
+    // #ifdef H5
+    // H5 存储邀请码后立即移除 URL 中的 inviteCode 参数，避免刷新时重复弹框
     uni.setStorageSync('pendingInviteCode', options.inviteCode)
     if (user.isLoggedIn) {
       joinForm.value.inviteCode = options.inviteCode
       showJoinPopup.value = true
       uni.removeStorageSync('pendingInviteCode')
     }
+    removeHashQueryParam('inviteCode')
+    // #endif
   }
   handleFamilyUpdated()
 })

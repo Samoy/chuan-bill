@@ -144,6 +144,35 @@ export function transformUnoCSS(cssName: string) {
 }
 
 /**
+ * 获取当前 hash 路由中的查询参数
+ * @param key 参数名
+ * @returns 参数值，不存在则返回 null
+ */
+export function getHashQueryParam(key: string): string | null {
+  const hash = window.location.hash
+  const queryStart = hash.indexOf('?')
+  if (queryStart === -1)
+    return null
+  return new URLSearchParams(hash.substring(queryStart + 1)).get(key)
+}
+
+/**
+ * 移除当前 hash 路由中的查询参数（无刷新）
+ * @param key 要移除的参数名
+ */
+export function removeHashQueryParam(key: string): void {
+  const hash = window.location.hash
+  const queryStart = hash.indexOf('?')
+  if (queryStart === -1)
+    return
+  const basePath = hash.substring(0, queryStart)
+  const params = new URLSearchParams(hash.substring(queryStart + 1))
+  params.delete(key)
+  const newHash = params.toString() ? `${basePath}?${params}` : basePath
+  history.replaceState(null, '', newHash)
+}
+
+/**
  * 友好化显示时间
  * @param t 时间
  * @returns 友好时间
