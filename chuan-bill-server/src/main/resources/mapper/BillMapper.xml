@@ -5,14 +5,18 @@
         SELECT
             SUM(amount) as total_amount
         FROM t_bill
-        WHERE user_id = #{userId}
-            AND time &gt;= #{startTime}
+        WHERE time &gt;= #{startTime}
             AND time &lt;= #{endTime}
             AND deleted = 0
             AND type = #{type}
-        <if test="familyId != null">
-            AND family_id = #{familyId}
-        </if>
+        <choose>
+            <when test="familyId != null">
+                AND family_id = #{familyId}
+            </when>
+            <otherwise>
+                AND user_id = #{userId}
+            </otherwise>
+        </choose>
     </select>
 
     <select id="selectCategoryStats" resultType="com.samoy.chuanbillserver.vo.CategoryStatisticsVO">
@@ -23,15 +27,19 @@
             SUM(b.amount) AS amount
         FROM t_bill b
         LEFT JOIN t_category c ON b.category_id = c.id
-        WHERE b.user_id = #{userId}
-            AND b.time &gt;= #{startTime}
+        WHERE b.time &gt;= #{startTime}
             AND b.time &lt;= #{endTime}
             AND b.deleted = 0
             AND b.type = #{type}
             AND b.category_id IS NOT NULL
-        <if test="familyId != null">
-            AND b.family_id = #{familyId}
-        </if>
+        <choose>
+            <when test="familyId != null">
+                AND b.family_id = #{familyId}
+            </when>
+            <otherwise>
+                AND b.user_id = #{userId}
+            </otherwise>
+        </choose>
         GROUP BY b.category_id, c.name, c.icon
         ORDER BY amount DESC
     </select>
@@ -42,13 +50,17 @@
       SUM(IF(type = 'expense', amount, 0)) AS expense,
       SUM(IF(type = 'income', amount, 0)) AS income
       FROM t_bill
-      WHERE user_id = #{userId}
-      AND time &gt;= #{startTime}
+      WHERE time &gt;= #{startTime}
       AND time &lt;= #{endTime}
       AND deleted = 0
-      <if test="familyId != null">
-            AND family_id = #{familyId}
-        </if>
+      <choose>
+          <when test="familyId != null">
+              AND family_id = #{familyId}
+          </when>
+          <otherwise>
+              AND user_id = #{userId}
+          </otherwise>
+      </choose>
       GROUP BY DATE_FORMAT(time, '%Y-%m-%d')
       ORDER BY DATE_FORMAT(time, '%Y-%m-%d')
     </select>
