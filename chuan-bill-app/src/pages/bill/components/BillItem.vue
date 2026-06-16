@@ -19,6 +19,7 @@ interface BillCardProps {
   bill: BillVO
   customClass?: string
   customStyle?: string
+  showCreator?: boolean
 }
 
 const isFriendlyTime = ref(true)
@@ -50,23 +51,33 @@ function toggleFriendlyTime(e: UniHelper.TouchEvent, time?: string) {
         <text class="h-4 w-4" :class="transformUnoCSS(bill.category?.icon || '')" />
       </view>
       <!-- 中间：名称、时间、支付方式 -->
-      <view class="flex flex-col gap-2">
-        <view class="font-500">
-          {{ bill.name }}
-        </view>
-        <view class="flex gap-2 text-xs text-gray-500">
-          <text v-if="bill.time" @click.stop="toggleFriendlyTime($event, bill.time)">
-            {{ isFriendlyTime ? friendlyTime(bill.time) : bill.time }}
+      <view class="flex flex-1 flex-col gap-2">
+        <view class="flex items-center justify-between gap-2">
+          <text class="font-500">
+            {{ bill.name }}
           </text>
-          <text v-if="bill.paymentMethod">
+          <text class="shrink-0 text-lg" :class="bill.type === 'expense' ? 'text-red-400' : 'text-green-500'">
+            {{ bill.type === 'expense' ? '-' : '+' }} {{ bill.amount }}
+          </text>
+        </view>
+        <view class="flex items-center text-xs text-gray-500">
+          <template v-if="bill.time">
+            <text class="shrink-0" @click.stop="toggleFriendlyTime($event, bill.time)">
+              {{ isFriendlyTime ? friendlyTime(bill.time) : bill.time }}
+            </text>
+            <wd-divider vertical custom-class="h-2!" />
+          </template>
+          <text v-if="bill.paymentMethod" class="shrink-0">
             {{ bill.paymentMethod.name }}
           </text>
+          <template v-if="showCreator && bill.userNickname">
+            <wd-divider vertical custom-class="h-2!" />
+            <text>
+              由{{ bill.userNickname }}添加
+            </text>
+          </template>
         </view>
       </view>
     </view>
-    <!-- 右侧：金额 -->
-    <text class="text-lg" :class="bill.type === 'expense' ? 'text-red-400' : 'text-green-500'">
-      {{ bill.type === 'expense' ? '-' : '+' }} {{ bill.amount }}
-    </text>
   </view>
 </template>

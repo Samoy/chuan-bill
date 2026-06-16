@@ -74,7 +74,7 @@ const showBtn = computed(() => {
   <wd-action-sheet v-model="show" title="账单详情" :z-index="100" safe-area-inset-bottom position="bottom" closable custom-class="rounded-tl-2xl rounded-tr-2xl pb-3!" lock-scroll>
     <view class="relative" :class="showBtn ? 'pb-12' : ''">
       <view class="box-border px-4">
-        <BillDetail :bill="bill" />
+        <BillDetail :bill="bill" :type="type" />
       </view>
       <view v-if="showBtn" class="absolute bottom-0 left-4 right-4 box-border h-8 flex items-center justify-center gap-3">
         <wd-button type="error" custom-class="flex-1" @click="deleteBill">

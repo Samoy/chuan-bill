@@ -189,7 +189,7 @@ watch(() => user.isLoggedIn, (newVal) => {
     <view v-if="billList.length" class="mb-9 box-border flex flex-col gap-3 px-3 pb-3">
       <template v-for="(bill, index) in billList" :key="bill.id">
         <BillSection v-if="!isSameMonth(bill.time, billList?.[index - 1]?.time)" :key="bill.amount" :month="dayjs(bill.time!).format('YYYY-MM')" :family-id="familyId" custom-class="mt-3" />
-        <BillItem :bill="bill" @click="onClickBill(bill)" />
+        <BillItem :bill="bill" show-creator @click="onClickBill(bill)" />
       </template>
       <wd-loadmore :state="loadingMoreStatus" finished-text="没有更多数据了" custom-class="h-8!" @reload="refresh" />
     </view>

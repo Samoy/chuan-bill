@@ -442,6 +442,16 @@ public class BillServiceImpl extends ServiceImpl<BillMapper, Bill> implements IB
             }
         }
 
+        // 填充记账人信息
+        if (bill.getUserId() != null) {
+            User user = userService.getById(bill.getUserId());
+            if (user != null) {
+                billVO.setUserId(user.getId());
+                billVO.setUserNickname(user.getNickname());
+                billVO.setUserAvatar(user.getAvatar());
+            }
+        }
+
         return billVO;
     }
 

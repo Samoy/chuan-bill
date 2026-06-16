@@ -156,9 +156,9 @@ async function handleRefreshInviteCode() {
       <!-- 家庭信息卡片 -->
       <view class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
         <view class="flex items-center gap-3">
-          <view class="flex items-center justify-center rounded-2xl bg-white/20 p-2 backdrop-blur-sm">
-            <wd-img v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-12 w-12 rounded-2xl" mode="aspectFill" />
-            <view v-else class="i-lucide:home h-7 w-7" />
+          <wd-avatar v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-10 w-10 rounded-xl" mode="aspectFill" />
+          <view v-else class="h-12 w-12 flex items-center justify-center rounded-2xl rounded-xl bg-white/20 p-1 backdrop-blur-sm">
+            <view class="i-mingcute:group-line h-8 w-8 text-white" />
           </view>
           <view class="flex-1">
             <view class="flex items-center gap-2">

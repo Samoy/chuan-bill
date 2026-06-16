@@ -293,7 +293,7 @@ onUnmounted(() => {
       </view>
     </template>
     <!-- 用户信息卡片 -->
-    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
+    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
       <view class="flex items-center gap-4">
         <!-- 头像 -->
         <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
