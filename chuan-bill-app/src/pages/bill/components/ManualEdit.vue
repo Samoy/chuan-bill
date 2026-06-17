@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AddBillDTO } from '@/api/globals'
+import dayjs from 'dayjs'
 import GridPickerPopup from './GridPickerPopup.vue'
 
 defineOptions({
@@ -32,6 +33,26 @@ const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'm
 const categoryItems = computed(() => billStore.getCategoryList(formData.value.type))
 const paymentMethodItems = computed(() => billStore.getPaymentMethodList())
 const familyOptions = computed<PickerOption[]>(() => familyStore.familyList.map(f => ({ label: f.name, value: f.id })))
+
+// 时间戳用于 wd-datetime-picker（组件要求 timestamp 类型）
+const timeTimestamp = ref<number>(Date.now())
+
+// 同步 formData.time 字符串到时间戳
+watch(() => formData.value.time, (newTime) => {
+  if (newTime) {
+    const timestamp = dayjs(newTime).valueOf()
+    if (!Number.isNaN(timestamp)) {
+      timeTimestamp.value = timestamp
+    }
+  }
+}, { immediate: true })
+
+// 同步时间戳到 formData.time 字符串
+watch(timeTimestamp, (newTimestamp) => {
+  if (newTimestamp) {
+    formData.value.time = dayjs(newTimestamp).format('YYYY-MM-DD HH:mm')
+  }
+})
 
 onLoad(async () => {
   await billStore.initBillData()
@@ -100,7 +121,7 @@ function sumbit() {
       时间
     </view>
     <wd-datetime-picker
-      v-model="formData.time" :default-value="Date.now()" custom-class="mt-3"
+      v-model="timeTimestamp" :default-value="Date.now()" custom-class="mt-3"
       prop="time"
       :rules="[{ required: true, message: '请选择账单时间' }]"
     />
