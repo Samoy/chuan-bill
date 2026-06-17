@@ -10,3 +10,6 @@ settings.local.json
 .qoder/
 .worktrees/
 .superpowers/
+
+# Git worktrees
+.worktrees/
