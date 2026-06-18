@@ -9,8 +9,11 @@ const props = defineProps<{
   familyId?: string
 }>()
 
-const statisticsStore = useStatisticsStore()
+const personalStore = usePersonalStatisticsStore()
+const familyStore = useFamilyStatisticsStore()
 const themeStore = useManualThemeStore()
+
+const store = computed(() => props.familyId ? familyStore : personalStore)
 
 const activeType = ref<'expense' | 'income'>('expense')
 
@@ -33,7 +36,7 @@ const segmentedOptions = [
 ]
 
 const pieOption = computed(() => {
-  const data = statisticsStore.categoryData
+  const data = store.value.categoryData
   const isDark = themeStore.isDark
   if (!data.length) {
     return {}
@@ -70,13 +73,18 @@ const pieOption = computed(() => {
   }
 })
 
-watch(activeType, (type) => {
-  statisticsStore.fetchCategoryBreakdown(props.month, type, props.familyId)
-})
+function fetchData() {
+  if (props.familyId) {
+    familyStore.fetchCategoryBreakdown(props.month, activeType.value, props.familyId)
+  }
+  else {
+    personalStore.fetchCategoryBreakdown(props.month, activeType.value)
+  }
+}
 
-watch(() => props.month, () => {
-  statisticsStore.fetchCategoryBreakdown(props.month, activeType.value, props.familyId)
-})
+watch(activeType, fetchData)
+
+watch(() => props.month, fetchData)
 </script>
 
 <template>
@@ -104,10 +112,10 @@ watch(() => props.month, () => {
     </view>
 
     <!-- 饼图 -->
-    <view v-if="!statisticsStore.categoryLoading && statisticsStore.categoryData.length">
+    <view v-if="!store.categoryLoading && store.categoryData.length">
       <uni-echarts :option="pieOption" autoresize custom-style="height: 220px; width: 100%;" />
     </view>
-    <view v-else-if="statisticsStore.categoryLoading" class="flex items-center justify-center py-8">
+    <view v-else-if="store.categoryLoading" class="flex items-center justify-center py-8">
       <wd-skeleton :row="0" animation="gradient">
         <template #label="{ option }">
           <view class="h-200px flex items-center justify-center gap-1">
@@ -126,9 +134,9 @@ watch(() => props.month, () => {
     </view>
 
     <!-- 分类列表 -->
-    <view v-if="statisticsStore.categoryData.length" class="mt-3 flex flex-col gap-2">
+    <view v-if="store.categoryData.length" class="mt-3 flex flex-col gap-2">
       <view
-        v-for="(item, index) in statisticsStore.categoryData"
+        v-for="(item, index) in store.categoryData"
         :key="item.categoryId"
         class="flex items-center gap-2"
       >
