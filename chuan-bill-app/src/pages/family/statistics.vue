@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AiSuggestionType } from '@/constant/ai'
 import AiSuggestionCard from '@/pages/statistics/components/AiSuggestionCard.vue'
 import { setupEcharts } from '@/utils/echarts-setup'
 import CategoryChart from '../statistics/components/CategoryChart.vue'
@@ -148,7 +147,7 @@ watch(currentMonth, (month) => {
 
     <!-- AI建议（仅户主可见） -->
     <view class="mx-3">
-      <AiSuggestionCard :month="currentMonth" :analysis-type="AiSuggestionType.FAMILY" :family-id="familyId" />
+      <AiSuggestionCard :month="currentMonth" :family-id="familyId" />
     </view>
   </view>
 </template>

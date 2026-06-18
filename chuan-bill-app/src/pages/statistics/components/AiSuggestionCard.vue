@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { AiSuggestionType } from '@/constant/ai'
-
 defineOptions({
   name: 'AiSuggestionCard',
   options: { virtualHost: true, styleIsolation: 'shared' },
@@ -8,7 +6,6 @@ defineOptions({
 
 const props = defineProps<{
   month: string
-  analysisType?: typeof AiSuggestionType.FAMILY | typeof AiSuggestionType.USER
   familyId?: string
 }>()
 

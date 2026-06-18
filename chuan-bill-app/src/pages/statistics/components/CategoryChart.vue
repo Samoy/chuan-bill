@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { MORANDI_COLORS } from '@/utils/echarts-setup'
+
 defineOptions({
   name: 'CategoryChart',
   options: { virtualHost: true, styleIsolation: 'shared' },
@@ -16,19 +18,6 @@ const themeStore = useManualThemeStore()
 const store = computed(() => props.familyId ? familyStore : personalStore)
 
 const activeType = ref<'expense' | 'income'>('expense')
-
-// 莫兰迪色系 - 与 echarts 主题一致
-const MORANDI_COLORS = [
-  '#8D9BA3',
-  '#B5C4B1',
-  '#C9B1A0',
-  '#A3B5C4',
-  '#C4B5A3',
-  '#B1B5C4',
-  '#C4A3B5',
-  '#B5C4C4',
-  '#C4C4A3',
-]
 
 const segmentedOptions = [
   { value: 'expense', payload: { label: '支出', icon: 'i-icon-park-outline:expenses' } },
