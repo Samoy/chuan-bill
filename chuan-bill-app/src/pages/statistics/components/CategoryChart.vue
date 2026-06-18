@@ -14,7 +14,18 @@ const themeStore = useManualThemeStore()
 
 const activeType = ref<'expense' | 'income'>('expense')
 
-const CHART_COLORS = ['#5B8FF9', '#5AD8A6', '#F6BD16', '#E86452', '#6DC8EC', '#945FB9', '#FF9845', '#1E9493', '#FF99C3']
+// 莫兰迪色系 - 与 echarts 主题一致
+const MORANDI_COLORS = [
+  '#8D9BA3',
+  '#B5C4B1',
+  '#C9B1A0',
+  '#A3B5C4',
+  '#C4B5A3',
+  '#B1B5C4',
+  '#C4A3B5',
+  '#B5C4C4',
+  '#C4C4A3',
+]
 
 const segmentedOptions = [
   { value: 'expense', payload: { label: '支出', icon: 'i-icon-park-outline:expenses' } },
@@ -41,7 +52,7 @@ const pieOption = computed(() => {
       borderColor: 'transparent',
       borderWidth: 0,
     },
-    color: CHART_COLORS,
+    color: MORANDI_COLORS,
     series: [{
       type: 'pie',
       radius: ['0%', '90%'],
@@ -123,7 +134,7 @@ watch(() => props.month, () => {
       >
         <view
           class="h-3 w-3 shrink-0 rounded-sm"
-          :style="{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }"
+          :style="{ backgroundColor: MORANDI_COLORS[index % MORANDI_COLORS.length] }"
         />
         <view class="h-4 w-4 flex shrink-0 items-center justify-center text-gray-500 dark:text-gray-300" :class="[item.categoryIcon]" />
         <text class="flex-1 text-xs text-gray-500 dark:text-gray-300">
