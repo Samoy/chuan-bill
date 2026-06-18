@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MORANDI_COLORS } from '@/utils/echarts-setup'
+import { CHART_COLORS } from '@/utils/echarts-setup'
 
 defineOptions({
   name: 'CategoryChart',
@@ -44,7 +44,7 @@ const pieOption = computed(() => {
       borderColor: 'transparent',
       borderWidth: 0,
     },
-    color: MORANDI_COLORS,
+    color: CHART_COLORS,
     series: [{
       type: 'pie',
       radius: ['0%', '90%'],
@@ -131,7 +131,7 @@ watch(() => props.month, fetchData)
       >
         <view
           class="h-3 w-3 shrink-0 rounded-sm"
-          :style="{ backgroundColor: MORANDI_COLORS[index % MORANDI_COLORS.length] }"
+          :style="{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }"
         />
         <view class="h-4 w-4 flex shrink-0 items-center justify-center text-gray-500 dark:text-gray-300" :class="[item.categoryIcon]" />
         <text class="flex-1 text-xs text-gray-500 dark:text-gray-300">
