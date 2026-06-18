@@ -27,7 +27,7 @@ definePage({
 // 鉴权检查
 const user = useUserStore()
 const billStore = useBillStore()
-const statisStore = useStatisticsStore()
+const statisStore = usePersonalStatisticsStore()
 const message = useGlobalMessage()
 
 const searchValue = ref('')

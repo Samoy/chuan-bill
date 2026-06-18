@@ -16,7 +16,7 @@ definePage({
 
 setupEcharts()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = useFamilyStatisticsStore()
 
 const familyId = ref('')
 const currentMonth = ref(dayjs().format('YYYY-MM'))
@@ -59,14 +59,13 @@ onLoad((options) => {
   if (options?.familyName) {
     uni.setNavigationBarTitle({ title: `${decodeURIComponent(options.familyName)}账单统计` })
   }
-  statisticsStore.setAnalysisContext(AiSuggestionType.FAMILY, familyId.value)
   statisticsStore.fetchAll(currentMonth.value, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, currentMonth.value, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value, familyId.value)
 })
 
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, month, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(month, familyId.value)
 })
 </script>
 
