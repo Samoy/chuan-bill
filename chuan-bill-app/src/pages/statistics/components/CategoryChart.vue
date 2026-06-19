@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { CHART_COLORS } from '@/utils/echarts-setup'
-
 defineOptions({
   name: 'CategoryChart',
   options: { virtualHost: true, styleIsolation: 'shared' },
@@ -14,6 +12,7 @@ const props = defineProps<{
 const personalStore = usePersonalStatisticsStore()
 const familyStore = useFamilyStatisticsStore()
 const themeStore = useManualThemeStore()
+const color = themeStore.currentThemeColor.primary
 
 const store = computed(() => props.familyId ? familyStore : personalStore)
 
@@ -24,42 +23,87 @@ const segmentedOptions = [
   { value: 'income', payload: { label: '收入', icon: 'i-icon-park-outline:income' } },
 ]
 
-const pieOption = computed(() => {
+const chartOption = computed(() => {
   const data = store.value.categoryData
   const isDark = themeStore.isDark
   if (!data.length) {
     return {}
   }
 
+  const reversed = [...data].reverse()
+  const maxAmount = Math.max(...data.map(d => d.amount))
+  const barHeight = 10
+
   return {
     grid: {
-      top: '10%',
-      bottom: '10%',
+      top: 8,
+      bottom: 8,
+      left: 8,
+      right: 20,
       containLabel: true,
     },
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: ¥{c} ({d}%)',
+      formatter: (params: { name: string, value: number, dataIndex: number }) => {
+        const item = data[params.dataIndex]
+        return `${params.name}: ¥${params.value.toFixed(2)} (${item.percentage.toFixed(1)}%)`
+      },
       backgroundColor: isDark ? '#333' : '#fff',
       borderColor: 'transparent',
       borderWidth: 0,
     },
-    color: CHART_COLORS,
+    xAxis: {
+      type: 'value',
+      max: maxAmount * 1.15,
+      show: false,
+    },
+    yAxis: {
+      type: 'category',
+      data: reversed.map(item => item.categoryName),
+      axisLine: { show: false },
+    },
     series: [{
-      type: 'pie',
-      radius: ['0%', '90%'],
-      center: ['50%', '50%'],
-      itemStyle: {
-        borderColor: isDark ? '#1a1a1a' : '#fff',
-        borderWidth: 2,
-      },
-      label: { show: false },
-      data: data.map(item => ({
+      type: 'bar',
+      data: reversed.map(item => ({
         value: item.amount,
-        name: item.categoryName,
+        itemStyle: {
+          borderRadius: 12,
+        },
       })),
+      barWidth: barHeight,
+      barGap: '10%',
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 1,
+          y2: 1,
+          colorStops: [{
+            offset: 0,
+            color, // 0% 处的颜色
+          }, {
+            offset: 1,
+            color: `rgba(${hexToRgbString(color, true)}, 0.5)`, // 100% 处的颜色
+          }],
+        },
+      },
+      label: {
+        show: true,
+        position: 'right',
+        formatter: '￥{@score}',
+        fontWeight: 'bold',
+        color: activeType.value === 'expense' ? '#f87171' : '#22c55e',
+      },
     }],
   }
+})
+
+const chartHeight = computed(() => {
+  const data = store.value.categoryData
+  if (!data.length)
+    return 0
+  return data.length * 36 + 32
 })
 
 function fetchData() {
@@ -100,9 +144,9 @@ watch(() => props.month, fetchData)
       </wd-segmented>
     </view>
 
-    <!-- 饼图 -->
+    <!-- 条形图 -->
     <view v-if="!store.categoryLoading && store.categoryData.length">
-      <uni-echarts :option="pieOption" autoresize custom-style="height: 220px; width: 100%;" />
+      <uni-echarts :option="chartOption" autoresize :custom-style="`height: ${chartHeight}px; width: 100%;`" />
     </view>
     <view v-else-if="store.categoryLoading" class="flex items-center justify-center py-8">
       <wd-skeleton :row="0" animation="gradient">
@@ -120,30 +164,6 @@ watch(() => props.month, fetchData)
       <text class="text-sm text-gray-400">
         暂无数据
       </text>
-    </view>
-
-    <!-- 分类列表 -->
-    <view v-if="store.categoryData.length" class="mt-3 flex flex-col gap-2">
-      <view
-        v-for="(item, index) in store.categoryData"
-        :key="item.categoryId"
-        class="flex items-center gap-2"
-      >
-        <view
-          class="h-3 w-3 shrink-0 rounded-sm"
-          :style="{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }"
-        />
-        <view class="h-4 w-4 flex shrink-0 items-center justify-center text-gray-500 dark:text-gray-300" :class="[item.categoryIcon]" />
-        <text class="flex-1 text-xs text-gray-500 dark:text-gray-300">
-          {{ item.categoryName }}
-        </text>
-        <text class="text-sm font-500">
-          ¥{{ item.amount.toFixed(2) }}
-        </text>
-        <text class="w-12 text-right text-xs text-gray-500 dark:text-gray-300">
-          {{ item.percentage.toFixed(1) }}%
-        </text>
-      </view>
     </view>
   </view>
 </template>
