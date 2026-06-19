@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import * as echarts from 'echarts/core'
-import { CHART_COLORS } from '@/utils/echarts-setup'
-
 defineOptions({
   name: 'CategoryChart',
   options: { virtualHost: true, styleIsolation: 'shared' },
@@ -15,6 +12,7 @@ const props = defineProps<{
 const personalStore = usePersonalStatisticsStore()
 const familyStore = useFamilyStatisticsStore()
 const themeStore = useManualThemeStore()
+const color = themeStore.currentThemeColor.primary
 
 const store = computed(() => props.familyId ? familyStore : personalStore)
 
@@ -34,16 +32,14 @@ const chartOption = computed(() => {
 
   const reversed = [...data].reverse()
   const maxAmount = Math.max(...data.map(d => d.amount))
-  const barHeight = 28
-  const chartHeight = reversed.length * (barHeight + 8) + 32
+  const barHeight = 10
 
   return {
-    height: chartHeight,
     grid: {
       top: 8,
       bottom: 8,
       left: 8,
-      right: 60,
+      right: 20,
       containLabel: true,
     },
     tooltip: {
@@ -64,28 +60,40 @@ const chartOption = computed(() => {
     yAxis: {
       type: 'category',
       data: reversed.map(item => item.categoryName),
-      show: false,
+      axisLine: { show: false },
     },
     series: [{
       type: 'bar',
-      data: reversed.map((item, index) => ({
+      data: reversed.map(item => ({
         value: item.amount,
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-            { offset: 0, color: CHART_COLORS[index % CHART_COLORS.length] },
-            { offset: 1, color: `${CHART_COLORS[index % CHART_COLORS.length]}99` },
-          ]),
-          borderRadius: [0, 4, 4, 0],
+          borderRadius: 12,
         },
       })),
       barWidth: barHeight,
       barGap: '10%',
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 1,
+          y2: 1,
+          colorStops: [{
+            offset: 0,
+            color, // 0% 处的颜色
+          }, {
+            offset: 1,
+            color: `rgba(${hexToRgbString(color, true)}, 0.5)`, // 100% 处的颜色
+          }],
+        },
+      },
       label: {
         show: true,
         position: 'right',
-        formatter: (params: { value: number }) => `¥${params.value.toFixed(2)}`,
-        fontSize: 12,
-        color: isDark ? '#ccc' : '#666',
+        formatter: '￥{@score}',
+        fontWeight: 'bold',
+        color: activeType.value === 'expense' ? '#f87171' : '#22c55e',
       },
     }],
   }

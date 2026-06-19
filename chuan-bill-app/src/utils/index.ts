@@ -61,18 +61,18 @@ export function getCurrentPath() {
 }
 
 /**
- * 将十六进制颜色转换为 RGB 字符串，支持透明通道
+ * 将十六进制颜色转换为 RGB 字符串，支持透明通道和逗号分隔格式
  * @param hex 十六进制颜色字符串，支持格式：
  *            - 3 位（如 'fff' 或 '#fff'）
  *            - 4 位（如 'ffff' 或 '#ffff'，包含 alpha 通道）
  *            - 6 位（如 'ffffff' 或 '#ffffff'）
  *            - 8 位（如 'ffffffff' 或 '#ffffffff'，包含 alpha 通道）
- * @returns RGB 字符串，格式：
- *          - 无 alpha：'255 255 255'
- *          - 有 alpha：'255 255 255 / 0.5'
- *          若输入无效则返回空字符串
+ * @param comma 是否使用逗号分隔，默认 false
+ *              - false: '255 255 255' 或 '255 255 255 / 0.5'
+ *              - true:  '255,255,255' 或 '255,255,255,0.5'
+ * @returns RGB 字符串，若输入无效则抛出异常
  */
-export function hexToRgbString(hex: string): string {
+export function hexToRgbString(hex: string, comma = false): string {
   // 去除前缀 # 并转为小写
   let raw = hex.trim()
   if (raw.startsWith('#')) {
@@ -117,12 +117,15 @@ export function hexToRgbString(hex: string): string {
     throw new Error('Invalid hex color format')
   }
 
-  // 构建 RGB 部分
-  const rgbPart = `${r} ${g} ${b}`
+  const sep = comma ? ',' : ' '
+  const rgbPart = `${r}${sep}${g}${sep}${b}`
 
   // 若有 alpha 通道，则添加透明度部分
   if (alpha !== null) {
-    const alphaValue = (alpha / 255).toString() // 直接输出小数，如 0.5, 0.5019607843137255
+    const alphaValue = (alpha / 255).toString()
+    if (comma) {
+      return `${rgbPart},${alphaValue}`
+    }
     return `${rgbPart} / ${alphaValue}`
   }
 
