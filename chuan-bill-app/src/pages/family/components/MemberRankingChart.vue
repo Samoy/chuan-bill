@@ -63,7 +63,7 @@ const rankingData = computed<RankingItem[]>(() => {
 })
 
 const barColor = computed(() =>
-  activeTab.value === 'expense' ? '#ef4444' : '#22c55e',
+  activeTab.value === 'expense' ? '#8D9BA3' : '#B5C4B1',
 )
 
 async function fetchMemberStats() {

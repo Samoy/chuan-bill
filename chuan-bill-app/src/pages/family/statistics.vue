@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AiSuggestionType } from '@/constant/ai'
 import AiSuggestionCard from '@/pages/statistics/components/AiSuggestionCard.vue'
 import { setupEcharts } from '@/utils/echarts-setup'
 import CategoryChart from '../statistics/components/CategoryChart.vue'
@@ -16,7 +15,7 @@ definePage({
 
 setupEcharts()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = useFamilyStatisticsStore()
 
 const familyId = ref('')
 const currentMonth = ref(dayjs().format('YYYY-MM'))
@@ -59,14 +58,13 @@ onLoad((options) => {
   if (options?.familyName) {
     uni.setNavigationBarTitle({ title: `${decodeURIComponent(options.familyName)}账单统计` })
   }
-  statisticsStore.setAnalysisContext(AiSuggestionType.FAMILY, familyId.value)
   statisticsStore.fetchAll(currentMonth.value, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, currentMonth.value, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value, familyId.value)
 })
 
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, month, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(month, familyId.value)
 })
 </script>
 
@@ -149,7 +147,7 @@ watch(currentMonth, (month) => {
 
     <!-- AI建议（仅户主可见） -->
     <view class="mx-3">
-      <AiSuggestionCard :month="currentMonth" :analysis-type="AiSuggestionType.FAMILY" :family-id="familyId" />
+      <AiSuggestionCard :month="currentMonth" :family-id="familyId" />
     </view>
   </view>
 </template>

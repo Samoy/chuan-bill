@@ -11,16 +11,14 @@ interface CategoryStatItem {
   percentage: number
 }
 
-export const useStatisticsStore = defineStore('statistics', () => {
+export const usePersonalStatisticsStore = defineStore('personalStatistics', () => {
   const user = useUserStore()
   const billStore = useBillStore()
-  const currentAnalysisType = ref<AiSuggestionType>(AiSuggestionType.USER)
-  const currentFamilyId = ref<string>()
 
   const overview = ref<BillMonthlyStatsVO | null>(null)
   const categoryData = ref<CategoryStatItem[]>([])
   const dailyTrend = ref<{ days: string[], expenses: number[], incomes: number[] } | null>(null)
-  const aiSuggestion = ref<string>('')
+  const aiSuggestion = ref('')
   const aiCached = ref(false)
   const aiRemainingCount = ref(-1)
   const overviewLoading = ref(false)
@@ -28,37 +26,21 @@ export const useStatisticsStore = defineStore('statistics', () => {
   const trendLoading = ref(false)
   const aiLoading = ref(false)
 
-  function setAnalysisContext(type: AiSuggestionType, familyId?: string) {
-    if (type !== currentAnalysisType.value || familyId !== currentFamilyId.value) {
-      reset()
-      currentAnalysisType.value = type
-      currentFamilyId.value = familyId
-    }
-  }
-
-  /**
-   * 获取月度概览
-   */
-  async function fetchOverview(month: string, familyId?: string) {
+  async function fetchOverview(month: string) {
     overviewLoading.value = true
     try {
-      const fid = familyId || currentFamilyId.value
-      overview.value = await billStore.getMonthlyBillStats(month, fid) || null
+      overview.value = await billStore.getMonthlyBillStats(month) || null
     }
     finally {
       overviewLoading.value = false
     }
   }
 
-  /**
-   * 获取分类统计
-   */
-  async function fetchCategoryBreakdown(month: string, type: 'expense' | 'income', familyId?: string) {
+  async function fetchCategoryBreakdown(month: string, type: 'expense' | 'income') {
     categoryLoading.value = true
     try {
       if (user.isLoggedIn) {
-        const fid = familyId || currentFamilyId.value
-        const res = await Apis.statistics.getCategoryStats({ params: { month, type, familyId: fid } })
+        const res = await Apis.statistics.getCategoryStats({ params: { month, type } })
         if (res.success && res.data) {
           categoryData.value = res.data.map(item => ({
             categoryId: item.categoryId || '',
@@ -81,7 +63,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
         return
       }
 
-      // 按分类分组求和
       const categoryMap = new Map<string, { categoryId: string, categoryName: string, categoryIcon: string, amount: number }>()
       for (const bill of filtered) {
         const catId = bill.category?.id || ''
@@ -100,13 +81,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
         }
       }
 
-      // 计算总金额
       let total = 0
       for (const item of categoryMap.values()) {
         total = add(total, item.amount) as number
       }
 
-      // 排序并计算百分比
       const sorted = [...categoryMap.values()].sort((a, b) => b.amount - a.amount)
       categoryData.value = sorted.map(item => ({
         ...item,
@@ -118,10 +97,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
     }
   }
 
-  /**
-   * 获取每日收支趋势
-   */
-  async function fetchDailyTrend(month: string, familyId?: string) {
+  async function fetchDailyTrend(month: string) {
     trendLoading.value = true
     try {
       const daysInMonth = dayjs(month).daysInMonth()
@@ -130,8 +106,7 @@ export const useStatisticsStore = defineStore('statistics', () => {
       const incomes = Array.from({ length: daysInMonth }, () => 0)
 
       if (user.isLoggedIn) {
-        const fid = familyId || currentFamilyId.value
-        const res = await Apis.statistics.getDailyTrend({ params: { month, familyId: fid } })
+        const res = await Apis.statistics.getDailyTrend({ params: { month } })
         if (res.success && res.data) {
           for (const item of res.data) {
             if (item.date) {
@@ -145,7 +120,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
         }
       }
       else {
-        // 本地计算
         const filtered = billStore.localBillList.filter(
           bill => dayjs(bill.time).isSame(dayjs(month), 'month'),
         )
@@ -170,19 +144,12 @@ export const useStatisticsStore = defineStore('statistics', () => {
     }
   }
 
-  /**
-   * 获取AI消费建议（登录后可用）
-   * @param analysisType 分析类型：1-个人，2-家庭
-   * @param month 月份
-   * @param familyId 家庭id
-   * @param regenerate 是否重新生成
-   */
-  async function fetchAiSuggestion(analysisType: AiSuggestionType, month: string, familyId?: string, regenerate = false) {
+  async function fetchAiSuggestion(month: string, regenerate = false) {
     if (!user.isLoggedIn)
       return
     aiLoading.value = true
     try {
-      const res = await Apis.ai.analysis({ params: { month, analysisType, familyId, regenerate } })
+      const res = await Apis.ai.analysis({ params: { month, analysisType: AiSuggestionType.USER, regenerate } })
       if (res.success && res.data) {
         aiSuggestion.value = res.data.content || ''
         aiCached.value = res.data.cached || false
@@ -202,14 +169,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
     }
   }
 
-  /**
-   * 获取缓存的AI建议（不触发AI生成，无缓存时返回空）
-   */
-  async function fetchAiSuggestionCached(analysisType: AiSuggestionType, month: string, familyId?: string) {
+  async function fetchAiSuggestionCached(month: string) {
     if (!user.isLoggedIn)
       return
     try {
-      const res = await Apis.ai.analysis({ params: { analysisType, month, familyId }, meta: { silent: true } } as any)
+      const res = await Apis.ai.analysis({ params: { analysisType: AiSuggestionType.USER, month }, meta: { silent: true } } as any)
       if (res.success && res.data) {
         aiSuggestion.value = res.data.content || ''
         aiCached.value = res.data.cached || false
@@ -226,15 +190,11 @@ export const useStatisticsStore = defineStore('statistics', () => {
     }
   }
 
-  /**
-   * 并行获取所有统计数据
-   */
-  async function fetchAll(month: string, familyId?: string) {
-    const fid = familyId || currentFamilyId.value
+  async function fetchAll(month: string) {
     await Promise.all([
-      fetchOverview(month, fid),
-      fetchCategoryBreakdown(month, 'expense', fid),
-      fetchDailyTrend(month, fid),
+      fetchOverview(month),
+      fetchCategoryBreakdown(month, 'expense'),
+      fetchDailyTrend(month),
     ])
   }
 
@@ -262,7 +222,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
     categoryLoading,
     trendLoading,
     aiLoading,
-    setAnalysisContext,
     fetchOverview,
     fetchCategoryBreakdown,
     fetchDailyTrend,

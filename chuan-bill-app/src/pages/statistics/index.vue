@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AiSuggestionType } from '@/constant/ai'
 import { EVENTS } from '@/constant/events'
 import { setupEcharts } from '@/utils/echarts-setup'
 import { eventBus } from '@/utils/eventBus'
@@ -20,7 +19,7 @@ definePage({
 
 setupEcharts()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = usePersonalStatisticsStore()
 const budgetStore = useBudgetStore()
 const user = useUserStore()
 const showSettingPopup = ref(false)
@@ -67,9 +66,8 @@ function onMonthSelect({ value }: { value: string }) {
 
 // 首次加载时获取数据
 onLoad(() => {
-  statisticsStore.setAnalysisContext(AiSuggestionType.USER)
   statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(currentMonth.value)
   }
@@ -96,7 +94,7 @@ onHide(() => {
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, month)
+  statisticsStore.fetchAiSuggestionCached(month)
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(month)
   }
@@ -105,7 +103,7 @@ watch(currentMonth, (month) => {
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(currentMonth.value)
   }
@@ -118,7 +116,7 @@ async function handleDataUpdated() {
     return
   }
   await statisticsStore.fetchAll(currentMonth.value)
-  await statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  await statisticsStore.fetchAiSuggestionCached(currentMonth.value)
   if (user.isLoggedIn) {
     await budgetStore.fetchBudget(currentMonth.value)
   }

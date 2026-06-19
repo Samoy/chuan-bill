@@ -8,8 +8,10 @@ declare global {
   const $$userConfigMap: typeof import('./api/index')['$$userConfigMap']
   const Apis: typeof import('./api/index')['Apis']
   const AsrClient: typeof import('./composables/useAsr')['AsrClient']
+  const CHART_COLORS: typeof import('./utils/echarts-setup')['CHART_COLORS']
   const CommonUtil: typeof import('wot-design-uni')['CommonUtil']
   const EffectScope: typeof import('vue')['EffectScope']
+  const MORANDI_COLORS: typeof import('./utils/echarts-setup')['MORANDI_COLORS']
   const WebSocketStatus: typeof import('./composables/useAsr')['WebSocketStatus']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const alovaInstance: typeof import('./api/index')['alovaInstance']
@@ -225,6 +227,7 @@ declare global {
   const useEventListener: typeof import('@vueuse/core')['useEventListener']
   const useEventSource: typeof import('@vueuse/core')['useEventSource']
   const useEyeDropper: typeof import('@vueuse/core')['useEyeDropper']
+  const useFamilyStatisticsStore: typeof import('./store/familyStatisticsStore')['useFamilyStatisticsStore']
   const useFamilyStore: typeof import('./store/familyStore')['useFamilyStore']
   const useFavicon: typeof import('@vueuse/core')['useFavicon']
   const useFetch: typeof import('@vueuse/core')['useFetch']
@@ -279,6 +282,7 @@ declare global {
   const useParentElement: typeof import('@vueuse/core')['useParentElement']
   const usePerformanceObserver: typeof import('@vueuse/core')['usePerformanceObserver']
   const usePermission: typeof import('@vueuse/core')['usePermission']
+  const usePersonalStatisticsStore: typeof import('./store/personalStatisticsStore')['usePersonalStatisticsStore']
   const usePointer: typeof import('@vueuse/core')['usePointer']
   const usePointerLock: typeof import('@vueuse/core')['usePointerLock']
   const usePointerSwipe: typeof import('@vueuse/core')['usePointerSwipe']
@@ -384,6 +388,7 @@ declare module 'vue' {
     readonly $$userConfigMap: UnwrapRef<typeof import('./api/index')['$$userConfigMap']>
     readonly Apis: UnwrapRef<typeof import('./api/index')['Apis']>
     readonly AsrClient: UnwrapRef<typeof import('./composables/useAsr')['AsrClient']>
+    readonly CHART_COLORS: UnwrapRef<typeof import('./utils/echarts-setup')['CHART_COLORS']>
     readonly CommonUtil: UnwrapRef<typeof import('wot-design-uni')['CommonUtil']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly WebSocketStatus: UnwrapRef<typeof import('./composables/useAsr')['WebSocketStatus']>
@@ -591,6 +596,7 @@ declare module 'vue' {
     readonly useEventListener: UnwrapRef<typeof import('@vueuse/core')['useEventListener']>
     readonly useEventSource: UnwrapRef<typeof import('@vueuse/core')['useEventSource']>
     readonly useEyeDropper: UnwrapRef<typeof import('@vueuse/core')['useEyeDropper']>
+    readonly useFamilyStatisticsStore: UnwrapRef<typeof import('./store/familyStatisticsStore')['useFamilyStatisticsStore']>
     readonly useFamilyStore: UnwrapRef<typeof import('./store/familyStore')['useFamilyStore']>
     readonly useFavicon: UnwrapRef<typeof import('@vueuse/core')['useFavicon']>
     readonly useFetch: UnwrapRef<typeof import('@vueuse/core')['useFetch']>
@@ -640,6 +646,7 @@ declare module 'vue' {
     readonly usePagination: UnwrapRef<typeof import('alova/client')['usePagination']>
     readonly useParallax: UnwrapRef<typeof import('@vueuse/core')['useParallax']>
     readonly usePermission: UnwrapRef<typeof import('@vueuse/core')['usePermission']>
+    readonly usePersonalStatisticsStore: UnwrapRef<typeof import('./store/personalStatisticsStore')['usePersonalStatisticsStore']>
     readonly usePointer: UnwrapRef<typeof import('@vueuse/core')['usePointer']>
     readonly usePointerLock: UnwrapRef<typeof import('@vueuse/core')['usePointerLock']>
     readonly usePointerSwipe: UnwrapRef<typeof import('@vueuse/core')['usePointerSwipe']>
@@ -666,7 +673,6 @@ declare module 'vue' {
     readonly useSorted: UnwrapRef<typeof import('@vueuse/core')['useSorted']>
     readonly useSpeechRecognition: UnwrapRef<typeof import('@vueuse/core')['useSpeechRecognition']>
     readonly useSpeechSynthesis: UnwrapRef<typeof import('@vueuse/core')['useSpeechSynthesis']>
-    readonly useStatisticsStore: UnwrapRef<typeof import('./store/statisticsStore')['useStatisticsStore']>
     readonly useStepper: UnwrapRef<typeof import('@vueuse/core')['useStepper']>
     readonly useStorage: UnwrapRef<typeof import('@vueuse/core')['useStorage']>
     readonly useStorageAsync: UnwrapRef<typeof import('@vueuse/core')['useStorageAsync']>

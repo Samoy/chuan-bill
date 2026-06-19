@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { AiSuggestionType } from '@/constant/ai'
-
 defineOptions({
   name: 'AiSuggestionCard',
   options: { virtualHost: true, styleIsolation: 'shared' },
@@ -8,38 +6,50 @@ defineOptions({
 
 const props = defineProps<{
   month: string
-  analysisType?: typeof AiSuggestionType.FAMILY | typeof AiSuggestionType.USER
   familyId?: string
 }>()
 
 const AI_DAILY_LIMIT = 5
 
 const user = useUserStore()
-const statisticsStore = useStatisticsStore()
+const personalStore = usePersonalStatisticsStore()
+const familyStore = useFamilyStatisticsStore()
+
+const store = computed(() => props.familyId ? familyStore : personalStore)
 
 function handleLogin() {
   user.requireAuth(() => {
-    statisticsStore.fetchAiSuggestion(props.analysisType || AiSuggestionType.USER, props.month, props.familyId)
+    if (props.familyId) {
+      familyStore.fetchAiSuggestion(props.month, props.familyId)
+    }
+    else {
+      personalStore.fetchAiSuggestion(props.month)
+    }
   })
 }
 
 function fetchAnalysis() {
-  statisticsStore.fetchAiSuggestion(props.analysisType || AiSuggestionType.USER, props.month, props.familyId, true)
+  if (props.familyId) {
+    familyStore.fetchAiSuggestion(props.month, props.familyId, true)
+  }
+  else {
+    personalStore.fetchAiSuggestion(props.month, true)
+  }
 }
 
 const remainingLabel = computed(() => {
-  const count = statisticsStore.aiRemainingCount
+  const count = store.value.aiRemainingCount
   if (count < 0)
     return ''
   return `(${count}/${AI_DAILY_LIMIT})`
 })
 
 const isDisabled = computed(() => {
-  return statisticsStore.aiRemainingCount === 0
+  return store.value.aiRemainingCount === 0
 })
 
 watch(() => props.month, () => {
-  statisticsStore.aiSuggestion = ''
+  store.value.aiSuggestion = ''
 })
 </script>
 
@@ -62,14 +72,14 @@ watch(() => props.month, () => {
     </view>
 
     <!-- 加载中 -->
-    <view v-else-if="statisticsStore.aiLoading" class="py-4">
+    <view v-else-if="store.aiLoading" class="py-4">
       <wd-skeleton :row="4" animation="gradient" />
     </view>
 
     <!-- 已有数据（缓存或新生成） -->
-    <view v-else-if="statisticsStore.aiSuggestion">
+    <view v-else-if="store.aiSuggestion">
       <view class="text-sm text-gray-600 leading-relaxed dark:text-gray-300">
-        {{ statisticsStore.aiSuggestion }}
+        {{ store.aiSuggestion }}
       </view>
       <!-- 生成按钮 -->
       <view class="mt-3">
@@ -97,7 +107,7 @@ watch(() => props.month, () => {
     </view>
 
     <!-- AI免责提示 -->
-    <view v-if="statisticsStore.aiSuggestion" class="mt-3 flex items-center justify-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+    <view v-if="store.aiSuggestion" class="mt-3 flex items-center justify-center gap-1 text-xs text-gray-400 dark:text-gray-500">
       <view class="i-lucide:info text-10px" />
       <text>内容由AI生成，仅供参考</text>
     </view>
