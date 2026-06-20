@@ -72,6 +72,9 @@ const chartOption = computed(() => {
       })),
       barWidth: barHeight,
       barGap: '10%',
+      tooltip: {
+        show: false,
+      },
       itemStyle: {
         color: {
           type: 'linear',
