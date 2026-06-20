@@ -36,12 +36,17 @@ function prevMonth() {
   currentMonth.value = dayjs(currentMonth.value).subtract(1, 'month').format('YYYY-MM')
 }
 
+// 是否为当前月（禁用右箭头）
+const isCurrentMonth = computed(() => {
+  return dayjs(currentMonth.value).isSame(dayjs(), 'month')
+})
+
 // 切换到下一个月
 function nextMonth() {
-  const next = dayjs(currentMonth.value).add(1, 'month')
-  if (next.isAfter(dayjs(), 'month')) {
+  if (isCurrentMonth.value) {
     return
   }
+  const next = dayjs(currentMonth.value).add(1, 'month')
   currentMonth.value = next.format('YYYY-MM')
 }
 
@@ -74,7 +79,7 @@ watch(currentMonth, (month) => {
     <wd-sticky :z-index="10">
       <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc] dark:bg-[var(--wot-dark-background2)]">
         <view
-          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-800"
           @click="prevMonth"
         >
           <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
@@ -92,10 +97,11 @@ watch(currentMonth, (month) => {
           </view>
         </wd-picker>
         <view
-          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          class="h-8 w-8 flex items-center justify-center rounded-full shadow-sm"
+          :class="isCurrentMonth ? 'bg-gray-100 dark:bg-gray-800 opacity-80' : 'bg-white dark:bg-gray-800'"
           @click="nextMonth"
         >
-          <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
+          <view class="i-lucide:chevron-right" :class="isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'" />
         </view>
       </view>
     </wd-sticky>
