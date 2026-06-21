@@ -426,7 +426,7 @@ async function handleUpdateByPassword() {
 <style lang="scss" scoped>
 /* 输入框样式覆盖 */
 :deep(.login-input) {
-  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100 dark:bg-gray-700;
+  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100! dark:bg-gray-700!;
 
   &::after {
     display: none !important;

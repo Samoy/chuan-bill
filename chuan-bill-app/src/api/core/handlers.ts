@@ -175,5 +175,9 @@ export function handleAlovaError(error: any, method: Method) {
     globalToast.error('发生意外错误')
   }
 
+  // #ifdef MP-WEIXIN
+  wx.getRealtimeLogManager().error(error)
+  // #endif
+
   throw error
 }
