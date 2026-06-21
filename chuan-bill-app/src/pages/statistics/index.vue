@@ -14,6 +14,7 @@ definePage({
   layout: 'tabbar',
   style: {
     navigationBarTitleText: '统计',
+    enablePullDownRefresh: true,
   },
 })
 

@@ -77,7 +77,8 @@
       "name": "family-statistics",
       "layout": "default",
       "style": {
-        "navigationBarTitleText": "家庭统计"
+        "navigationBarTitleText": "家庭统计",
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -148,7 +149,8 @@
       "name": "statistics",
       "layout": "tabbar",
       "style": {
-        "navigationBarTitleText": "统计"
+        "navigationBarTitleText": "统计",
+        "enablePullDownRefresh": true
       }
     }
   ],
