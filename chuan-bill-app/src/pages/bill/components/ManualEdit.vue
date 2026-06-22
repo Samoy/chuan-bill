@@ -52,7 +52,7 @@ watch(timeTimestamp, (newTimestamp) => {
   if (newTimestamp) {
     formData.value.time = dayjs(newTimestamp).format('YYYY-MM-DD HH:mm')
   }
-})
+}, { immediate: true })
 
 onLoad(async () => {
   await billStore.initBillData()
