@@ -22,3 +22,4 @@ dist
 *.sw?
 
 globals.d.d.ts.bak.*
+unpackage/resources
