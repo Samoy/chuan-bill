@@ -39,6 +39,18 @@ public class GlobalExceptionHandler {
         return Result.error(e.getCode(), e.getMessage());
     }
 
+    /**
+     * 处理重复提交异常
+     *
+     * @param e 异常对象
+     * @return 处理结果
+     */
+    @ExceptionHandler(IdempotentException.class)
+    public Result<?> handleIdempotentException(IdempotentException e) {
+        log.info("重复提交: {}", e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<String> errorMessages = e.getBindingResult().getFieldErrors().stream()
