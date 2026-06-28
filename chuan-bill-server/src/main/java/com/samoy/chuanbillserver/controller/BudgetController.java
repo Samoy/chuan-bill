@@ -37,6 +37,7 @@ public class BudgetController {
         return Result.success(budgetService.setBudget(userId, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/delete")
     @Operation(summary = "删除预算", description = "删除当月预算")
     public Result<Boolean> deleteBudget() {

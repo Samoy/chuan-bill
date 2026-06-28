@@ -111,6 +111,7 @@ public class BillController {
         return Result.success(categoryService.addCategory(userId, dto));
     }
 
+    @Idempotent
     @PutMapping("/categories/{id}")
     @Operation(summary = "更新自定义类目", description = "用户更新自定义类目名称和图标")
     public Result<CategoryVO> updateCategory(
@@ -120,6 +121,7 @@ public class BillController {
         return Result.success(categoryService.updateCategory(userId, id, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/categories/{id}")
     @Operation(summary = "删除自定义类目", description = "用户删除自定义类目，有关联账单时不可删除")
     public Result<Boolean> deleteCategory(@Parameter(description = "类目 ID", required = true) @PathVariable String id) {
@@ -128,6 +130,7 @@ public class BillController {
         return Result.success(true);
     }
 
+    @Idempotent
     @PutMapping("/categories/sort")
     @Operation(summary = "批量更新类目排序", description = "用户批量更新自定义类目的排序")
     public Result<Boolean> sortCategories(@Validated @RequestBody SortDTO dto) {
@@ -152,6 +155,7 @@ public class BillController {
         return Result.success(paymentMethodService.addPaymentMethod(userId, dto));
     }
 
+    @Idempotent
     @PutMapping("/payment-methods/{id}")
     @Operation(summary = "更新自定义支付方式", description = "用户更新自定义支付方式名称和图标")
     public Result<PaymentMethodVO> updatePaymentMethod(
@@ -161,6 +165,7 @@ public class BillController {
         return Result.success(paymentMethodService.updatePaymentMethod(userId, id, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/payment-methods/{id}")
     @Operation(summary = "删除自定义支付方式", description = "用户删除自定义支付方式，有关联账单时不可删除")
     public Result<Boolean> deletePaymentMethod(
@@ -170,6 +175,7 @@ public class BillController {
         return Result.success(true);
     }
 
+    @Idempotent
     @PutMapping("/payment-methods/sort")
     @Operation(summary = "批量更新支付方式排序", description = "用户批量更新自定义支付方式的排序")
     public Result<Boolean> sortPaymentMethods(@Validated @RequestBody SortDTO dto) {
