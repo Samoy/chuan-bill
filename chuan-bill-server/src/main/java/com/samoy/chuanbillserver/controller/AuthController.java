@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.controller;
 
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.enums.SmsScene;
 import com.samoy.chuanbillserver.result.Result;
@@ -31,6 +32,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
+    @Idempotent
     @PostMapping("/login-password")
     @Operation(summary = "密码登录", description = "使用手机号和密码进行登录")
     public Result<TokenVO> loginByPassword(@Validated @RequestBody LoginByPasswordDTO loginDTO) {
@@ -43,6 +45,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
+    @Idempotent
     @PostMapping("/login-phone")
     @Operation(summary = "手机号登录", description = "使用手机号和验证码进行登录")
     public Result<TokenVO> loginByPhone(@Validated @RequestBody LoginByPhoneDTO loginDTO) {
@@ -55,6 +58,7 @@ public class AuthController {
      * @param loginDTO 登录信息
      * @return 登录结果
      */
+    @Idempotent
     @PostMapping("/login-wechat")
     @Operation(summary = "微信登录", description = "使用微信小程序 code 进行登录")
     public Result<TokenVO> loginByWechat(@Validated @RequestBody LoginByWechatDTO loginDTO) {
@@ -67,6 +71,7 @@ public class AuthController {
      * @param sendCodeDTO 发送验证码请求体，包含手机号
      * @return 发送结果
      */
+    @Idempotent
     @PostMapping("/send-code")
     @Operation(summary = "发送验证码", description = "向指定手机号发送短信验证码")
     public Result<Void> sendCode(@Validated @RequestBody SendCodeDTO sendCodeDTO) {
@@ -77,6 +82,7 @@ public class AuthController {
     /**
      * 找回密码
      */
+    @Idempotent
     @PostMapping("/retrieve-password")
     @Operation(summary = "找回密码", description = "使用手机号和验证码进行密码重置")
     public Result<Boolean> retrievePassword(@Validated @RequestBody RetrievePasswordDTO retrievePasswordDTO) {
@@ -88,6 +94,7 @@ public class AuthController {
      *
      * @return 登出结果
      */
+    @Idempotent
     @PostMapping("/logout")
     @Operation(summary = "登出", description = "用户登出，清除登录信息")
     public Result<Void> logout() {
