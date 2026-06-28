@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IFileService;
 import com.samoy.chuanbillserver.vo.TempFileVO;
@@ -22,6 +23,7 @@ public class FileController {
     @Resource
     private IFileService fileService;
 
+    @Idempotent
     @PostMapping("/temp/upload")
     @Operation(summary = "上传临时文件", description = "上传临时文件到本地，返回fileId供ocr使用")
     public Result<TempFileVO> uploadTempFile(MultipartFile file) {

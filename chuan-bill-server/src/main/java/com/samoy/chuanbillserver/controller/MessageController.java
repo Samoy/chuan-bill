@@ -2,6 +2,7 @@ package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.MessageListDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IMessageService;
@@ -29,6 +30,7 @@ public class MessageController {
         return Result.success(messageService.getMessageList(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/mark-read")
     @Operation(summary = "标记消息已读", description = "将指定消息标记为已读")
     public Result<Boolean> markAsRead(@Parameter(description = "消息ID", required = true) @RequestParam String id) {
@@ -36,6 +38,7 @@ public class MessageController {
         return Result.success(messageService.markAsRead(userId, id));
     }
 
+    @Idempotent
     @PostMapping("/mark-all-read")
     @Operation(summary = "全部标记已读", description = "将所有未读消息标记为已读")
     public Result<Boolean> markAllAsRead() {
