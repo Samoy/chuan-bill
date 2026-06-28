@@ -226,6 +226,12 @@
       <version>8.17.0</version>
     </dependency>
 
+    <!-- AOP -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+
     <!-- commons-io (显式指定版本避免依赖冲突) -->
     <dependency>
       <groupId>commons-io</groupId>
