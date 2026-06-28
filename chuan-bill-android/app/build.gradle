@@ -2,6 +2,34 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// 签名配置：优先读取 keystore.properties，不存在时回退到环境变量（CI/CD）
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def getProp = { String key ->
+    keystoreProperties.getProperty(key) ?: System.getenv(key) ?: ""
+}
+
+// CI/CD：从环境变量 KEYSTORE_BASE64 解码 jks 文件
+def keyStoreDir = file("${buildDir}/keystore")
+def resolvedStoreFile
+if (keystorePropertiesFile.exists() && keystoreProperties.getProperty("KEYSTORE_FILE")) {
+    // 本地开发：直接使用 properties 中配置的路径
+    resolvedStoreFile = rootProject.file(keystoreProperties.getProperty("KEYSTORE_FILE"))
+} else if (System.getenv("KEYSTORE_BASE64")) {
+    // CI/CD：从 Base64 环境变量解码
+    keyStoreDir.mkdirs()
+    def jksFile = new File(keyStoreDir, "release.jks")
+    jksFile.bytes = System.getenv("KEYSTORE_BASE64").decodeBase64()
+    resolvedStoreFile = jksFile
+} else {
+    // 回退：使用默认路径
+    resolvedStoreFile = rootProject.file("chuanbill.jks")
+}
+
 android {
     namespace 'com.samoy.chuanbill'
     compileSdk {
@@ -23,10 +51,25 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile resolvedStoreFile
+            storePassword getProp("KEYSTORE_PASSWORD")
+            keyAlias getProp("KEY_ALIAS")
+            keyPassword getProp("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
+
+        debug {
+           signingConfig signingConfigs.release
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

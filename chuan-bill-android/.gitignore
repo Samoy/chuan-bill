@@ -15,5 +15,6 @@
 local.properties
 *.jks
 keystore.properties
+!keystore.example.properties
 app/src/main/assets/apps
 app/release

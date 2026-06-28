@@ -6,15 +6,15 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icon_round"
         android:supportsRtl="true"
         android:extractNativeLibs="true"
         android:theme="@style/Theme.Chuanbillandroid">
         <meta-data
             android:name="dcloud_appkey"
-            android:value="b9ff440bf1f0d508ed67be10c43a48ef" />
+            android:value="a39d33c39592d74b7abad20cedbdc3e8" />
         <meta-data
             android:name="DCLOUD_DARK_MODE"
             android:value="auto" />

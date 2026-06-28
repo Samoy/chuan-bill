@@ -46,6 +46,11 @@ const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
 const billList = ref<BillVO[]>([])
 const page = ref(1)
 const loadingMoreStatus = ref<'loading' | 'finished' | 'error'>()
+const bottomGap = ref(70)
+
+// #ifdef APP-PLUS
+bottomGap.value = 110
+// #endif
 
 // 获取账单列表
 async function getBillList() {
@@ -276,7 +281,7 @@ onUnmounted(() => {
     <!-- 筛选弹框 -->
     <FilterModal v-model="showFilterModal" @submit="submitFilter" />
     <!-- FAB 按钮 - 仅已登录显示 -->
-    <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="addBill" />
+    <wd-fab draggable :expandable="false" :gap="{ bottom: bottomGap + safeAreaBottomHeight, right: 20 }" @click="addBill" />
     <!-- 快速记账模态框 -->
     <QuickBillModal
       v-model="showQuickBillModal"
