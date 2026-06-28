@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.*;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserService;
@@ -27,6 +28,7 @@ public class UserController {
         return Result.success(userService.getProfileById(userId));
     }
 
+    @Idempotent
     @PostMapping("/profile/update")
     @Operation(summary = "更新用户资料", description = "更新用户的昵称、头像、性别等信息")
     public Result<Boolean> updateProfile(@Validated @RequestBody UserProfileUpdateDTO updateDTO) {
@@ -35,6 +37,7 @@ public class UserController {
         return Result.success(userService.updateUserProfile(updateDTO));
     }
 
+    @Idempotent
     @PostMapping("/password/update-by-old")
     @Operation(summary = "通过旧密码修改密码", description = "使用原密码设置新密码")
     public Result<Boolean> updatePasswordByOld(@Validated @RequestBody UpdatePasswordByOldDTO updateDTO) {
@@ -43,6 +46,7 @@ public class UserController {
         return Result.success(userService.updatePassWordByOld(updateDTO));
     }
 
+    @Idempotent
     @PostMapping("/password/update-by-code")
     @Operation(summary = "通过验证码修改密码", description = "使用手机验证码设置新密码")
     public Result<Boolean> updatePasswordByCode(@Validated @RequestBody UpdatePasswordByCodeDTO updateDTO) {
@@ -57,6 +61,7 @@ public class UserController {
         return Result.success(userService.hasPassword(userId));
     }
 
+    @Idempotent
     @PostMapping("/phone/code")
     @Operation(summary = "获取手机验证码", description = "向当前登录的用户获取手机验证码")
     public Result<Void> getPhoneCode(@Parameter(description = "验证码场景") String scene) {
@@ -68,6 +73,7 @@ public class UserController {
     /**
      * 通过验证码更换手机号
      */
+    @Idempotent
     @PostMapping("/phone/update-by-code")
     @Operation(summary = "通过验证码更换手机号", description = "使用手机验证码更换手机号")
     public Result<Boolean> updatePhoneByCode(@Validated @RequestBody UpdatePhoneByCodeDTO updateDTO) {
@@ -78,6 +84,7 @@ public class UserController {
     /**
      * 通过密码验证更换手机号
      */
+    @Idempotent
     @PostMapping("/phone/update-by-password")
     @Operation(summary = "通过密码验证更换手机号", description = "使用密码验证更换手机号")
     public Result<Boolean> updatePhoneByPassword(@Validated @RequestBody UpdatePhoneByPasswordDTO updateDTO) {
@@ -88,6 +95,7 @@ public class UserController {
     /**
      * 绑定手机号
      */
+    @Idempotent
     @PostMapping("/phone/bind")
     @Operation(summary = "绑定手机号", description = "绑定手机号")
     public Result<Boolean> bindPhone(@Validated @RequestBody BindPhoneDTO bindDTO) {
@@ -95,6 +103,7 @@ public class UserController {
         return Result.success(userService.bindPhone(userId, bindDTO));
     }
 
+    @Idempotent
     @Operation(summary = "注销账号", description = "通过手机验证码验证身份后注销账号")
     @PostMapping("/account/delete")
     public Result<Void> deleteAccount(@Validated @RequestBody DeleteAccountDTO dto) {
