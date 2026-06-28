@@ -3,6 +3,8 @@ import type { AddBillDTO, BillListDTO, BillVO, UpdateBillDTO } from '@/api/globa
 import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import BillDetailModal from './components/BillDetailModal.vue'
 import BillItem from './components/BillItem.vue'
 import BillSection from './components/BillSection.vue'
@@ -18,13 +20,14 @@ definePage({
   type: 'home',
   style: {
     navigationBarTitleText: '我的账单',
+    enablePullDownRefresh: true,
   },
 })
 
 // 鉴权检查
 const user = useUserStore()
 const billStore = useBillStore()
-const statisStore = useStatisticsStore()
+const statisStore = usePersonalStatisticsStore()
 const message = useGlobalMessage()
 
 const searchValue = ref('')
@@ -206,11 +209,21 @@ onReachBottom(() => {
 })
 
 // 监听登录状态变化
-watch(() => user.isLoggedIn, (newVal) => {
-  if (newVal) {
-    // 登录后刷新数据
-    refresh()
-  }
+watch(() => user.isLoggedIn, () => {
+  refresh()
+})
+
+// 监听家庭数据变化事件（家庭账单相关）
+function handleFamilyUpdated() {
+  refresh()
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
 })
 </script>
 

@@ -60,6 +60,10 @@ jobs:
 
       - name: Spotless check
         run: mvn spotless:check -B
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Test
         run: mvn test -B
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

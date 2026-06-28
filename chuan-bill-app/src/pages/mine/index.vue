@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import ExportFilterPopup from './components/ExportFilterPopup.vue'
 import NotificationSettingsPopup from './components/NotificationSettingsPopup.vue'
 import SyncStatusPopup from './components/SyncStatusPopup.vue'
@@ -163,7 +165,7 @@ const menuGroups: { title: string, items: MenuItem[], needLogin?: boolean }[] = 
         title: '帮助与反馈',
         action: () => router.push('/pages/mine/help'),
       },
-      // #ifndef MP
+      // #ifdef APP-PLUS
       {
         icon: 'i-lucide:download-cloud',
         title: '检查更新',
@@ -221,11 +223,28 @@ function selectDarkMode({ item }: { item: { name: string, value: DarkModeValue }
   }
 }
 
-// 页面显示时获取未读消息数
-onShow(() => {
+// 首次加载时获取未读消息数
+onLoad(() => {
   if (user.isLoggedIn) {
     messageStore.fetchUnreadCount()
   }
+})
+
+// 监听用户和账单数据变化事件
+function handleDataUpdated() {
+  if (user.isLoggedIn) {
+    messageStore.fetchUnreadCount()
+  }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.USER.UPDATED, handleDataUpdated)
+  eventBus.on(EVENTS.BILL.UPDATED, handleDataUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.USER.UPDATED, handleDataUpdated)
+  eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
 })
 </script>
 
@@ -274,7 +293,7 @@ onShow(() => {
       </view>
     </template>
     <!-- 用户信息卡片 -->
-    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/80 bg-gradient-to-br p-6 text-white shadow-lg">
+    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
       <view class="flex items-center gap-4">
         <!-- 头像 -->
         <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
@@ -328,7 +347,7 @@ onShow(() => {
     </view>
 
     <!-- 退出登录 -->
-    <view v-if="user.isLoggedIn" class="mx-3 my-4">
+    <view v-if="user.isLoggedIn" class="mx-3 mt-4 -mb-10">
       <wd-button type="error" plain block @click="logout">
         退出登录
       </wd-button>

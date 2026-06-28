@@ -10,9 +10,9 @@
 import { defineManifestConfig } from '@uni-helper/vite-plugin-uni-manifest'
 
 export default defineManifestConfig({
-  'name': 'chuan-bill-app',
+  'name': '小川记账',
   'appid': '__UNI__1BBFCBB',
-  'description': '',
+  'description': '一款集个人记账、家庭共享、预算管理和智能分析于一体的应用，旨在为用户提供便捷的记账体验和科学的财务管理方案。',
   'versionName': '1.0.0',
   'versionCode': '100',
   'transformPx': false,
@@ -49,10 +49,18 @@ export default defineManifestConfig({
           '<uses-permission android:name="android.permission.FLASHLIGHT"/>',
           '<uses-feature android:name="android.hardware.camera"/>',
           '<uses-permission android:name="android.permission.WRITE_SETTINGS"/>',
+          '<uses-permission android:name="android.permission.RECORD_AUDIO"/>',
+          '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>',
         ],
       },
       /* ios打包配置 */
-      ios: {},
+      ios: {
+        privacyDescription: {
+          NSCameraUsageDescription: 'App需要访问您的相机以便能够上传头像或者账单图片',
+          NSMicrophoneUsageDescription: 'App需要访问您的麦克风以便您能够进行语音记账',
+          NSPhotoLibraryUsageDescription: 'App需要访问您的相册以便能够上传头像或者账单图片',
+        },
+      },
       /* SDK配置 */
       sdkConfigs: {},
       icons: {
@@ -87,6 +95,14 @@ export default defineManifestConfig({
           },
         },
       },
+      splashscreen: {
+        androidStyle: 'default',
+        android: {
+          xxhdpi: 'unpackage/res/images/splash.png',
+          hdpi: 'unpackage/res/images/splash.png',
+          xhdpi: 'unpackage/res/images/splash.png',
+        },
+      },
     },
   },
   /* 快应用特有相关 */
@@ -99,6 +115,8 @@ export default defineManifestConfig({
     appid: 'wx67e283815fae178d',
     setting: {
       urlCheck: false,
+      minified: true,
+      swc: true,
     },
     usingComponents: true,
     darkmode: true,

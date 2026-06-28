@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
+
 definePage({
   name: 'profile-edit',
   layout: 'default',
@@ -67,10 +70,8 @@ async function handleSave() {
 
   if (success) {
     toast.success('资料已更新')
+    eventBus.emit(EVENTS.USER.UPDATED)
     router.back()
-  }
-  else {
-    toast.error('更新失败，请重试')
   }
 }
 </script>

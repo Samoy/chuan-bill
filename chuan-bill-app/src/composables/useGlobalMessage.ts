@@ -28,7 +28,7 @@ export const useGlobalMessage = defineStore('global-message', {
         confirmButtonProps: {
           ...(isOptionStr ? {} : option.confirmButtonProps),
         },
-        zIndex: 99999,
+        zIndex: 999999,
       }
     },
     alert(option: GlobalMessageOptions | string) {

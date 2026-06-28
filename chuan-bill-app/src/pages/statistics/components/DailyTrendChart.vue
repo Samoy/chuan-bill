@@ -8,7 +8,7 @@ defineProps<{
   month: string
 }>()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = usePersonalStatisticsStore()
 const themeStore = useManualThemeStore()
 
 const lineOption = computed(() => {

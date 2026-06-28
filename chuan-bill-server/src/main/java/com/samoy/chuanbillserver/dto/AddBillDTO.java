@@ -1,6 +1,8 @@
 package com.samoy.chuanbillserver.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.samoy.chuanbillserver.enums.ModerationScene;
+import com.samoy.chuanbillserver.validation.TextModeration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -11,7 +13,8 @@ import lombok.Data;
 @Schema(description = "添加账单请求")
 public class AddBillDTO {
 
-    @NotBlank(message = "账单名称不能为空") @Size(min = 1, max = 50, message = "账单名称长度在 1 到 50 个字符之间") @Schema(description = "账单名称", example = "早餐", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "账单名称不能为空") @Size(min = 1, max = 50, message = "账单名称长度在 1 到 50 个字符之间") @TextModeration(scene = ModerationScene.TITLE, message = "账单名称包含违规内容，请重新输入")
+    @Schema(description = "账单名称", example = "早餐", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @NotBlank(message = "账单类目 id 不能为空") @Schema(description = "分类 ID", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -31,7 +34,8 @@ public class AddBillDTO {
     @Schema(description = "账单时间", example = "2024-01-01 08:00", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime time;
 
-    @Size(max = 500, message = "账单备注长度不能超过 500 个字符") @Schema(description = "账单备注", example = "在公司楼下吃的早餐")
+    @Size(max = 500, message = "账单备注长度不能超过 500 个字符") @TextModeration(scene = ModerationScene.DESCRIPTION, message = "账单备注包含违规内容，请重新输入")
+    @Schema(description = "账单备注", example = "在公司楼下吃的早餐")
     private String remark;
 
     @Schema(description = "家庭 ID（可选）", example = "family123")

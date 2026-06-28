@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
+
 definePage({
   name: 'family-detail',
   layout: 'default',
@@ -17,21 +20,21 @@ const familyId = ref('')
 const showRemoveConfirm = ref(false)
 const removeTarget = ref<{ id: string, nickname: string } | null>(null)
 
-onLoad((options) => {
+onLoad(async (options) => {
   if (options?.familyId) {
     familyId.value = options.familyId
-  }
-})
-
-onShow(async () => {
-  if (familyId.value) {
-    await Promise.all([
-      familyStore.fetchFamilyDetail(familyId.value),
-      familyStore.fetchMembers(familyId.value),
-    ])
-    // 如果是户主，也获取待处理申请
-    if (familyStore.currentFamily?.isOwner) {
-      await familyStore.fetchPendingApplies(familyId.value)
+    if (familyId.value) {
+      // #ifdef MP-WEIXIN
+      uni.showShareMenu({ menus: ['shareAppMessage'] })
+      // #endif
+      await Promise.all([
+        familyStore.fetchFamilyDetail(familyId.value),
+        familyStore.fetchMembers(familyId.value),
+      ])
+      // 如果是户主，也获取待处理申请
+      if (familyStore.currentFamily?.isOwner) {
+        await familyStore.fetchPendingApplies(familyId.value)
+      }
     }
   }
 })
@@ -41,20 +44,42 @@ const members = computed(() => familyStore.memberList)
 const pendingApplies = computed(() => familyStore.pendingApplies)
 const isOwner = computed(() => currentFamily.value?.isOwner || false)
 
-// 复制邀请码
-function copyInviteCode() {
-  if (currentFamily.value?.inviteCode) {
-    uni.setClipboardData({
-      data: currentFamily.value.inviteCode,
-    })
-  }
+// 分享家庭
+function shareFamily() {
+  // #ifndef MP-WEIXIN
+  const inviteCode = currentFamily.value?.inviteCode
+  const familyName = currentFamily.value?.name || '我的家庭'
+  if (!inviteCode)
+    return
+  const shareUrl = `${import.meta.env.VITE_SHARE_BASE_URL}/#/pages/family/index?inviteCode=${inviteCode}`
+  const shareText = `${userStore.nickname || '您的好友'}邀请你加入「${familyName}」，邀请码：${inviteCode}\n链接：${shareUrl}`
+  uni.setClipboardData({
+    data: shareText,
+    success: () => {
+      toast.success('分享链接已复制到剪贴板')
+    },
+  })
+  // #endif
 }
+
+// #ifdef MP-WEIXIN
+onShareAppMessage(() => {
+  return {
+    title: `${userStore.nickname || '您的好友'}邀请你加入「${currentFamily.value?.name || '我的家庭'}」`,
+    path: `/pages/family/index?inviteCode=${currentFamily.value?.inviteCode}`,
+    imageUrl: currentFamily.value?.avatar,
+  }
+})
+// #endif
 
 // 处理加入申请
 async function handleApply(applyId: string, approved: boolean) {
   const success = await familyStore.handleJoinApply(applyId, familyId.value, approved)
   if (success) {
     toast.success(approved ? '已同意加入申请' : '已拒绝加入申请')
+    if (approved) {
+      eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
+    }
   }
 }
 
@@ -68,6 +93,7 @@ async function removeMember(familyId: string, userId: string, nickname: string) 
       if (success) {
         resolve(true)
         toast.success('已移除成员')
+        eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
       }
       showRemoveConfirm.value = false
       removeTarget.value = null
@@ -85,6 +111,7 @@ function handleLeave() {
       if (success) {
         resolve(true)
         toast.success('已退出家庭')
+        eventBus.emit(EVENTS.FAMILY.MEMBER_CHANGED)
         router.back()
       }
     },
@@ -129,9 +156,9 @@ async function handleRefreshInviteCode() {
       <!-- 家庭信息卡片 -->
       <view class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
         <view class="flex items-center gap-3">
-          <view class="flex items-center justify-center rounded-2xl bg-white/20 p-2 backdrop-blur-sm">
-            <wd-img v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-12 w-12 rounded-2xl" mode="aspectFill" />
-            <view v-else class="i-lucide:home h-7 w-7" />
+          <wd-avatar v-if="currentFamily.avatar" :src="currentFamily.avatar" class="h-10 w-10 rounded-xl" mode="aspectFill" />
+          <view v-else class="h-12 w-12 flex items-center justify-center rounded-2xl rounded-xl bg-white/20 p-1 backdrop-blur-sm">
+            <view class="i-mingcute:group-line h-8 w-8 text-white" />
           </view>
           <view class="flex-1">
             <view class="flex items-center gap-2">
@@ -160,7 +187,7 @@ async function handleRefreshInviteCode() {
           <!-- 家庭账单 -->
           <view
             class="flex items-center gap-3"
-            @click="router.push(`/pages/family/bills?familyId=${familyId}`)"
+            @click="router.push(`/pages/family/bill?familyId=${familyId}&familyName=${encodeURIComponent(currentFamily.name || '')}`)"
           >
             <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
               <view class="i-lucide:receipt h-5 w-5 text-primary" />
@@ -177,10 +204,10 @@ async function handleRefreshInviteCode() {
           <!-- 家庭统计 -->
           <view
             class="flex items-center gap-3"
-            @click="router.push(`/pages/family/statistics?familyId=${familyId}`)"
+            @click="router.push(`/pages/family/statistics?familyId=${familyId}&familyName=${encodeURIComponent(currentFamily.name || '')}`)"
           >
-            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/20">
-              <view class="i-lucide:bar-chart-3 h-5 w-5 text-green-600" />
+            <view class="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10">
+              <view class="i-lucide:bar-chart-3 h-5 w-5 text-primary" />
             </view>
             <view>
               <text class="block text-sm font-500">
@@ -194,8 +221,8 @@ async function handleRefreshInviteCode() {
         </view>
       </view>
 
-      <!-- 邀请码区域（仅户主可见） -->
-      <view v-if="isOwner" class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
+      <!-- 邀请码区域 -->
+      <view class="mx-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-[var(--wot-dark-background2)]">
         <view class="flex items-center justify-between">
           <view>
             <text class="block text-sm font-500">
@@ -206,10 +233,10 @@ async function handleRefreshInviteCode() {
             <text class="mr-2 text-lg font-bold tracking-widest font-mono">
               {{ currentFamily.inviteCode }}
             </text>
-            <wd-button size="small" plain @click="copyInviteCode">
-              复制
+            <wd-button size="small" plain open-type="share" @click="shareFamily">
+              分享
             </wd-button>
-            <wd-button size="small" plain @click="handleRefreshInviteCode">
+            <wd-button v-if="isOwner" size="small" plain @click="handleRefreshInviteCode">
               刷新
             </wd-button>
           </view>

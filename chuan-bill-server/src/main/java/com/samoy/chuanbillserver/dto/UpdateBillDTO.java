@@ -1,6 +1,8 @@
 package com.samoy.chuanbillserver.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.samoy.chuanbillserver.enums.ModerationScene;
+import com.samoy.chuanbillserver.validation.TextModeration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -13,7 +15,8 @@ public class UpdateBillDTO {
     @NotBlank(message = "账单 ID 不能为空") @Schema(description = "账单 ID", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
     private String id;
 
-    @Size(min = 1, max = 50, message = "账单名称长度在 1 到 50 个字符之间") @Schema(description = "账单名称", example = "午餐")
+    @Size(min = 1, max = 50, message = "账单名称长度在 1 到 50 个字符之间") @TextModeration(scene = ModerationScene.TITLE, message = "账单名称包含违规内容，请重新输入")
+    @Schema(description = "账单名称", example = "午餐")
     private String name;
 
     @Schema(description = "分类 ID", example = "123456")
@@ -33,7 +36,8 @@ public class UpdateBillDTO {
     @DecimalMin(value = "0.01", message = "账单金额必须大于 0") @Digits(integer = 10, fraction = 2, message = "账单金额最多 10 位数字，且小数点后最多 2 位") @Schema(description = "账单金额", example = "25.00")
     private BigDecimal amount;
 
-    @Size(max = 500, message = "账单备注长度不能超过 500 个字符") @Schema(description = "账单备注", example = "公司附近的餐厅")
+    @Size(max = 500, message = "账单备注长度不能超过 500 个字符") @TextModeration(scene = ModerationScene.DESCRIPTION, message = "账单备注包含违规内容，请重新输入")
+    @Schema(description = "账单备注", example = "公司附近的餐厅")
     private String remark;
 
     @Schema(description = "家庭 ID，为空则属于个人账单", example = "family123")

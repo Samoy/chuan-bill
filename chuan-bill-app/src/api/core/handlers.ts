@@ -11,15 +11,6 @@ import type { Method } from 'alova'
 // 防止重复弹出登录弹框的标记
 let isShowingLoginPopup = false
 
-// 获取 useAuthCheck 的引用（延迟获取以避免循环依赖）
-let authCheckRef: ReturnType<typeof useAuthCheck> | null = null
-function getAuthCheck() {
-  if (!authCheckRef) {
-    authCheckRef = useAuthCheck()
-  }
-  return authCheckRef
-}
-
 // Custom error class for API errors
 export class ApiError extends Error {
   code: number
@@ -58,18 +49,18 @@ export async function handleAlovaResponse(
       }
       isShowingLoginPopup = true
 
-      // 清除过期登录信息
-      useUserStore().logout()
+      // 清除过期登录信息并弹出登录弹框
+      const userStore = useUserStore()
+      userStore.logout()
 
       // 提示用户
-      globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
+      globalToast.error({ msg: '登录已过期，请重新登录！' })
 
-      // 接入 useAuthCheck 弹出登录弹框
-      const authCheck = getAuthCheck()
-      authCheck.showLoginPopup.value = true
+      // 弹出登录弹框
+      userStore.showLoginPopup = true
 
       // 监听弹框关闭，重置标记
-      const unwatch = watch(() => authCheck.showLoginPopup.value, (visible) => {
+      const unwatch = watch(() => userStore.showLoginPopup, (visible) => {
         if (!visible) {
           isShowingLoginPopup = false
           unwatch()
@@ -149,18 +140,18 @@ export function handleAlovaError(error: any, method: Method) {
     if (!isShowingLoginPopup) {
       isShowingLoginPopup = true
 
-      // 清除过期登录信息
-      useUserStore().logout()
+      // 清除过期登录信息并弹出登录弹框
+      const userStore = useUserStore()
+      userStore.logout()
 
       // 提示用户
       globalToast.error({ msg: '登录已过期，请重新登录！', duration: 500 })
 
-      // 接入 useAuthCheck 弹出登录弹框
-      const authCheck = getAuthCheck()
-      authCheck.showLoginPopup.value = true
+      // 弹出登录弹框
+      userStore.showLoginPopup = true
 
       // 监听弹框关闭，重置标记
-      const unwatch = watch(() => authCheck.showLoginPopup.value, (visible) => {
+      const unwatch = watch(() => userStore.showLoginPopup, (visible) => {
         if (!visible) {
           isShowingLoginPopup = false
           unwatch()
@@ -183,6 +174,10 @@ export function handleAlovaError(error: any, method: Method) {
   else {
     globalToast.error('发生意外错误')
   }
+
+  // #ifdef MP-WEIXIN
+  wx.getRealtimeLogManager().error(error)
+  // #endif
 
   throw error
 }

@@ -71,11 +71,22 @@ public enum ResultEnum {
     FAMILY_CANNOT_REMOVE_OWNER(4011, "不能移除户主"),
     FAMILY_CREATE_LIMIT_REACHED(4012, "每个家庭最多只能创建5个家庭"),
 
-    // 消息相关错误码 4050+
-    MESSAGE_NOT_FOUND(4051, "消息不存在"),
+    // 类目/支付方式相关错误码 6000+
+    CATEGORY_NOT_FOUND(6001, "类目不存在"),
+    CATEGORY_HAS_BILLS(6002, "该类目下存在账单，无法删除"),
+    CANNOT_MODIFY_DEFAULT_CATEGORY(6003, "系统预设类目不可修改"),
+    PAYMENT_METHOD_NOT_FOUND(6004, "支付方式不存在"),
+    PAYMENT_METHOD_HAS_BILLS(6005, "该支付方式下存在账单，无法删除"),
+    CANNOT_MODIFY_DEFAULT_PAYMENT_METHOD(6006, "系统预设支付方式不可修改"),
 
-    // 预算相关错误码 5000+
-    BUDGET_NOT_FOUND(5001, "预算不存在"),
+    // 消息相关错误码 7000+
+    MESSAGE_NOT_FOUND(7001, "消息不存在"),
+
+    // 预算相关错误码 8000+
+    BUDGET_NOT_FOUND(8001, "预算不存在"),
+
+    // 内容安全相关错误码 9000+
+    CONTENT_MODERATION_FAILED(9001, "内容包含违规信息，请修改后重试"),
     ;
 
     private final Integer code;

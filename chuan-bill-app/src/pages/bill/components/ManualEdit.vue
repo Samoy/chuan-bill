@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { AddBillDTO } from '@/api/globals'
+import dayjs from 'dayjs'
+import GridPickerPopup from './GridPickerPopup.vue'
 
 defineOptions({
   name: 'ManualEdit',
@@ -19,6 +21,8 @@ interface PickerOption {
   disabled?: boolean
 }
 
+type BillType = 'expense' | 'income'
+
 const form = ref()
 const isShared = ref(false)
 const billStore = useBillStore()
@@ -26,9 +30,29 @@ const user = useUserStore()
 const familyStore = useFamilyStore()
 
 const formData = defineModel<AddBillDTO>({ required: true, default: { source: 'manual', type: 'expense' } })
-const categoryOptions = computed<PickerOption[]>(() => billStore.getCategoryList(formData.value.type).map(category => ({ label: category.name, value: category.id })))
-const paymentMethodOptions = computed<PickerOption[]>(() => billStore.getPaymentMethodList().map(paymentMethod => ({ label: paymentMethod.name, value: paymentMethod.id })))
+const categoryItems = computed(() => billStore.getCategoryList(formData.value.type))
+const paymentMethodItems = computed(() => billStore.getPaymentMethodList())
 const familyOptions = computed<PickerOption[]>(() => familyStore.familyList.map(f => ({ label: f.name, value: f.id })))
+
+// 时间戳用于 wd-datetime-picker（组件要求 timestamp 类型）
+const timeTimestamp = ref<number>(Date.now())
+
+// 同步 formData.time 字符串到时间戳
+watch(() => formData.value.time, (newTime) => {
+  if (newTime) {
+    const timestamp = dayjs(newTime).valueOf()
+    if (!Number.isNaN(timestamp)) {
+      timeTimestamp.value = timestamp
+    }
+  }
+}, { immediate: true })
+
+// 同步时间戳到 formData.time 字符串
+watch(timeTimestamp, (newTimestamp) => {
+  if (newTimestamp) {
+    formData.value.time = dayjs(newTimestamp).format('YYYY-MM-DD HH:mm')
+  }
+}, { immediate: true })
 
 onLoad(async () => {
   await billStore.initBillData()
@@ -97,7 +121,7 @@ function sumbit() {
       时间
     </view>
     <wd-datetime-picker
-      v-model="formData.time" :default-value="Date.now()" custom-class="mt-3"
+      v-model="timeTimestamp" :default-value="Date.now()" custom-class="mt-3"
       prop="time"
       :rules="[{ required: true, message: '请选择账单时间' }]"
     />
@@ -107,18 +131,25 @@ function sumbit() {
         <view class="text-xs text-gray-500">
           <text class="i-lucide:tag mr-2" />类目
         </view>
-        <wd-picker
-          v-model="formData.categoryId" :columns="categoryOptions" title="请选择账单类目" placeholder="请选择" custom-class="mt-2" prop="categoryId"
-          :rules="[{ required: true, message: '请选择账单类目' }]"
+        <GridPickerPopup
+          v-model="formData.categoryId"
+          :items="categoryItems"
+          title="选择类目"
+          entity="category"
+          custom-class="mt-2"
+          :type="formData.type as BillType"
         />
       </view>
       <view class="flex-1">
         <view class="text-xs text-gray-500">
           <text class="i-lucide:credit-card mr-2" />支付方式
         </view>
-        <wd-picker
-          v-model="formData.paymentMethodId" :columns="paymentMethodOptions" title="请选择支付方式" placeholder="请选择" custom-class="mt-2" prop="paymentMethodId"
-          :rules="[{ required: true, message: '请选择支付方式' }]"
+        <GridPickerPopup
+          v-model="formData.paymentMethodId"
+          :items="paymentMethodItems"
+          title="选择支付方式"
+          entity="paymentMethod"
+          custom-class="mt-2"
         />
       </view>
     </view>

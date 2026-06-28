@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
+
 definePage({
   name: 'family',
   layout: 'tabbar',
   style: {
     navigationBarTitleText: '家庭',
+    enablePullDownRefresh: true,
   },
 })
 
@@ -19,12 +23,71 @@ const joinForm = ref({ inviteCode: '', remark: '' })
 const joinLoading = ref(false)
 const showKeyboard = ref(false)
 
-// 页面加载时获取数据
-onShow(async () => {
+// 页面加载时获取数据（仅首次）
+onLoad((options) => {
+  if (options?.inviteCode) {
+    // #ifdef MP-WEIXIN
+    // 微信小程序通过 scene 判断是否为邀请入口
+    const launchOptions = wx.getLaunchOptionsSync()
+    const INVITE_SCENES = [1007, 1008]
+    const isInviteScene = INVITE_SCENES.includes(launchOptions.scene)
+    if (isInviteScene) {
+      uni.setStorageSync('pendingInviteCode', options.inviteCode)
+      if (user.isLoggedIn) {
+        joinForm.value.inviteCode = options.inviteCode
+        showJoinPopup.value = true
+        uni.removeStorageSync('pendingInviteCode')
+      }
+    }
+    // #endif
+
+    // #ifdef H5
+    // H5 存储邀请码后立即移除 URL 中的 inviteCode 参数，避免刷新时重复弹框
+    uni.setStorageSync('pendingInviteCode', options.inviteCode)
+    if (user.isLoggedIn) {
+      joinForm.value.inviteCode = options.inviteCode
+      showJoinPopup.value = true
+      uni.removeStorageSync('pendingInviteCode')
+    }
+    removeHashQueryParam('inviteCode')
+    // #endif
+  }
+  handleFamilyUpdated()
+})
+
+// 监听登录状态变化，自动弹出邀请码弹框
+watch(() => user.isLoggedIn, (loggedIn) => {
+  if (loggedIn) {
+    const pendingCode = uni.getStorageSync('pendingInviteCode')
+    if (pendingCode) {
+      joinForm.value.inviteCode = pendingCode
+      showJoinPopup.value = true
+      uni.removeStorageSync('pendingInviteCode')
+    }
+  }
+}, { immediate: true })
+
+onPullDownRefresh(() => {
+  handleFamilyUpdated()
+    .finally(() => uni.stopPullDownRefresh())
+})
+
+// 监听家庭数据变化事件
+async function handleFamilyUpdated() {
   if (user.isLoggedIn) {
     await familyStore.fetchFamilyList()
     await messageStore.fetchUnreadCount()
   }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
+  eventBus.on(EVENTS.FAMILY.MEMBER_CHANGED, handleFamilyUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.FAMILY.UPDATED, handleFamilyUpdated)
+  eventBus.off(EVENTS.FAMILY.MEMBER_CHANGED, handleFamilyUpdated)
 })
 
 // 加入家庭
@@ -238,7 +301,7 @@ async function handleJoin() {
               class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary/5 py-2 text-primary transition-all active:scale-95"
               @click.stop="router.push(`/pages/family/bill?familyId=${family.id}&familyName=${encodeURIComponent(family.name || '')}`)"
             >
-              <view class="i-lucide:clipboard-list h-4 w-4" />
+              <view class="i-lucide:receipt h-4 w-4" />
               <view class="text-xs font-500">
                 账单列表
               </view>

@@ -1,0 +1,107 @@
+/**
+ * UnoCSS 图标常量列表
+ * 用于自定义类目/支付方式的图标选择器
+ * 使用 i-lucide:* 图标体系
+ */
+export const ICON_LIST = [
+  // 餐饮美食
+  'i-lucide:utensils',
+  'i-lucide:coffee',
+  'i-lucide:beer',
+  'i-lucide:cake',
+  'i-lucide:egg',
+  'i-lucide:apple',
+  'i-lucide:cherry',
+  'i-lucide:grape',
+  'i-lucide:pizza',
+  'i-lucide:soup',
+  // 购物消费
+  'i-lucide:shopping-bag',
+  'i-lucide:shopping-cart',
+  'i-lucide:gift',
+  'i-lucide:tag',
+  'i-lucide:receipt',
+  'i-lucide:store',
+  'i-lucide:package',
+  // 交通出行
+  'i-lucide:car',
+  'i-lucide:bus',
+  'i-lucide:train-front',
+  'i-lucide:plane',
+  'i-lucide:bike',
+  'i-lucide:ship',
+  'i-lucide:taxi',
+  'i-lucide:fuel',
+  // 居住生活
+  'i-lucide:house',
+  'i-lucide:lamp',
+  'i-lucide:sofa',
+  'i-lucide:bath',
+  'i-lucide:bed',
+  'i-lucide:washer',
+  'i-lucide:refrigerator',
+  // 通讯数码
+  'i-lucide:smartphone',
+  'i-lucide:laptop',
+  'i-lucide:monitor',
+  'i-lucide:headphones',
+  'i-lucide:camera',
+  'i-lucide:wifi',
+  'i-lucide:bluetooth',
+  // 医疗健康
+  'i-lucide:hospital',
+  'i-lucide:pill',
+  'i-lucide:heart-pulse',
+  'i-lucide:stethoscope',
+  'i-lucide:thermometer',
+  // 教育学习
+  'i-lucide:book-open',
+  'i-lucide:graduation-cap',
+  'i-lucide:pen',
+  'i-lucide:pencil',
+  'i-lucide:calculator',
+  // 娱乐休闲
+  'i-lucide:music',
+  'i-lucide:gamepad-2',
+  'i-lucide:film',
+  'i-lucide:ticket',
+  'i-lucide:dice-5',
+  'i-lucide:tent',
+  // 运动健身
+  'i-lucide:dumbbell',
+  'i-lucide:trophy',
+  'i-lucide:medal',
+  // 工作收入
+  'i-lucide:briefcase',
+  'i-lucide:landmark',
+  'i-lucide:credit-card',
+  'i-lucide:wallet',
+  'i-lucide:banknote',
+  'i-lucide:coins',
+  'i-lucide:piggy-bank',
+  'i-lucide:trending-up',
+  // 其他通用
+  'i-lucide:star',
+  'i-lucide:heart',
+  'i-lucide:home',
+  'i-lucide:user',
+  'i-lucide:users',
+  'i-lucide:baby',
+  'i-lucide:paw-print',
+  'i-lucide:leaf',
+  'i-lucide:sun',
+  'i-lucide:moon',
+  'i-lucide:zap',
+  'i-lucide:flame',
+  'i-lucide:droplets',
+  'i-lucide:scissors',
+  'i-lucide:wrench',
+  'i-lucide:hammer',
+  'i-lucide:phone',
+  'i-lucide:mail',
+  'i-lucide:globe',
+  'i-lucide:compass',
+  'i-lucide:map-pin',
+] as const
+
+export type IconClass = (typeof ICON_LIST)[number]

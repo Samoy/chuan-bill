@@ -218,7 +218,6 @@ async function handleUpdateByCode() {
     title="修改密码"
     :z-index="999"
     safe-area-inset-bottom
-    :close-on-click-modal="false"
   >
     <view class="p-4 pt-0">
       <!-- Tab 切换（有密码时显示） -->
@@ -369,7 +368,7 @@ async function handleUpdateByCode() {
 <style lang="scss" scoped>
 /* 输入框样式覆盖 */
 :deep(.login-input) {
-  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100 dark:bg-gray-700;
+  @apply px-3 py-1 rounded-2xl mb-4 bg-gray-100! dark:bg-gray-700!;
 
   &::after {
     display: none !important;

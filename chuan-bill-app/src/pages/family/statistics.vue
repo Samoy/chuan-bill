@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AiSuggestionType } from '@/constant/ai'
 import AiSuggestionCard from '@/pages/statistics/components/AiSuggestionCard.vue'
-import { setupEcharts } from '../../utils/echarts-setup'
+import { setupEcharts } from '@/utils/echarts-setup'
 import CategoryChart from '../statistics/components/CategoryChart.vue'
 import MemberRankingChart from './components/MemberRankingChart.vue'
 
@@ -11,12 +10,13 @@ definePage({
   layout: 'default',
   style: {
     navigationBarTitleText: '家庭统计',
+    enablePullDownRefresh: true,
   },
 })
 
 setupEcharts()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = useFamilyStatisticsStore()
 
 const familyId = ref('')
 const currentMonth = ref(dayjs().format('YYYY-MM'))
@@ -37,12 +37,17 @@ function prevMonth() {
   currentMonth.value = dayjs(currentMonth.value).subtract(1, 'month').format('YYYY-MM')
 }
 
+// 是否为当前月（禁用右箭头）
+const isCurrentMonth = computed(() => {
+  return dayjs(currentMonth.value).isSame(dayjs(), 'month')
+})
+
 // 切换到下一个月
 function nextMonth() {
-  const next = dayjs(currentMonth.value).add(1, 'month')
-  if (next.isAfter(dayjs(), 'month')) {
+  if (isCurrentMonth.value) {
     return
   }
+  const next = dayjs(currentMonth.value).add(1, 'month')
   currentMonth.value = next.format('YYYY-MM')
 }
 
@@ -59,14 +64,13 @@ onLoad((options) => {
   if (options?.familyName) {
     uni.setNavigationBarTitle({ title: `${decodeURIComponent(options.familyName)}账单统计` })
   }
-  statisticsStore.setAnalysisContext(AiSuggestionType.FAMILY, familyId.value)
   statisticsStore.fetchAll(currentMonth.value, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, currentMonth.value, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value, familyId.value)
 })
 
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month, familyId.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.FAMILY, month, familyId.value)
+  statisticsStore.fetchAiSuggestionCached(month, familyId.value)
 })
 </script>
 
@@ -74,9 +78,9 @@ watch(currentMonth, (month) => {
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 月份选择器 -->
     <wd-sticky :z-index="10">
-      <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc]">
+      <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc] dark:bg-[var(--wot-dark-background2)]">
         <view
-          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-800"
           @click="prevMonth"
         >
           <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
@@ -94,10 +98,11 @@ watch(currentMonth, (month) => {
           </view>
         </wd-picker>
         <view
-          class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]"
+          class="h-8 w-8 flex items-center justify-center rounded-full shadow-sm"
+          :class="isCurrentMonth ? 'bg-gray-100 dark:bg-gray-800 opacity-80' : 'bg-white dark:bg-gray-800'"
           @click="nextMonth"
         >
-          <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
+          <view class="i-lucide:chevron-right" :class="isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'" />
         </view>
       </view>
     </wd-sticky>
@@ -137,7 +142,7 @@ watch(currentMonth, (month) => {
       </view>
     </view>
 
-    <!-- 成员收支饼图 -->
+    <!-- 类别支出占比饼图 -->
     <view class="mx-3">
       <CategoryChart :month="currentMonth" :family-id="familyId" />
     </view>
@@ -149,7 +154,7 @@ watch(currentMonth, (month) => {
 
     <!-- AI建议（仅户主可见） -->
     <view class="mx-3">
-      <AiSuggestionCard :month="currentMonth" :analysis-type="AiSuggestionType.FAMILY" :family-id="familyId" />
+      <AiSuggestionCard :month="currentMonth" :family-id="familyId" />
     </view>
   </view>
 </template>

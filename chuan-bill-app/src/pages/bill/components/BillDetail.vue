@@ -10,8 +10,9 @@ defineOptions({
   },
 })
 
-const { bill, customClass, customStyle } = defineProps<{
+const { bill, type, customClass, customStyle } = defineProps<{
   bill: BillVO
+  type?: 'user' | 'family'
   customClass?: string
   customStyle?: string
 }>()
@@ -75,7 +76,19 @@ const { bill, customClass, customStyle } = defineProps<{
           {{ SOURCE_MAP[bill.source! as keyof typeof SOURCE_MAP] || '未知' }}
         </text>
       </view>
-      <view class="flex flex-col gap-1 border-1 border-gray-100 rounded-xl border-solid bg-gray-50 px-3 py-2.5 dark:border-gray-700 dark:bg-gray-800">
+      <view v-if="type === 'family' && bill.userNickname" class="flex flex-col gap-1 border-1 border-gray-100 rounded-xl border-solid bg-gray-50 px-3 py-2.5 dark:border-gray-700 dark:bg-gray-800">
+        <view class="flex items-center text-xs text-gray-400">
+          <text class="i-lucide:user mr-1" />
+          <text>添加者</text>
+        </view>
+        <view class="flex items-center gap-1.5">
+          <image v-if="bill.userAvatar" :src="bill.userAvatar" class="h-4 w-4 rounded-full" mode="aspectFill" />
+          <text class="text-sm">
+            {{ bill.userNickname }}
+          </text>
+        </view>
+      </view>
+      <view v-else class="flex flex-col gap-1 border-1 border-gray-100 rounded-xl border-solid bg-gray-50 px-3 py-2.5 dark:border-gray-700 dark:bg-gray-800">
         <view class="flex items-center text-xs text-gray-400">
           <text class="i-carbon:pedestrian-family mr-1" />
           <text>所属家庭</text>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { AiSuggestionType } from '@/constant/ai'
-import { setupEcharts } from '../../utils/echarts-setup'
+import { EVENTS } from '@/constant/events'
+import { setupEcharts } from '@/utils/echarts-setup'
+import { eventBus } from '@/utils/eventBus'
 import AiSuggestionCard from './components/AiSuggestionCard.vue'
 import BudgetCard from './components/BudgetCard.vue'
 import BudgetSettingPopup from './components/BudgetSettingPopup.vue'
@@ -13,18 +14,23 @@ definePage({
   layout: 'tabbar',
   style: {
     navigationBarTitleText: '统计',
+    enablePullDownRefresh: true,
   },
 })
 
 setupEcharts()
 
-const statisticsStore = useStatisticsStore()
+const statisticsStore = usePersonalStatisticsStore()
 const budgetStore = useBudgetStore()
 const user = useUserStore()
 const showSettingPopup = ref(false)
 
 // 当前选中的月份
 const currentMonth = ref(dayjs().format('YYYY-MM'))
+
+// 页面可见性（用于避免后台更新导致 echarts 渲染空白）
+const pageVisible = ref(true)
+const needsRefresh = ref(false)
 
 // 月份选择器显示状态
 const showMonthPicker = ref(false)
@@ -44,12 +50,17 @@ function prevMonth() {
   currentMonth.value = dayjs(currentMonth.value).subtract(1, 'month').format('YYYY-MM')
 }
 
+// 是否为当前月（禁用右箭头）
+const isCurrentMonth = computed(() => {
+  return dayjs(currentMonth.value).isSame(dayjs(), 'month')
+})
+
 // 切换到下一个月
 function nextMonth() {
-  const next = dayjs(currentMonth.value).add(1, 'month')
-  if (next.isAfter(dayjs(), 'month')) {
+  if (isCurrentMonth.value) {
     return
   }
+  const next = dayjs(currentMonth.value).add(1, 'month')
   currentMonth.value = next.format('YYYY-MM')
 }
 
@@ -59,33 +70,72 @@ function onMonthSelect({ value }: { value: string }) {
   showMonthPicker.value = false
 }
 
+// 首次加载时获取数据
+onLoad(() => {
+  statisticsStore.fetchAll(currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
+  if (user.isLoggedIn) {
+    budgetStore.fetchBudget(currentMonth.value)
+  }
+})
+
+onPullDownRefresh(() => {
+  handleDataUpdated()
+    .finally(() => uni.stopPullDownRefresh())
+})
+
+// 页面可见性管理：切回前台时，如果有待刷新的数据则立即获取
 onShow(() => {
-  nextTick(() => {
-    statisticsStore.setAnalysisContext(AiSuggestionType.USER)
-    statisticsStore.fetchAll(currentMonth.value)
-    statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
-    if (user.isLoggedIn) {
-      budgetStore.fetchBudget(currentMonth.value)
-    }
-  })
+  pageVisible.value = true
+  if (needsRefresh.value) {
+    needsRefresh.value = false
+    handleDataUpdated()
+  }
+})
+
+onHide(() => {
+  pageVisible.value = false
 })
 
 // 监听月份变化，获取统计数据
 watch(currentMonth, (month) => {
   statisticsStore.fetchAll(month)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, month)
+  statisticsStore.fetchAiSuggestionCached(month)
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(month)
   }
-}, { immediate: true })
+})
 
 // 监听登录状态变化，重新获取
 watch(() => user.isLoggedIn, () => {
   statisticsStore.fetchAll(currentMonth.value)
-  statisticsStore.fetchAiSuggestionCached(AiSuggestionType.USER, currentMonth.value)
+  statisticsStore.fetchAiSuggestionCached(currentMonth.value)
   if (user.isLoggedIn) {
     budgetStore.fetchBudget(currentMonth.value)
   }
+})
+
+// 监听账单和家庭数据变化事件（页面不可见时延迟到 onShow 再刷新，避免 echarts 渲染空白）
+async function handleDataUpdated() {
+  if (!pageVisible.value) {
+    needsRefresh.value = true
+    return
+  }
+  await statisticsStore.fetchAll(currentMonth.value)
+  await statisticsStore.fetchAiSuggestionCached(currentMonth.value)
+  if (user.isLoggedIn) {
+    await budgetStore.fetchBudget(currentMonth.value)
+  }
+}
+
+onMounted(() => {
+  eventBus.on(EVENTS.BILL.UPDATED, handleDataUpdated)
+  eventBus.on(EVENTS.FAMILY.UPDATED, handleDataUpdated)
+})
+
+onUnmounted(() => {
+  eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
+  eventBus.off(EVENTS.FAMILY.UPDATED, handleDataUpdated)
 })
 </script>
 
@@ -94,7 +144,7 @@ watch(() => user.isLoggedIn, () => {
     <!-- 月份选择器 -->
     <wd-sticky :z-index="10">
       <view class="box-border h-50px w-100vw flex items-center justify-center gap-4 bg-[#faf8fc] dark:bg-[var(--wot-dark-background2)]">
-        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="prevMonth">
+        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-800" @click="prevMonth">
           <view class="i-lucide:chevron-left text-gray-600 dark:text-gray-400" />
         </view>
         <wd-picker
@@ -109,8 +159,12 @@ watch(() => user.isLoggedIn, () => {
             <view class="i-lucide:chevron-down h-4 w-4 text-gray-400" />
           </view>
         </wd-picker>
-        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]" @click="nextMonth">
-          <view class="i-lucide:chevron-right text-gray-600 dark:text-gray-400" />
+        <view
+          class="h-8 w-8 flex items-center justify-center rounded-full shadow-sm"
+          :class="isCurrentMonth ? 'bg-gray-100 dark:bg-gray-700 opacity-80' : 'bg-white dark:bg-gray-800'"
+          @click="nextMonth"
+        >
+          <view class="i-lucide:chevron-right" :class="isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'" />
         </view>
       </view>
     </wd-sticky>

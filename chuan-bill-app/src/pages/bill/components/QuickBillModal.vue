@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AddBillDTO, BillVO, UpdateBillDTO } from '@/api/globals'
 import dayjs from 'dayjs'
+import { EVENTS } from '@/constant/events'
+import { eventBus } from '@/utils/eventBus'
 import ManualEdit from './ManualEdit.vue'
 import OcrEdit from './OcrEdit.vue'
 import VoiceEdit from './VoiceEdit.vue'
@@ -116,6 +118,7 @@ function addBillSuccess(billDTO: AddBillDTO) {
   show.value = false
   resetBillForm()
   emit('success', billDTO)
+  eventBus.emit(EVENTS.BILL.UPDATED)
 }
 
 async function updateBill(billDTO: UpdateBillDTO) {
@@ -140,6 +143,7 @@ function updateBillSuccess(billDTO: UpdateBillDTO) {
   show.value = false
   resetBillForm()
   emit('success', billDTO)
+  eventBus.emit(EVENTS.BILL.UPDATED)
 }
 
 function showInfo() {
@@ -164,7 +168,7 @@ watch(() => props.bill, (newVal) => {
 <template>
   <wd-action-sheet
     v-model="show" position="bottom" custom-class="!rounded-3xl !rounded-b-none" title="记一笔"
-    :close-on-click-modal="false" :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
+    :z-index="100" @opened="segmentedRef?.updateActiveStyle(false)"
   >
     <text v-if="source === 'manual'" class="i-icon-park-outline:clear-format absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="resetBillForm" />
     <text v-else-if="isLoggedIn" class="i-lucide:info absolute right-10 top-[var(--wot-action-sheet-close-top,25px)] box-border h-4 h-4 w-4 w-4 text-black/65 dark:text-[#e8e6e3cc]" @click="showInfo" />

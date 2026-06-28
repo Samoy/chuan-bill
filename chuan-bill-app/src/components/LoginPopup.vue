@@ -5,6 +5,7 @@ const router = useRouter()
 
 // ========== 状态管理 ==========
 const userStore = useUserStore()
+const billStore = useBillStore()
 const toast = useGlobalToast()
 const loading = useGlobalLoading()
 
@@ -110,6 +111,8 @@ async function handleLoginSuccess(tokenVO: TokenVO) {
     nickname: tokenVO.nickname || '',
   })
   userStore.onLoginSuccess()
+  // 登录后刷新账单数据（类目、支付方式）
+  await billStore.refreshBillData()
   toast.success('登录成功')
   resetForm()
 }
@@ -322,7 +325,7 @@ export default {
         </wd-tabs>
 
         <!-- 自动注册提示 -->
-        <view class="mt-4 text-center">
+        <view class="mt-4 text-center" :class="activeTab === 0 ? 'visible' : 'invisible'">
           <text class="text-xs text-gray-400">
             未注册手机号验证通过后将自动注册
           </text>

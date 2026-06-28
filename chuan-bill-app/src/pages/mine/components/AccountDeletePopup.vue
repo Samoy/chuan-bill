@@ -106,7 +106,6 @@ onUnload(() => {
     title="注销账号"
     :z-index="999"
     safe-area-inset-bottom
-    :close-on-click-modal="false"
   >
     <view class="p-4">
       <!-- 警告文案 -->
