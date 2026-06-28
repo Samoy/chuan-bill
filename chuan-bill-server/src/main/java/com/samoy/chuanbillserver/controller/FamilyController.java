@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.CreateFamilyDTO;
 import com.samoy.chuanbillserver.dto.HandleJoinApplyDTO;
 import com.samoy.chuanbillserver.dto.JoinFamilyDTO;
@@ -34,6 +35,7 @@ public class FamilyController {
     @Resource
     private IFamilyService familyService;
 
+    @Idempotent
     @PostMapping("/create")
     @Operation(summary = "创建家庭", description = "创建一个新的家庭")
     public Result<FamilyVO> createFamily(@Validated @RequestBody CreateFamilyDTO dto) {
@@ -41,6 +43,7 @@ public class FamilyController {
         return Result.success(familyService.createFamily(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/update")
     @Operation(summary = "更新家庭信息", description = "更新家庭名称、头像、描述等信息")
     public Result<FamilyVO> updateFamily(@Validated @RequestBody UpdateFamilyDTO dto) {
@@ -56,6 +59,7 @@ public class FamilyController {
         return Result.success(familyService.getFamilyDetail(userId, familyId));
     }
 
+    @Idempotent
     @PostMapping("/delete")
     @Operation(summary = "删除家庭", description = "仅户主可删除家庭，删除后所有成员将被移除")
     public Result<Boolean> deleteFamily(
@@ -71,6 +75,7 @@ public class FamilyController {
         return Result.success(familyService.getMyFamilies(userId));
     }
 
+    @Idempotent
     @PostMapping("/join")
     @Operation(summary = "申请加入家庭", description = "通过邀请码申请加入家庭，需要户主审批")
     public Result<FamilyJoinApplyVO> joinFamily(@Validated @RequestBody JoinFamilyDTO dto) {
@@ -78,6 +83,7 @@ public class FamilyController {
         return Result.success(familyService.joinFamily(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/leave")
     @Operation(summary = "退出家庭", description = "退出当前所在的家庭，户主不能退出，需先转让户主身份")
     public Result<Boolean> leaveFamily(
@@ -86,6 +92,7 @@ public class FamilyController {
         return Result.success(familyService.leaveFamily(userId, familyId));
     }
 
+    @Idempotent
     @PostMapping("/remove-member")
     @Operation(summary = "移除家庭成员", description = "仅户主可移除家庭成员")
     public Result<Boolean> removeMember(@Validated @RequestBody RemoveMemberDTO dto) {
@@ -93,6 +100,7 @@ public class FamilyController {
         return Result.success(familyService.removeMember(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/transfer-owner")
     @Operation(summary = "转让户主", description = "将户主身份转让给其他家庭成员")
     public Result<Boolean> transferOwner(@Validated @RequestBody TransferOwnerDTO dto) {
@@ -116,6 +124,7 @@ public class FamilyController {
         return Result.success(familyService.getPendingApplies(userId, familyId));
     }
 
+    @Idempotent
     @PostMapping("/handle-apply")
     @Operation(summary = "处理加入申请", description = "户主同意或拒绝加入申请")
     public Result<Boolean> handleJoinApply(@Validated @RequestBody HandleJoinApplyDTO dto) {
@@ -123,6 +132,7 @@ public class FamilyController {
         return Result.success(familyService.handleJoinApply(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/refresh-invite-code")
     @Operation(summary = "刷新邀请码", description = "重新生成家庭邀请码，仅户主可操作")
     public Result<String> refreshInviteCode(
