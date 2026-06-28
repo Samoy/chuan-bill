@@ -1,5 +1,6 @@
 package com.samoy.chuanbillserver.exception;
 
+import com.samoy.chuanbillserver.result.ResultEnum;
 import lombok.Getter;
 
 @Getter
@@ -9,7 +10,7 @@ public class IdempotentException extends RuntimeException {
 
     public IdempotentException(String message) {
         super(message);
-        this.code = 429;
+        this.code = ResultEnum.REPEAT_SUBMIT.getCode();
     }
 
     public IdempotentException(Integer code, String message) {

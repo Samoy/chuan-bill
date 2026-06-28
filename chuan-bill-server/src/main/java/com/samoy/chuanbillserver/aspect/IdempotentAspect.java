@@ -118,6 +118,6 @@ public class IdempotentAspect {
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }
-        return ip;
+        return ip != null ? ip : "unknown";
     }
 }
