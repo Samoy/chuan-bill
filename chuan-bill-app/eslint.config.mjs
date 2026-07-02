@@ -12,6 +12,8 @@ export default uni(
       'docs/.vitepress/dist',
       'docs/.vitepress/cache',
       '**/*.md',
+      '.agents/**/*',
+      '.claude/**/*',
     ],
   },
 )
