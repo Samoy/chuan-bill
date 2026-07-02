@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.SetBudgetDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IBudgetService;
@@ -28,6 +29,7 @@ public class BudgetController {
         return Result.success(budgetService.getCurrentBudget(userId, month));
     }
 
+    @Idempotent
     @PostMapping("/set")
     @Operation(summary = "设置预算", description = "设置或修改当月预算金额")
     public Result<BudgetVO> setBudget(@Validated @RequestBody SetBudgetDTO dto) {
@@ -35,6 +37,7 @@ public class BudgetController {
         return Result.success(budgetService.setBudget(userId, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/delete")
     @Operation(summary = "删除预算", description = "删除当月预算")
     public Result<Boolean> deleteBudget() {

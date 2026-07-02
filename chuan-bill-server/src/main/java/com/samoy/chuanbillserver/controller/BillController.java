@@ -2,6 +2,7 @@ package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.AddBillDTO;
 import com.samoy.chuanbillserver.dto.AddCategoryDTO;
 import com.samoy.chuanbillserver.dto.AddPaymentMethodDTO;
@@ -60,6 +61,7 @@ public class BillController {
         return Result.success(billService.getBillDetail(userId, id));
     }
 
+    @Idempotent
     @PostMapping("/add")
     @Operation(summary = "添加账单", description = "创建新的账单记录")
     public Result<Boolean> addBill(@Validated @RequestBody AddBillDTO addBillDTO) {
@@ -67,6 +69,7 @@ public class BillController {
         return Result.success(billService.addBill(userId, addBillDTO));
     }
 
+    @Idempotent
     @PostMapping("/batchCreate")
     @Operation(summary = "批量添加账单", description = "批量创建账单记录，用于数据同步")
     public Result<BatchSyncResultVO> batchCreate(@Validated @RequestBody BatchCreateBillDTO dto) {
@@ -74,6 +77,7 @@ public class BillController {
         return Result.success(billService.batchCreate(userId, dto));
     }
 
+    @Idempotent
     @PostMapping("/update")
     @Operation(summary = "更新账单", description = "更新已有账单信息")
     public Result<Boolean> updateBill(@Validated @RequestBody UpdateBillDTO updateBillDTO) {
@@ -81,6 +85,7 @@ public class BillController {
         return Result.success(billService.updateBill(userId, updateBillDTO));
     }
 
+    @Idempotent
     @PostMapping("/delete")
     @Operation(summary = "删除账单", description = "根据 ID 删除账单记录")
     public Result<Boolean> deleteBill(
@@ -98,6 +103,7 @@ public class BillController {
         return Result.success(categoryService.getCategoryList(userId, type));
     }
 
+    @Idempotent
     @PostMapping("/categories")
     @Operation(summary = "新增自定义类目", description = "用户新增自定义类目")
     public Result<CategoryVO> addCategory(@Validated @RequestBody AddCategoryDTO dto) {
@@ -105,6 +111,7 @@ public class BillController {
         return Result.success(categoryService.addCategory(userId, dto));
     }
 
+    @Idempotent
     @PutMapping("/categories/{id}")
     @Operation(summary = "更新自定义类目", description = "用户更新自定义类目名称和图标")
     public Result<CategoryVO> updateCategory(
@@ -114,6 +121,7 @@ public class BillController {
         return Result.success(categoryService.updateCategory(userId, id, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/categories/{id}")
     @Operation(summary = "删除自定义类目", description = "用户删除自定义类目，有关联账单时不可删除")
     public Result<Boolean> deleteCategory(@Parameter(description = "类目 ID", required = true) @PathVariable String id) {
@@ -122,6 +130,7 @@ public class BillController {
         return Result.success(true);
     }
 
+    @Idempotent
     @PutMapping("/categories/sort")
     @Operation(summary = "批量更新类目排序", description = "用户批量更新自定义类目的排序")
     public Result<Boolean> sortCategories(@Validated @RequestBody SortDTO dto) {
@@ -138,6 +147,7 @@ public class BillController {
         return Result.success(result);
     }
 
+    @Idempotent
     @PostMapping("/payment-methods")
     @Operation(summary = "新增自定义支付方式", description = "用户新增自定义支付方式")
     public Result<PaymentMethodVO> addPaymentMethod(@Validated @RequestBody AddPaymentMethodDTO dto) {
@@ -145,6 +155,7 @@ public class BillController {
         return Result.success(paymentMethodService.addPaymentMethod(userId, dto));
     }
 
+    @Idempotent
     @PutMapping("/payment-methods/{id}")
     @Operation(summary = "更新自定义支付方式", description = "用户更新自定义支付方式名称和图标")
     public Result<PaymentMethodVO> updatePaymentMethod(
@@ -154,6 +165,7 @@ public class BillController {
         return Result.success(paymentMethodService.updatePaymentMethod(userId, id, dto));
     }
 
+    @Idempotent
     @DeleteMapping("/payment-methods/{id}")
     @Operation(summary = "删除自定义支付方式", description = "用户删除自定义支付方式，有关联账单时不可删除")
     public Result<Boolean> deletePaymentMethod(
@@ -163,6 +175,7 @@ public class BillController {
         return Result.success(true);
     }
 
+    @Idempotent
     @PutMapping("/payment-methods/sort")
     @Operation(summary = "批量更新支付方式排序", description = "用户批量更新自定义支付方式的排序")
     public Result<Boolean> sortPaymentMethods(@Validated @RequestBody SortDTO dto) {
@@ -179,6 +192,7 @@ public class BillController {
         return Result.success(billService.getMonthlyStats(userId, billMonthlyStatsDTO));
     }
 
+    @Idempotent
     @PostMapping("/export")
     @Operation(summary = "导出账单", description = "根据筛选条件导出账单，支持 Excel 和 PDF 格式")
     public void exportBill(@Validated @RequestBody ExportBillDTO dto, HttpServletResponse response) {

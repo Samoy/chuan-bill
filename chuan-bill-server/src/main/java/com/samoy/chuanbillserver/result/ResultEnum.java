@@ -15,6 +15,7 @@ public enum ResultEnum {
     METHOD_NOT_ALLOWED(405, "请求方法不允许"),
     UNPROCESSABLE_ENTITY(422, "请求参数校验失败"),
     TOO_MANY_REQUESTS(429, "请求过于频繁"),
+    REPEAT_SUBMIT(429, "请勿重复提交"),
 
     // 服务器错误 5xx
     ERROR(500, "服务器内部错误"),

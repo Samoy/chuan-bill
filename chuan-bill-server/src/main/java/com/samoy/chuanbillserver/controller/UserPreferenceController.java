@@ -1,6 +1,7 @@
 package com.samoy.chuanbillserver.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.samoy.chuanbillserver.annotation.Idempotent;
 import com.samoy.chuanbillserver.dto.PreferenceSetDTO;
 import com.samoy.chuanbillserver.result.Result;
 import com.samoy.chuanbillserver.service.IUserPreferenceService;
@@ -40,6 +41,7 @@ public class UserPreferenceController {
         return Result.success(userPreferenceService.getAll(userId));
     }
 
+    @Idempotent
     @PostMapping("/set")
     @Operation(summary = "设置偏好", description = "设置单个偏好值")
     public Result<Boolean> setPreference(@RequestBody @Valid PreferenceSetDTO dto) {
@@ -48,6 +50,7 @@ public class UserPreferenceController {
         return Result.success(true);
     }
 
+    @Idempotent
     @PostMapping("/delete")
     @Operation(summary = "删除偏好", description = "删除单个偏好设置")
     public Result<Boolean> deletePreference(
