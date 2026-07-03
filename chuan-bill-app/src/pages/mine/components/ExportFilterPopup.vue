@@ -123,6 +123,7 @@ async function handleExport() {
     :z-index="999"
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     title="数据导出"
+    lock-scroll
   >
     <view class="max-h-80vh p-4">
       <!-- 时间范围 -->

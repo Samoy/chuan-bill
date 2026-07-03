@@ -218,6 +218,7 @@ async function handleUpdateByCode() {
     title="修改密码"
     :z-index="999"
     safe-area-inset-bottom
+    lock-scroll
   >
     <view class="p-4 pt-0">
       <!-- Tab 切换（有密码时显示） -->

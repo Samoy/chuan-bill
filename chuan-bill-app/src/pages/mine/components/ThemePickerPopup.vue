@@ -25,6 +25,7 @@ function selectTheme(color: typeof themeColorOptions[0]) {
     closable
     :z-index="999"
     safe-area-inset-bottom
+    lock-scroll
     title="主题颜色"
     custom-class="rounded-tl-2xl rounded-tr-2xl"
   >

@@ -96,11 +96,11 @@ export default defineManifestConfig({
         },
       },
       splashscreen: {
-        androidStyle: 'default',
+        androidStyle: 'common',
         android: {
-          xxhdpi: 'unpackage/res/images/splash.png',
-          hdpi: 'unpackage/res/images/splash.png',
-          xhdpi: 'unpackage/res/images/splash.png',
+          xxhdpi: 'unpackage/res/images/splash.9.png',
+          hdpi: 'unpackage/res/images/splash.9.png',
+          xhdpi: 'unpackage/res/images/splash.9.png',
         },
       },
     },

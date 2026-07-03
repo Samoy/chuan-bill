@@ -12,6 +12,7 @@ node_modules
 dist
 *.local
 .vite
+vite.config.ts.timestamp*
 
 # Editor directories and files
 .idea

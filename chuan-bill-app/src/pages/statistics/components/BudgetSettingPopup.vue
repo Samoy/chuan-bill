@@ -86,6 +86,7 @@ function onDelete() {
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     title="设置预算"
+    lock-scroll
   >
     <view class="p-4 pt-0">
       <!-- 金额输入 -->
@@ -96,7 +97,7 @@ function onDelete() {
           </text>
           <wd-input
             v-model="amount"
-            type="number"
+            type="digit"
             placeholder="1000"
             custom-class="flex-1 rounded-xl px-1! py-0.5!"
             custom-input-class="text-[32px]! font-bold! h-10!"

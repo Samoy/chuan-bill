@@ -159,9 +159,14 @@ watch(() => user.isLoggedIn, (newVal) => {
     refresh()
   }
 })
+
+const lockScroll = computed(() => {
+  return user.showLoginPopup || showFilterModal.value || showBillDetailModal.value
+})
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 搜索区域 -->
     <wd-sticky>

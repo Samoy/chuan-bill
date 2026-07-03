@@ -246,9 +246,15 @@ onUnmounted(() => {
   eventBus.off(EVENTS.USER.UPDATED, handleDataUpdated)
   eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
 })
+
+const lockScroll = computed(() => {
+  return user.showLoginPopup || showDarkModePopup.value || showExportPopup.value || showNotificationPopup.value || showThemePopup.value
+    || showThemePopup.value || showSyncPopup.value
+})
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 未登录状态 -->
     <template v-if="!user.isLoggedIn">
@@ -293,10 +299,16 @@ onUnmounted(() => {
       </view>
     </template>
     <!-- 用户信息卡片 -->
-    <view v-if="user.isLoggedIn" class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg">
+    <view
+      v-if="user.isLoggedIn"
+      class="mx-3 rounded-2xl from-primary to-primary/50 bg-gradient-to-br p-5 text-white shadow-lg"
+    >
       <view class="flex items-center gap-4">
         <!-- 头像 -->
-        <wd-img v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden" mode="aspectFill" />
+        <wd-img
+          v-if="user.avatar" :src="user.avatar" custom-class="w-16 h-16 rounded-full! overflow-hidden"
+          mode="aspectFill"
+        />
         <view v-else class="i-lucide:user h-12 w-12" />
         <view class="flex-1">
           <text class="block text-lg font-bold">
@@ -310,7 +322,10 @@ onUnmounted(() => {
     </view>
 
     <!-- 菜单分组列表 -->
-    <view v-for="(group, groupIndex) in menuGroups" :key="groupIndex" class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]">
+    <view
+      v-for="(group, groupIndex) in menuGroups" :key="groupIndex"
+      class="mx-3 rounded-2xl bg-white shadow-sm dark:bg-[var(--wot-dark-background2)]"
+    >
       <template v-if="!group.needLogin || user.isLoggedIn">
         <!-- 分组标题 -->
         <view class="px-4 pb-2 pt-3 text-xs text-gray-400 font-medium">
@@ -318,9 +333,7 @@ onUnmounted(() => {
         </view>
         <!-- 菜单项 -->
         <view
-          v-for="(item, itemIndex) in group.items"
-          v-show="user.isLoggedIn || !item.needLogin"
-          :key="itemIndex"
+          v-for="(item, itemIndex) in group.items" v-show="user.isLoggedIn || !item.needLogin" :key="itemIndex"
           class="flex items-center justify-between px-4 py-3"
           :class="itemIndex < group.items.length - 1 && 'border-b border-gray-100 dark:border-gray-700'"
           @click="item.action"
@@ -337,7 +350,10 @@ onUnmounted(() => {
               {{ item.subtitle.value }}
             </text>
             <!-- 徽章 -->
-            <view v-if="item.badge && item.badge.value > 0" class="h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            <view
+              v-if="item.badge && item.badge.value > 0"
+              class="h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-xs text-white"
+            >
               {{ item.badge.value > 99 ? '99+' : item.badge.value }}
             </view>
             <view class="i-lucide:chevron-right h-4 w-4 text-gray-400" />
@@ -359,10 +375,7 @@ onUnmounted(() => {
     <NotificationSettingsPopup v-if="user.isLoggedIn" v-model="showNotificationPopup" />
     <ExportFilterPopup v-if="user.isLoggedIn" v-model="showExportPopup" />
     <wd-action-sheet
-      v-model="showDarkModePopup"
-      :actions="darkModeActions"
-      :z-index="999"
-      cancel-text="取消"
+      v-model="showDarkModePopup" :actions="darkModeActions" :z-index="999" cancel-text="取消" lock-scroll
       @select="selectDarkMode"
     />
 

@@ -1,5 +1,3 @@
-const toast = useGlobalToast()
-
 export enum WebSocketStatus {
   CONNECTING = 'connecting',
   CONNECTED = 'connected',
@@ -47,9 +45,11 @@ export class AsrClient {
   private maxBufferFrames = 1000 // 30s x ~31fps (frameSize: 1KB, 16kHz, 16bit, mono)
   private isRecordingActive = false
   private lastAsrConfig?: AsrConfig
+  private toast: ReturnType<typeof useGlobalToast>
 
-  constructor(token: string) {
+  constructor(token: string, toast: ReturnType<typeof useGlobalToast>) {
     this.serviceUrl = `${import.meta.env.VITE_WS_BASE_URL}/asr?token=${token}`
+    this.toast = toast
   }
 
   setCallbacks(callbacks: AsrCallbacks) {
@@ -187,7 +187,7 @@ export class AsrClient {
   private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('[ASR] WebSocket重试次数达到上限，放弃重连')
-      toast.show('语音服务连接失败，请稍后再试')
+      this.toast.show('语音服务连接失败，请稍后再试')
       return
     }
     this.reconnectAttempts++
@@ -201,7 +201,7 @@ export class AsrClient {
   startRecognition(config?: AsrConfig) {
     this.lastAsrConfig = config || this.lastAsrConfig
     if (!this.isConnected) {
-      toast.show('语音服务未连接')
+      this.toast.show('语音服务未连接')
       return
     }
     const command = {
@@ -252,11 +252,12 @@ export class AsrClient {
   }
 }
 
-export function createAsr(token: string) {
-  return new AsrClient(token)
+export function createAsr(token: string, toast: ReturnType<typeof useGlobalToast>) {
+  return new AsrClient(token, toast)
 }
 
 export function useAsr() {
+  const toast = useGlobalToast()
   let client: AsrClient | null = null
   let recorderManager: UniApp.RecorderManager | null = null
   let isRecording = false
@@ -267,7 +268,7 @@ export function useAsr() {
     onError?: (error: string) => void
   }) {
     return new Promise<void>((resolve, reject) => {
-      client = createAsr(options.token)
+      client = createAsr(options.token, toast)
       client.setCallbacks({
         onConnected: () => {
           console.log('[ASR] 已连接到服务器')

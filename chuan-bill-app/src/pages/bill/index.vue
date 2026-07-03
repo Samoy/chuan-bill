@@ -46,6 +46,11 @@ const safeAreaBottomHeight = uni.getWindowInfo().safeAreaInsets.bottom
 const billList = ref<BillVO[]>([])
 const page = ref(1)
 const loadingMoreStatus = ref<'loading' | 'finished' | 'error'>()
+const bottomGap = ref(70)
+
+// #ifdef APP-PLUS
+bottomGap.value = 110
+// #endif
 
 // 获取账单列表
 async function getBillList() {
@@ -213,6 +218,10 @@ watch(() => user.isLoggedIn, () => {
   refresh()
 })
 
+const lockScroll = computed(() => {
+  return user.showLoginPopup || showFilterModal.value || showQuickBillModal.value || showBillDetailModal.value
+})
+
 // 监听家庭数据变化事件（家庭账单相关）
 function handleFamilyUpdated() {
   refresh()
@@ -228,6 +237,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 搜索区域 -->
     <wd-sticky>
@@ -276,7 +286,7 @@ onUnmounted(() => {
     <!-- 筛选弹框 -->
     <FilterModal v-model="showFilterModal" @submit="submitFilter" />
     <!-- FAB 按钮 - 仅已登录显示 -->
-    <wd-fab draggable :expandable="false" :gap="{ bottom: 70 + safeAreaBottomHeight, right: 20 }" @click="addBill" />
+    <wd-fab draggable :expandable="false" :gap="{ bottom: bottomGap + safeAreaBottomHeight, right: 20 }" @click="addBill" />
     <!-- 快速记账模态框 -->
     <QuickBillModal
       v-model="showQuickBillModal"

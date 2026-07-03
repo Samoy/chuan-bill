@@ -1,0 +1,118 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+// 签名配置：优先读取 keystore.properties，不存在时回退到环境变量（CI/CD）
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def getProp = { String key ->
+    keystoreProperties.getProperty(key) ?: System.getenv(key) ?: ""
+}
+
+// CI/CD：从环境变量 KEYSTORE_BASE64 解码 jks 文件
+def keyStoreDir = file("${buildDir}/keystore")
+def resolvedStoreFile
+if (keystorePropertiesFile.exists() && keystoreProperties.getProperty("KEYSTORE_FILE")) {
+    // 本地开发：直接使用 properties 中配置的路径
+    resolvedStoreFile = rootProject.file(keystoreProperties.getProperty("KEYSTORE_FILE"))
+} else if (System.getenv("KEYSTORE_BASE64")) {
+    // CI/CD：从 Base64 环境变量解码
+    keyStoreDir.mkdirs()
+    def jksFile = new File(keyStoreDir, "release.jks")
+    jksFile.bytes = System.getenv("KEYSTORE_BASE64").decodeBase64()
+    resolvedStoreFile = jksFile
+} else {
+    // 回退：使用默认路径
+    resolvedStoreFile = rootProject.file("chuanbill.jks")
+}
+
+android {
+    namespace 'com.samoy.chuanbill'
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.samoy.chuanbill"
+        minSdk 24
+        targetSdk 36
+        versionCode 100
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters 'x86', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile resolvedStoreFile
+            storePassword getProp("KEYSTORE_PASSWORD")
+            keyAlias getProp("KEY_ALIAS")
+            keyPassword getProp("KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+
+        debug {
+           signingConfig signingConfigs.release
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    aaptOptions {
+        additionalParameters '--auto-add-overlay'
+        ignoreAssetsPattern "!.svn:!.git:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~"
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
+}
+
+dependencies {
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.appcompat
+    implementation libs.material
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.aar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'androidx.core:core:1.6.0'
+    implementation "androidx.fragment:fragment:1.1.0"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "com.facebook.fresco:fresco:3.4.0"
+    implementation "com.facebook.fresco:middleware:3.4.0"
+    implementation "com.facebook.fresco:animated-gif:3.4.0"
+    implementation "com.facebook.fresco:webpsupport:3.4.0"
+    implementation "com.facebook.fresco:animated-webp:3.4.0"
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'com.alibaba:fastjson:1.2.83'
+    implementation 'androidx.webkit:webkit:1.5.0'
+    implementation "net.lingala.zip4j:zip4j:2.11.5"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.espresso.core
+}

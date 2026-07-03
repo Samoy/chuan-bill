@@ -195,6 +195,7 @@ function handleClose() {
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     :z-index="999"
+    lock-scroll
     @close="handleClose"
   >
     <!-- 编辑/完成图标按钮（关闭按钮左侧） -->
