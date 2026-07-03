@@ -150,6 +150,7 @@ function handleClose() {
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     :z-index="999"
     title="账单同步"
+    lock-scroll
     @update:model-value="handleClose"
   >
     <view class="max-h-[70vh] overflow-y-auto p-4">

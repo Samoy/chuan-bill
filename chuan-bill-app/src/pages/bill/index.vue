@@ -218,6 +218,10 @@ watch(() => user.isLoggedIn, () => {
   refresh()
 })
 
+const lockScroll = computed(() => {
+  return user.showLoginPopup || showFilterModal.value || showQuickBillModal.value || showBillDetailModal.value
+})
+
 // 监听家庭数据变化事件（家庭账单相关）
 function handleFamilyUpdated() {
   refresh()
@@ -233,6 +237,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 搜索区域 -->
     <wd-sticky>

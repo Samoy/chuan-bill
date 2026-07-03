@@ -109,9 +109,14 @@ async function handleJoin() {
     joinLoading.value = false
   }
 }
+
+const lockScroll = computed(() => {
+  return user.showLoginPopup || showJoinPopup.value
+})
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 未登录状态 -->
     <template v-if="!user.isLoggedIn">
@@ -336,7 +341,7 @@ async function handleJoin() {
     </template>
 
     <!-- 加入家庭弹框 -->
-    <wd-popup v-if="user.isLoggedIn" v-model="showJoinPopup" position="bottom" :z-index="100" custom-class="rounded-2xl rounded-b-0 p-6" closable>
+    <wd-popup v-if="user.isLoggedIn" v-model="showJoinPopup" position="bottom" :z-index="100" custom-class="rounded-2xl rounded-b-0 p-6" closable lock-scroll>
       <view class="mb-4">
         <text class="block text-lg font-500">
           加入家庭

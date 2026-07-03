@@ -87,6 +87,7 @@ function onTimeConfirm({ value }: { value: number[] }) {
     safe-area-inset-bottom
     custom-class="rounded-tl-2xl rounded-tr-2xl"
     title="通知设置"
+    lock-scroll
   >
     <view class="p-4">
       <!-- 通知总开关 -->

@@ -137,9 +137,14 @@ onUnmounted(() => {
   eventBus.off(EVENTS.BILL.UPDATED, handleDataUpdated)
   eventBus.off(EVENTS.FAMILY.UPDATED, handleDataUpdated)
 })
+
+const lockScroll = computed(() => {
+  return showMonthPicker.value || showSettingPopup.value
+})
 </script>
 
 <template>
+  <page-meta :page-style="`overflow:${lockScroll ? 'hidden' : 'auto'};`" :enable-pull-down-refresh="!lockScroll" />
   <view class="box-border flex flex-col gap-3 py-3">
     <!-- 月份选择器 -->
     <wd-sticky :z-index="10">

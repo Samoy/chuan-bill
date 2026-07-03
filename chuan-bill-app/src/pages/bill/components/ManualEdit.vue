@@ -39,11 +39,9 @@ const timeTimestamp = ref<number>(Date.now())
 
 // 同步 formData.time 字符串到时间戳
 watch(() => formData.value.time, (newTime) => {
-  if (newTime) {
-    const timestamp = dayjs(newTime).valueOf()
-    if (!Number.isNaN(timestamp)) {
-      timeTimestamp.value = timestamp
-    }
+  const timestamp = dayjs(newTime || Date.now()).valueOf()
+  if (!Number.isNaN(timestamp)) {
+    timeTimestamp.value = timestamp
   }
 }, { immediate: true })
 

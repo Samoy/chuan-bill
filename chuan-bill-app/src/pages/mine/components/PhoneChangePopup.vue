@@ -284,6 +284,7 @@ async function handleUpdateByPassword() {
     :title="mode === 'bind' ? '绑定手机号' : '更换手机号'"
     :z-index="999"
     safe-area-inset-bottom
+    lock-scroll
   >
     <view class="p-4 pt-0">
       <!-- 绑定手机号模式 -->
