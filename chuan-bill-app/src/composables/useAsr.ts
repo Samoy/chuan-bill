@@ -258,15 +258,20 @@ export function createAsr(token: string, toast: ReturnType<typeof useGlobalToast
 
 export function useAsr() {
   const toast = useGlobalToast()
+  const message = useGlobalMessage()
   let client: AsrClient | null = null
   let recorderManager: UniApp.RecorderManager | null = null
   let isRecording = false
 
-  function init(options: {
+  async function init(options: {
     token: string
     onResult?: (result: string, isSentenceEnd: boolean) => void
     onError?: (error: string) => void
   }) {
+    const permission = await checkMicrophonePermission()
+    if (!permission) {
+      throw new Error('麦克风权限被拒绝')
+    }
     return new Promise<void>((resolve, reject) => {
       client = createAsr(options.token, toast)
       client.setCallbacks({
@@ -287,7 +292,7 @@ export function useAsr() {
         },
       })
 
-      // #ifndef H5
+      // #ifdef MP-WEIXIN
       recorderManager = uni.getRecorderManager()
       recorderManager.onStart(() => {
         console.log('[ASR] 录音开始')
@@ -327,32 +332,73 @@ export function useAsr() {
   }
 
   async function checkMicrophonePermission(): Promise<boolean> {
-    // #ifdef H5
-    return true
-    // #endif
-    // #ifndef H5
-    const setting = uni.getAppAuthorizeSetting()
-    const status = setting.microphoneAuthorized
-    if (status === 'authorized') {
-      return true
-    }
-    if (status === 'denied') {
-      toast.show('麦克风权限被拒绝，请在设置中开启')
-      uni.openSetting()
-      return false
-    }
-    // status === 'not determined'
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>((resolve, reject) => {
+      // #ifdef H5
+      return navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((stream) => {
+          stream.getTracks().forEach(track => track.stop())
+          resolve(true)
+        })
+        .catch((error) => {
+          toast.show('麦克风权限获取失败')
+          console.log('[ASR] 获取麦克风权限失败', error)
+          reject(new Error('获取麦克风权限失败'))
+        })
+      // #endif
+      // #ifdef APP-PLUS
+      if (uni.getSystemInfoSync().platform === 'android') {
+        plus.android.requestPermissions(['android.permission.RECORD_AUDIO'], (e) => {
+          if (e.deniedAlways.length > 0) {
+            message.alert({
+              title: '提示',
+              msg: '麦克风权限被永久拒绝，您需要在应用设置中打开该权限',
+            })
+            reject(new Error('Always Denied'))
+          }
+          if (e.deniedPresent.length > 0) {
+            message.confirm({
+              title: '提示',
+              msg: '您需要打开麦克风权限才能进行录音',
+              success: (res) => {
+                if (res.action === 'confirm') {
+                  checkMicrophonePermission()
+                }
+              },
+            })
+            reject(new Error('Present Denied'))
+          }
+          if (e.granted.length > 0) {
+            resolve(true)
+          }
+        }, (e) => {
+          console.error(`Request Permissions error:${JSON.stringify(e)}`)
+        })
+      }
+      // #endif
+      // #ifdef MP-WEIXIN
       uni.authorize({
         scope: 'scope.record',
-        success: () => resolve(true),
-        fail: () => {
-          toast.show('需要麦克风权限才能录音')
-          resolve(false)
+        success: (res) => {
+          console.log('[ASR] 获取权限成功', res)
+          resolve(true)
+        },
+        fail: (error) => {
+          console.log('[ASR] 获取权限失败', error)
+          message.confirm({
+            title: '提示',
+            msg: '需要麦克风权限才能录音，请在设置中打开权限',
+            success: (res) => {
+              if (res.action === 'confirm') {
+                uni.openSetting()
+              }
+            },
+            confirmButtonText: '去设置',
+          })
+          reject(new Error('Permission Denied'))
         },
       })
+      // #endif
     })
-    // #endif
   }
 
   async function startRecording(config?: {
@@ -364,11 +410,7 @@ export function useAsr() {
   }) {
     if (!client) {
       toast.show('语音识别服务未初始化')
-      return
-    }
-    const hasPermission = await checkMicrophonePermission()
-    if (!hasPermission) {
-      return
+      throw new Error('语音识别服务未初始化')
     }
     client.setRecording(true)
     client.startRecognition({
@@ -376,11 +418,11 @@ export function useAsr() {
       languageHints: ['zh'],
       sampleRate: config?.sampleRate || 16000,
     })
-    // #ifndef H5
+    // #ifdef MP-WEIXIN
     if (recorderManager) {
       recorderManager.start({
         duration: config?.duration || 60000,
-        sampleRate: config?.sampleRate || 16000,
+        sampleRate: config?.sampleRate || 44100,
         numberOfChannels: config?.numberOfChannels || 1,
         encodeBitRate: config?.encodeBitRate || 48000,
         format: 'PCM',
@@ -430,7 +472,7 @@ export function useAsr() {
   function stopRecording() {
     isRecording = false
     client?.setRecording(false)
-    // #ifndef H5
+    // #ifdef MP-WEIXIN
     recorderManager?.stop()
     // #endif
 

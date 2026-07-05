@@ -11,11 +11,14 @@
     "compilerVersion": 3,
     "splashscreen": {
       "alwaysShowBeforeRender": true,
-      "waiting": true,
+      "waiting": false,
       "autoclose": true,
       "delay": 0
     },
-    "modules": {},
+    "modules": {
+      "Camera": {},
+      "Record": {}
+    },
     "distribute": {
       "android": {
         "permissions": [

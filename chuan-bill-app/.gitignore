@@ -21,6 +21,7 @@ vite.config.ts.timestamp*
 *.njsproj
 *.sln
 *.sw?
+.hbuilderx
 
 globals.d.d.ts.bak.*
 unpackage/resources

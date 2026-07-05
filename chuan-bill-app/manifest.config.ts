@@ -23,12 +23,15 @@ export default defineManifestConfig({
     compilerVersion: 3,
     splashscreen: {
       alwaysShowBeforeRender: true,
-      waiting: true,
+      waiting: false,
       autoclose: true,
       delay: 0,
     },
     /* 模块配置 */
-    modules: {},
+    modules: {
+      Camera: {},
+      Record: {},
+    },
     /* 应用发布信息 */
     distribute: {
       /* android打包配置 */
