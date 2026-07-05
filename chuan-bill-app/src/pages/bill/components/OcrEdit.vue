@@ -87,10 +87,6 @@ function reset() {
   taskStatus.value = TaskStatus.Init
 }
 
-if (process.env.NODE_ENV === 'development') {
-  actionUrl.value = '/api/file/temp/upload'
-}
-
 // #ifndef H5
 actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}${actionUrl.value}`
 // #endif
