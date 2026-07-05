@@ -63,11 +63,16 @@ async function touchStart(event: UniHelper.TouchEvent) {
   tipText.value = '正在倾听您的声音...'
   await initAsr()
   isRecording.value = true
-  asrClient.startRecording({
-    duration: 60000,
-    sampleRate: 16000,
-    format: 'pcm',
-  })
+  try {
+    asrClient.startRecording({
+      duration: 60000,
+      sampleRate: 16000,
+      format: 'pcm',
+    })
+  }
+  catch {
+    reset()
+  }
 }
 
 function touchMove(event: UniHelper.TouchEvent) {
