@@ -150,10 +150,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}${actionUrl.value}`
         AI识别中，请稍候...
       </text>
       <template v-if="taskStatus === TaskStatus.Failed">
-        <view class="h-8 w-8 flex items-center justify-center rounded-full bg-red-200">
-          <!-- 失败图标 -->
-          <text class="i-carbon:close text-xs text-red-500" />
-        </view>
+        <image class="h-10 w-10" src="@/static/cross.svg" mode="aspectFit" />
         <text class="text-center text-xs text-gray-400">
           识别失败，请重试或者手动输入
         </text>
@@ -167,10 +164,7 @@ actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}${actionUrl.value}`
         </view>
       </template>
       <template v-if="taskResult">
-        <view class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100">
-          <!-- 成功图标 -->
-          <wd-icon name="check-circle" size="20px" color="green" />
-        </view>
+        <image class="h-10 w-10" src="@/static/checkmark.svg" mode="aspectFit" />
         <BillCard :bill="taskResult" custom-class="w-full flex" />
         <view class="box-border w-full flex gap-3">
           <wd-button plain custom-class="flex-1" @click="reset">
