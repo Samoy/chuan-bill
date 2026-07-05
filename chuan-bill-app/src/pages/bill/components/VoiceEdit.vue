@@ -61,14 +61,14 @@ async function touchStart(event: UniHelper.TouchEvent) {
   }
   startY.value = event.touches[0].clientY
   tipText.value = '正在倾听您的声音...'
-  await initAsr()
-  isRecording.value = true
   try {
-    asrClient.startRecording({
+    await initAsr()
+    await asrClient.startRecording({
       duration: 60000,
       sampleRate: 16000,
       format: 'pcm',
     })
+    isRecording.value = true
   }
   catch {
     reset()
@@ -103,6 +103,9 @@ async function touchEnd() {
   if (webSocketError.value) {
     toast.error('语音识别服务连接失败')
     reset()
+    return
+  }
+  if (taskStatus.value === TaskStatus.Idle) {
     return
   }
   tipText.value = '开始识别账单...'

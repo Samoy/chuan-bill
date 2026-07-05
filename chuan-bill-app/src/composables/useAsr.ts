@@ -263,11 +263,15 @@ export function useAsr() {
   let recorderManager: UniApp.RecorderManager | null = null
   let isRecording = false
 
-  function init(options: {
+  async function init(options: {
     token: string
     onResult?: (result: string, isSentenceEnd: boolean) => void
     onError?: (error: string) => void
   }) {
+    const permission = await checkMicrophonePermission()
+    if (!permission) {
+      throw new Error('麦克风权限被拒绝')
+    }
     return new Promise<void>((resolve, reject) => {
       client = createAsr(options.token, toast)
       client.setCallbacks({
@@ -330,7 +334,16 @@ export function useAsr() {
   async function checkMicrophonePermission(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       // #ifdef H5
-      return true
+      return navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((stream) => {
+          stream.getTracks().forEach(track => track.stop())
+          resolve(true)
+        })
+        .catch((error) => {
+          toast.show('麦克风权限获取失败')
+          console.log('[ASR] 获取麦克风权限失败', error)
+          reject(new Error('获取麦克风权限失败'))
+        })
       // #endif
       // #ifdef APP-PLUS
       if (uni.getSystemInfoSync().platform === 'android') {
@@ -365,10 +378,12 @@ export function useAsr() {
       // #ifdef MP-WEIXIN
       uni.authorize({
         scope: 'scope.record',
-        success: () => {
+        success: (res) => {
+          console.log('[ASR] 获取权限成功', res)
           resolve(true)
         },
-        fail: () => {
+        fail: (error) => {
+          console.log('[ASR] 获取权限失败', error)
           message.confirm({
             title: '提示',
             msg: '需要麦克风权限才能录音，请在设置中打开权限',
@@ -396,10 +411,6 @@ export function useAsr() {
     if (!client) {
       toast.show('语音识别服务未初始化')
       throw new Error('语音识别服务未初始化')
-    }
-    const hasPermission = await checkMicrophonePermission()
-    if (!hasPermission) {
-      throw new Error('麦克风权限被拒绝')
     }
     client.setRecording(true)
     client.startRecognition({
