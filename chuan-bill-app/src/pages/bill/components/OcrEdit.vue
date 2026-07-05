@@ -23,7 +23,7 @@ enum TaskStatus {
   Failed = 'failed',
 }
 
-const actionUrl = ref('/file/temp/upload')
+const actionUrl = ref('/api/file/temp/upload')
 
 const fileList = ref<UploadFile[]>([])
 const tempFileInfo = ref<TempFileVO>()
@@ -92,7 +92,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // #ifndef H5
-actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}/file/temp/upload`
+actionUrl.value = `${import.meta.env.VITE_API_BASE_URL}${actionUrl.value}`
 // #endif
 </script>
 
