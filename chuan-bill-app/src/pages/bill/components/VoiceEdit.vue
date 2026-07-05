@@ -21,7 +21,7 @@ enum TaskStatus {
 }
 
 const asrText = ref('')
-const webSocketError = ref(false)
+const asrError = ref(false)
 const isRecording = ref(false)
 const startY = ref<number>()
 const isCanceled = ref(false)
@@ -38,7 +38,7 @@ async function initAsr() {
   await asrClient.init({
     token: user.token,
     onResult: (text: string, isSentenceEnd: boolean) => {
-      webSocketError.value = false
+      asrError.value = false
       asrText.value = asrFullTextList.value.join().concat(text)
       if (isSentenceEnd) {
         asrFullTextList.value.push(text)
@@ -49,7 +49,7 @@ async function initAsr() {
     },
     onError: (error) => {
       console.error('ASR error', error)
-      webSocketError.value = true
+      asrError.value = true
       isRecording.value = false
     },
   })
@@ -71,7 +71,7 @@ async function touchStart(event: UniHelper.TouchEvent) {
     })
   }
   catch {
-    reset()
+    asrError.value = true
   }
 }
 
@@ -100,8 +100,8 @@ async function touchEnd() {
     return
   }
   isRecording.value = false
-  if (webSocketError.value) {
-    toast.error('语音识别服务连接失败')
+  if (asrError.value) {
+    toast.error('识别失败，请重试')
     reset()
     return
   }
@@ -126,7 +126,7 @@ async function touchEnd() {
 function reset() {
   taskStatus.value = TaskStatus.Idle
   asrText.value = ''
-  webSocketError.value = false
+  asrError.value = false
   isRecording.value = false
   isCanceled.value = false
   tipText.value = '按住按钮开始录音'
