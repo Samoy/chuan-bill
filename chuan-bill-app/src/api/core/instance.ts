@@ -132,8 +132,8 @@ export const alovaInstance = createAlova({
   // We'll use the middleware in the hooks
   // middleware is not directly supported in createAlova options
 
-  // Default request timeout (30 seconds)
-  timeout: 1000 * 30,
+  // Default request timeout (120 seconds)
+  timeout: 1000 * 120,
   // 设置为null即可全局关闭全部请求缓存
   cacheFor: null,
 })
