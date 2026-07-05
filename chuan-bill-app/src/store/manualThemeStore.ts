@@ -112,8 +112,8 @@ export const useManualThemeStore = defineStore('manualTheme', {
         // #ifndef MP-WEIXIN
         // 其他平台使用 getSystemInfoSync
         const systemInfo = uni.getSystemInfoSync()
-        if (systemInfo && systemInfo.theme) {
-          return systemInfo.theme as ThemeMode
+        if (systemInfo && systemInfo.osTheme) {
+          return systemInfo.osTheme as ThemeMode
         }
         // #endif
       }

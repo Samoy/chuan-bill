@@ -23,7 +23,7 @@ export default defineManifestConfig({
     compilerVersion: 3,
     splashscreen: {
       alwaysShowBeforeRender: true,
-      waiting: true,
+      waiting: false,
       autoclose: true,
       delay: 0,
     },

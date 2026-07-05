@@ -15,9 +15,6 @@
         <meta-data
             android:name="dcloud_appkey"
             android:value="a39d33c39592d74b7abad20cedbdc3e8" />
-        <meta-data
-            android:name="DCLOUD_DARK_MODE"
-            android:value="auto" />
 
 
         <activity
