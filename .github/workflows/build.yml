@@ -175,4 +175,6 @@ jobs:
           tags: chuan-bill-backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
