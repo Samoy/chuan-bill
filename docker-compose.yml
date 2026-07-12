@@ -3,6 +3,8 @@ services:
     build:
       context: ./chuan-bill-server
       dockerfile: Dockerfile
+      args:
+        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
     container_name: chuan-bill-backend
     restart: unless-stopped
     ports:
