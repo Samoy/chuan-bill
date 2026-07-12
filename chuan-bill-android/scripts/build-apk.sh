@@ -17,6 +17,7 @@ fi
 echo "📦 开始构建 chuan-bill v${VERSION}..."
 
 # 构建 Release APK
+chmod +x gradlew
 ./gradlew assembleRelease --no-daemon
 
 # 重命名 APK
