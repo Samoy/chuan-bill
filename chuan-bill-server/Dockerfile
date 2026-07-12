@@ -2,6 +2,9 @@
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 
+# 从 build args 注入 Sentry auth token
+ARG SENTRY_AUTH_TOKEN
+
 # 复制 pom.xml 并下载依赖
 COPY pom.xml .
 RUN mvn dependency:go-offline -B -Dspotless.check.skip=true
