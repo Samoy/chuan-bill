@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小川记账 - 智能记账，轻松生活</title>
+  <meta name="description" content="小川记账是一款集OCR识别、语音输入、家庭共享和AI智能分析于一体的记账应用。让每一笔记录，都成为生活的轨迹。">
+  <meta name="keywords" content="小川记账,记账,家庭记账,OCR记账,语音记账,AI记账,个人理财">
+  <meta property="og:title" content="小川记账 - 智能记账，轻松生活">
+  <meta property="og:description" content="OCR识别、语音输入、家庭共享、AI智能分析，让记账变得简单高效。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <link rel="icon" href="./assets/logo.ico" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' },
+            accent:  { 50:'#fffbeb',100:'#fef3c7',200:'#fde68a',300:'#fcd34d',400:'#fbbf24',500:'#f59e0b',600:'#d97706' }
+          },
+          keyframes: {
+            'float': { '0%,100%':{ transform:'translateY(0px)' }, '50%':{ transform:'translateY(-10px)' } },
+            'float-delayed': { '0%,100%':{ transform:'translateY(0px)' }, '50%':{ transform:'translateY(-8px)' } },
+            'fade-in-up': { from:{ opacity:'0',transform:'translateY(24px)' }, to:{ opacity:'1',transform:'translateY(0)' } },
+            'slide-in-left': { from:{ opacity:'0',transform:'translateX(-30px)' }, to:{ opacity:'1',transform:'translateX(0)' } },
+            'slide-in-right': { from:{ opacity:'0',transform:'translateX(30px)' }, to:{ opacity:'1',transform:'translateX(0)' } }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delayed': 'float-delayed 7s ease-in-out infinite 2s',
+            'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+            'slide-in-left': 'slide-in-left 0.6s ease-out forwards',
+            'slide-in-right': 'slide-in-right 0.6s ease-out forwards'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    .observe-fade { opacity:0; transform:translateY(24px); transition:all 0.6s ease-out; }
+    .observe-fade.in-view { opacity:1; transform:translateY(0); }
+    .observe-left { opacity:0; transform:translateX(-30px); transition:all 0.6s ease-out; }
+    .observe-left.in-view { opacity:1; transform:translateX(0); }
+    .observe-right { opacity:0; transform:translateX(30px); transition:all 0.6s ease-out; }
+    .observe-right.in-view { opacity:1; transform:translateX(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .observe-fade, .observe-left, .observe-right { opacity:1 !important; transform:none !important; transition:none !important; }
+      .animate-float, .animate-float-delayed { animation:none !important; }
+    }
+  </style>
+</head>
+<body class="bg-[#FAFBFC] text-slate-800 antialiased">
+
+  <!-- ==================== Header ==================== -->
+  <header class="bg-white/80 backdrop-blur-lg border-b border-slate-100 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <img src="./assets/logo.png" alt="小川记账的logo" class="w-8 h-8 rounded-lg">
+        <span class="text-base font-semibold text-slate-800">小川记账</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm text-slate-500 font-semibold hover:text-primary-600 transition-colors">功能介绍</a>
+        <a href="#download" class="text-sm text-slate-500 font-semibold hover:text-primary-600 transition-colors">下载</a>
+      </nav>
+      <a href="#download" class="hidden md:inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors shadow-sm shadow-primary-600/25">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        立即下载
+      </a>
+      <button id="menuBtn" class="md:hidden p-2 -mr-2" aria-label="菜单">
+        <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden border-t border-slate-100 bg-white px-5 py-4 space-y-3">
+      <a href="#features" class="block text-sm text-slate-600 hover:text-primary-600 py-1">功能介绍</a>
+      <a href="#download" class="block text-sm text-slate-600 hover:text-primary-600 py-1">下载</a>
+      <a href="#download" class="block text-center bg-primary-600 text-white text-sm font-medium py-2.5 rounded-full mt-2">立即下载</a>
+    </div>
+  </header>
+
+  <!-- ==================== Hero ==================== -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-[#FAFBFC]">
+    <!-- Decorative blurs -->
+    <div class="absolute top-20 right-[10%] w-72 h-72 bg-primary-200/40 rounded-full blur-3xl animate-float pointer-events-none"></div>
+    <div class="absolute bottom-20 left-[5%] w-56 h-56 bg-accent-200/30 rounded-full blur-3xl animate-float-delayed pointer-events-none"></div>
+    <div class="absolute top-40 left-[20%] w-40 h-40 bg-primary-100/50 rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="relative max-w-6xl mx-auto px-5 pt-16 pb-20 md:pt-24 md:pb-28">
+      <div class="grid md:grid-cols-2 gap-12 md:gap-8 items-center">
+        <!-- Text -->
+        <div class="text-center md:text-left space-y-6">
+          <h1 class="text-4xl md:text-5xl lg:text-[3.4rem] font-extrabold !leading-tight bg-gradient-to-br from-primary-500 to-accent-500 bg-clip-text text-transparent">
+            每一笔记录<br>
+            都是生活的轨迹
+          </h1>
+          <p class="text-base md:text-lg text-slate-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+            拍一拍、说一句，账单自动入账。<br class="hidden sm:block">
+            和家人一起，让每一笔花销都清清楚楚。
+          </p>
+          <div class="flex flex-wrap justify-center md:justify-start gap-3">
+            <span class="inline-flex items-center gap-1.5 bg-primary-50 text-primary-700 text-xs font-medium px-3 py-1.5 rounded-full">
+              <i data-lucide="scan-line" class="w-3.5 h-3.5"></i> OCR识别
+            </span>
+            <span class="inline-flex items-center gap-1.5 bg-accent-50 text-accent-600 text-xs font-medium px-3 py-1.5 rounded-full">
+              <i data-lucide="mic" class="w-3.5 h-3.5"></i> 语音记账
+            </span>
+            <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 text-xs font-medium px-3 py-1.5 rounded-full">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i> 家庭共享
+            </span>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center md:items-start gap-3 pt-2">
+            <a href="#download" class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold px-7 py-3 rounded-full transition-all shadow-lg shadow-accent-500/30 hover:shadow-xl hover:shadow-accent-500/30 hover:-translate-y-0.5">
+              <i data-lucide="download" class="w-5 h-5"></i>
+              免费下载
+            </a>
+            <a href="#features" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-medium px-6 py-3 rounded-full transition-colors border border-slate-200">
+              了解更多
+              <i data-lucide="arrow-down" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+        <!-- Phone mockup -->
+        <div class="flex justify-center md:justify-end">
+          <div class="relative w-[260px] md:w-[280px]">
+            <div class="relative bg-slate-900 rounded-[2.5rem] p-2 shadow-2xl shadow-slate-900/20">
+              <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-slate-900 rounded-b-2xl z-10"></div>
+              <div class="bg-white rounded-[2rem] aspect-[9/19.5] flex flex-col items-center justify-center text-white text-center">
+                <img src="./assets/splash.png" alt="小川记账的截图" class="w-full h-full object-cover rounded-[2rem]">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Features ==================== -->
+  <section id="features" class="py-20 md:py-28 bg-white">
+    <div class="max-w-6xl mx-auto px-5">
+      <!-- Section header -->
+      <div class="text-center max-w-2xl mx-auto mb-16 observe-fade">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">记账，可以很简单</h2>
+        <p class="text-slate-500 leading-relaxed">四大智能功能，让记账不再是一件麻烦事</p>
+      </div>
+      <!-- Feature highlights -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
+        <!-- 1. OCR -->
+        <div class="group bg-gradient-to-br from-primary-50 to-white rounded-2xl border border-primary-100 p-6 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 observe-fade">
+          <div class="w-11 h-11 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-200 transition-colors">
+            <i data-lucide="scan-line" class="w-5.5 h-5.5 text-primary-600"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-2">OCR 智能识别</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">拍一张小票或账单照片，AI自动识别金额、商户和分类，告别手动输入。</p>
+        </div>
+        <!-- 2. Voice -->
+        <div class="group bg-gradient-to-br from-accent-50 to-white rounded-2xl border border-accent-100 p-6 hover:shadow-lg hover:shadow-accent-100/50 transition-all duration-300 observe-fade">
+          <div class="w-11 h-11 bg-accent-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-accent-200 transition-colors">
+            <i data-lucide="mic" class="w-5.5 h-5.5 text-accent-600"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-2">语音快速记账</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">说一句"午饭花了35元"，系统自动解析并记录，做饭、开车时也能轻松记账。</p>
+        </div>
+        <!-- 3. Family -->
+        <div class="group bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-100 p-6 hover:shadow-lg hover:shadow-emerald-100/50 transition-all duration-300 observe-fade">
+          <div class="w-11 h-11 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+            <i data-lucide="users" class="w-5.5 h-5.5 text-emerald-600"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-2">家庭共同记账</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">创建家庭账本，邀请家人一起记录，共同管理家庭财务，每笔开销一目了然。</p>
+        </div>
+        <!-- 4. AI -->
+        <div class="group bg-gradient-to-br from-violet-50 to-white rounded-2xl border border-violet-100 p-6 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300 observe-fade">
+          <div class="w-11 h-11 bg-violet-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-200 transition-colors">
+            <i data-lucide="sparkles" class="w-5.5 h-5.5 text-violet-600"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-2">AI 智能分析</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">基于你的消费数据，AI智能分析消费习惯，提供个性化的理财建议和预算规划。</p>
+        </div>
+      </div>
+      <!-- Feature showcase -->
+      <div class="observe-fade">
+        <img src="./assets/feat.png" alt="小川记账功能展示" class="w-full mx-auto rounded-2xl">
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Download ==================== -->
+  <section id="download" class="py-20 md:py-28 bg-gradient-to-b from-[#FAFBFC] to-primary-50/40">
+    <div class="max-w-6xl mx-auto px-5">
+      <!-- Section header -->
+      <div class="text-center max-w-2xl mx-auto mb-14 observe-fade">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">在你常用的设备上开始记账</h2>
+        <p class="text-slate-500 leading-relaxed">支持 iOS、Android、微信小程序和网页版，随时随地记录生活</p>
+      </div>
+      <!-- Platform cards -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- iOS -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 text-center hover:shadow-lg hover:border-primary-100 hover:-translate-y-1 transition-all duration-300 observe-fade">
+          <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
+           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35c-1.09-.46-2.09-.48-3.24 0c-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8c1.18-.24 2.31-.93 3.57-.84c1.51.12 2.65.72 3.4 1.8c-3.12 1.87-2.38 5.98.48 7.13c-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25c.29 2.58-2.34 4.5-3.74 4.25"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-1">iOS</h3>
+          <p class="text-xs text-slate-400 mb-5">iPhone / iPad</p>
+          <button class="inline-flex cursor-not-allowed items-center gap-2 bg-gray-500 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors w-full justify-center">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            敬请期待
+          </button>
+        </div>
+        <!-- Android -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 text-center hover:shadow-lg hover:border-primary-100 hover:-translate-y-1 transition-all duration-300 observe-fade">
+          <div class="w-14 h-14 bg-[#34a853] rounded-2xl flex items-center justify-center mx-auto mb-4 text-white">
+           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M1 18q.225-2.675 1.638-4.925T6.4 9.5L4.55 6.3q-.15-.225-.075-.475T4.8 5.45q.2-.125.45-.05t.4.3L7.5 8.9Q9.65 8 12 8t4.5.9l1.85-3.2q.15-.225.4-.3t.45.05q.25.125.325.375t-.075.475L17.6 9.5q2.35 1.325 3.762 3.575T23 18zm6-2.75q.525 0 .888-.363T8.25 14t-.363-.888T7 12.75t-.888.363T5.75 14t.363.888t.887.362m10 0q.525 0 .888-.363T18.25 14t-.363-.888T17 12.75t-.888.363t-.362.887t.363.888t.887.362"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-1">Android</h3>
+          <p class="text-xs text-slate-400 mb-5">安卓手机</p>
+          <a href="#" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors w-full justify-center">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            立即下载
+          </a>
+        </div>
+        <!-- WeChat -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 text-center hover:shadow-lg hover:border-primary-100 hover:-translate-y-1 transition-all duration-300 observe-fade">
+          <div class="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <img src="./assets/mp.png" alt="微信小程序码">
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-1">微信小程序</h3>
+          <p class="text-xs text-slate-400 mb-5">无需下载</p>
+          <div class="relative group">
+            <button class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors w-full justify-center">
+              <i data-lucide="qr-code" class="w-4 h-4"></i>
+              微信扫码
+            </button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 w-60 h-60 flex items-center justify-center opacity-0 group-hover:opacity-100 -mb-2 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 scale-95 group-hover:scale-100 z-10">
+              <div class="bg-white rounded-xl shadow-xl shadow-black/15 p-3 border border-slate-100">
+                <img src="./assets/mp.png" alt="微信小程序码" class="w-44 h-44 object-contain rounded-lg">
+              </div>
+              <div class="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-r border-b border-slate-100 rotate-45 -mt-6"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Web -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 text-center hover:shadow-lg hover:border-primary-100 hover:-translate-y-1 transition-all duration-300 observe-fade">
+          <div class="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="globe" class="w-7 h-7 text-white"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-1">网页版</h3>
+          <p class="text-xs text-slate-400 mb-5">浏览器直接访问</p>
+          <a href="https://chuanbill.samoy.site" target="_blank" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors w-full justify-center">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            立即访问
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="bg-slate-900 text-white">
+    <div class="max-w-6xl mx-auto px-5 py-12">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-2.5">
+          <img src="./assets/logo.png" alt="小川记账的logo" class="w-8 h-8 rounded-lg">
+          <span class="text-base font-semibold">小川记账</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm text-slate-400">
+          <a href="./privacy.html" class="hover:text-white transition-colors">隐私政策</a>
+          <a href="./agreement.html" class="hover:text-white transition-colors">用户协议</a>
+          <a href="mailto://feedback.chuanbill@samoy.site" class="hover:text-white transition-colors">联系我们</a>
+        </nav>
+      </div>
+      <div class="border-t border-slate-800 mt-8 pt-6 text-center">
+        <p class="text-xs text-slate-500 space-x-2">
+          <a href="https://beian.miit.gov.cn" target="_blank" class="underline">豫ICP备2024096491号-2</a>
+          <span>&copy; 2026 小川记账 All rights reserved.</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== Scripts ==================== -->
+  <script>
+    // Init Lucide icons
+    lucide.createIcons();
+
+    // Mobile menu toggle
+    document.getElementById('menuBtn').addEventListener('click', function() {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+    // Close mobile menu on link click
+    document.querySelectorAll('#mobileMenu a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        document.getElementById('mobileMenu').classList.add('hidden');
+      });
+    });
+
+    // Scroll reveal (IntersectionObserver)
+    (function() {
+      var els = document.querySelectorAll('.observe-fade, .observe-left, .observe-right');
+      if (!els.length) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(function(el) { el.classList.add('in-view'); });
+        return;
+      }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('in-view');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold:0.15 });
+      els.forEach(function(el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>
